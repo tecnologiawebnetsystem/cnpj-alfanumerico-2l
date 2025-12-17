@@ -1,0 +1,1458 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "CNPJ Alfanumérico API",
+    "description": "API completa para análise e correção de campos CNPJ em repositórios de código e bancos de dados. Sistema multi-perfil com gestão de tarefas, integrações com Azure DevOps/GitHub e chatbot inteligente.",
+    "version": "2.0.0",
+    "contact": {
+      "name": "Suporte CNPJ Alfanumérico",
+      "email": "suporte@cnpj-alfa.com"
+    },
+    "license": {
+      "name": "Proprietário",
+      "url": "https://cnpj-alfa.com/license"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.cnpj-alfa.com",
+      "description": "Servidor de Produção"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Desenvolvimento Local"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Autenticação",
+      "description": "Endpoints de login, logout e gerenciamento de sessão"
+    },
+    {
+      "name": "Super Admin",
+      "description": "Endpoints exclusivos para Super Administradores (gestão global)"
+    },
+    {
+      "name": "Admin Cliente",
+      "description": "Endpoints para Administradores de Cliente (gestão do próprio cliente)"
+    },
+    {
+      "name": "Desenvolvedor",
+      "description": "Endpoints para Desenvolvedores (visualização e execução de tarefas)"
+    },
+    {
+      "name": "Análises",
+      "description": "Criação e gerenciamento de análises de repositórios"
+    },
+    {
+      "name": "Tarefas",
+      "description": "Gestão completa de tarefas de correção CNPJ"
+    },
+    {
+      "name": "Relatórios",
+      "description": "Geração e exportação de relatórios analíticos"
+    },
+    {
+      "name": "Integrações",
+      "description": "Configuração de integrações (GitHub, Azure DevOps, GitLab)"
+    },
+    {
+      "name": "Chatbot",
+      "description": "Chatbot inteligente de assistência"
+    },
+    {
+      "name": "Analytics",
+      "description": "Métricas e estatísticas do sistema"
+    },
+    {
+      "name": "Notificações",
+      "description": "Sistema de notificações em tempo real"
+    },
+    {
+      "name": "Desenvolvedores",
+      "description": "Gestão de desenvolvedores do cliente"
+    }
+  ],
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Autenticação"],
+        "summary": "Autenticar usuário",
+        "description": "Realiza login no sistema com email e senha. Retorna token JWT e informações do usuário.",
+        "operationId": "login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "admin@empresa.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "SenhaSegura123!"
+                  },
+                  "twoFactorCode": {
+                    "type": "string",
+                    "description": "Código 2FA (se habilitado)",
+                    "example": "123456"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login realizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": ["Autenticação"],
+        "summary": "Obter usuário atual",
+        "description": "Retorna informações do usuário autenticado atualmente",
+        "operationId": "getCurrentUser",
+        "security": [{"BearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Dados do usuário",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/admin/clients": {
+      "get": {
+        "tags": ["Super Admin"],
+        "summary": "Listar todos os clientes",
+        "description": "Retorna lista completa de clientes cadastrados (apenas Super Admin)",
+        "operationId": "listClients",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {"type": "integer", "default": 1}
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {"type": "integer", "default": 20}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de clientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "clients": {
+                      "type": "array",
+                      "items": {"$ref": "#/components/schemas/Client"}
+                    },
+                    "total": {"type": "integer"},
+                    "page": {"type": "integer"},
+                    "totalPages": {"type": "integer"}
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Super Admin"],
+        "summary": "Criar novo cliente",
+        "description": "Cria um novo cliente no sistema com licença e configurações",
+        "operationId": "createClient",
+        "security": [{"BearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateClientRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cliente criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Client"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/api/admin/clients/{id}": {
+      "put": {
+        "tags": ["Super Admin"],
+        "summary": "Atualizar cliente",
+        "description": "Atualiza informações de um cliente específico",
+        "operationId": "updateClient",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateClientRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cliente atualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Client"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Super Admin"],
+        "summary": "Excluir cliente",
+        "description": "Remove um cliente e todos os seus dados do sistema",
+        "operationId": "deleteClient",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Cliente excluído com sucesso"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/analyze": {
+      "post": {
+        "tags": ["Análises", "Admin Cliente"],
+        "summary": "Iniciar nova análise",
+        "description": "Inicia análise de repositório para detectar campos CNPJ que precisam de correção",
+        "operationId": "startAnalysis",
+        "security": [{"BearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartAnalysisRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Análise iniciada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Analysis"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/api/analyses/{id}": {
+      "delete": {
+        "tags": ["Análises", "Admin Cliente"],
+        "summary": "Excluir análise",
+        "description": "Remove uma análise e todas as suas tarefas associadas",
+        "operationId": "deleteAnalysis",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Análise excluída com sucesso"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/analyses/{id}/progress": {
+      "get": {
+        "tags": ["Análises"],
+        "summary": "Obter progresso da análise",
+        "description": "Retorna status e progresso em tempo real da análise",
+        "operationId": "getAnalysisProgress",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Progresso da análise",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisProgress"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/tasks": {
+      "get": {
+        "tags": ["Tarefas"],
+        "summary": "Listar tarefas",
+        "description": "Retorna lista de tarefas com filtros e paginação",
+        "operationId": "listTasks",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["pendente", "em_progresso", "concluida", "cancelada"]
+            }
+          },
+          {
+            "name": "priority",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["baixa", "media", "alta", "critica"]
+            }
+          },
+          {
+            "name": "assignee_id",
+            "in": "query",
+            "schema": {"type": "string", "format": "uuid"}
+          },
+          {
+            "name": "repository",
+            "in": "query",
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de tarefas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {"$ref": "#/components/schemas/Task"}
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Tarefas", "Admin Cliente"],
+        "summary": "Criar nova tarefa",
+        "description": "Cria uma tarefa manual de correção CNPJ",
+        "operationId": "createTask",
+        "security": [{"BearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTaskRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tarefa criada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks/{id}": {
+      "put": {
+        "tags": ["Tarefas"],
+        "summary": "Atualizar tarefa",
+        "description": "Atualiza informações de uma tarefa (status, prioridade, assignee)",
+        "operationId": "updateTask",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTaskRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tarefa atualizada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Tarefas", "Admin Cliente"],
+        "summary": "Excluir tarefa",
+        "description": "Remove uma tarefa do sistema",
+        "operationId": "deleteTask",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Tarefa excluída"
+          }
+        }
+      }
+    },
+    "/api/tasks/{id}/apply": {
+      "post": {
+        "tags": ["Tarefas", "Desenvolvedor"],
+        "summary": "Aplicar correção automaticamente",
+        "description": "Aplica a correção CNPJ no repositório (cria branch, commit e PR)",
+        "operationId": "applyTaskFix",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["method"],
+                "properties": {
+                  "method": {
+                    "type": "string",
+                    "enum": ["pr", "commit", "copy"],
+                    "description": "Método de aplicação: PR (recomendado), commit direto ou copiar código"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Correção aplicada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean"},
+                    "pr_url": {"type": "string", "format": "uri"},
+                    "branch_name": {"type": "string"},
+                    "commit_sha": {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks/azure-devops": {
+      "post": {
+        "tags": ["Tarefas", "Integrações"],
+        "summary": "Sincronizar tarefa com Azure DevOps",
+        "description": "Cria Work Item no Azure Boards para uma tarefa",
+        "operationId": "syncTaskToAzure",
+        "security": [{"BearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["task_id", "integration_id"],
+                "properties": {
+                  "task_id": {"type": "string", "format": "uuid"},
+                  "integration_id": {"type": "string", "format": "uuid"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sincronização realizada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "work_item_id": {"type": "integer"},
+                    "work_item_url": {"type": "string", "format": "uri"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/client/developers": {
+      "get": {
+        "tags": ["Desenvolvedores", "Admin Cliente"],
+        "summary": "Listar desenvolvedores",
+        "description": "Retorna lista de desenvolvedores do cliente",
+        "operationId": "listDevelopers",
+        "security": [{"BearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Lista de desenvolvedores",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {"$ref": "#/components/schemas/Developer"}
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Desenvolvedores", "Admin Cliente"],
+        "summary": "Criar desenvolvedor",
+        "description": "Adiciona um novo desenvolvedor ao cliente",
+        "operationId": "createDeveloper",
+        "security": [{"BearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDeveloperRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Desenvolvedor criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Developer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/client/developers/{id}": {
+      "delete": {
+        "tags": ["Desenvolvedores", "Admin Cliente"],
+        "summary": "Excluir desenvolvedor",
+        "description": "Remove um desenvolvedor do cliente",
+        "operationId": "deleteDeveloper",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["user_id"],
+                "properties": {
+                  "user_id": {"type": "string", "format": "uuid"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Desenvolvedor excluído"
+          }
+        }
+      }
+    },
+    "/api/admin/cleanup-developer-tasks": {
+      "post": {
+        "tags": ["Tarefas", "Admin Cliente"],
+        "summary": "Limpar tarefas de desenvolvedor",
+        "description": "Remove todas as tarefas atribuídas a um desenvolvedor específico",
+        "operationId": "cleanupDeveloperTasks",
+        "security": [{"BearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["developer_id"],
+                "properties": {
+                  "developer_id": {"type": "string", "format": "uuid"},
+                  "preview": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Se true, retorna contagem sem excluir"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado da limpeza",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted_tasks": {"type": "integer"},
+                    "deleted_progress": {"type": "integer"},
+                    "deleted_history": {"type": "integer"},
+                    "deleted_comments": {"type": "integer"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/cleanup-client-tasks": {
+      "post": {
+        "tags": ["Tarefas", "Admin Cliente"],
+        "summary": "Limpar TODAS as tarefas do cliente",
+        "description": "Remove todas as tarefas do cliente (independente de desenvolvedor ou repositório)",
+        "operationId": "cleanupClientTasks",
+        "security": [{"BearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["client_id"],
+                "properties": {
+                  "client_id": {"type": "string", "format": "uuid"},
+                  "preview": {
+                    "type": "boolean",
+                    "default": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado da limpeza",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted_tasks": {"type": "integer"},
+                    "deleted_progress": {"type": "integer"},
+                    "deleted_history": {"type": "integer"},
+                    "deleted_comments": {"type": "integer"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reports/generate": {
+      "get": {
+        "tags": ["Relatórios", "Admin Cliente"],
+        "summary": "Gerar relatório de análise",
+        "description": "Gera relatório completo com todas as correções necessárias",
+        "operationId": "generateReport",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "analysis_id",
+            "in": "query",
+            "required": true,
+            "schema": {"type": "string", "format": "uuid"}
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "pdf", "csv"],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Relatório gerado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Report"
+                }
+              },
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatbot": {
+      "post": {
+        "tags": ["Chatbot"],
+        "summary": "Enviar mensagem ao chatbot",
+        "description": "Interage com o chatbot inteligente para consultar tarefas e obter assistência",
+        "operationId": "chatbotMessage",
+        "security": [{"BearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["message", "user_id"],
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Minhas tarefas pendentes"
+                  },
+                  "user_id": {"type": "string", "format": "uuid"},
+                  "session_id": {"type": "string", "format": "uuid"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resposta do chatbot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "reply": {"type": "string"},
+                    "session_id": {"type": "string"},
+                    "intent": {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Chatbot"],
+        "summary": "Obter histórico do chat",
+        "description": "Retorna histórico de conversas do usuário",
+        "operationId": "getChatHistory",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "query",
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Histórico de conversas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "message": {"type": "string"},
+                      "reply": {"type": "string"},
+                      "timestamp": {"type": "string", "format": "date-time"}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/integrations": {
+      "get": {
+        "tags": ["Integrações", "Admin Cliente"],
+        "summary": "Listar integrações",
+        "description": "Retorna todas as integrações configuradas do cliente",
+        "operationId": "listIntegrations",
+        "security": [{"BearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Lista de integrações",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {"$ref": "#/components/schemas/Integration"}
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Integrações", "Admin Cliente"],
+        "summary": "Criar integração",
+        "description": "Configura nova integração (GitHub, Azure DevOps, GitLab)",
+        "operationId": "createIntegration",
+        "security": [{"BearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIntegrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Integração criada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Integration"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/integrations/{id}/test": {
+      "post": {
+        "tags": ["Integrações"],
+        "summary": "Testar integração",
+        "description": "Valida conexão com a integração configurada",
+        "operationId": "testIntegration",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Teste realizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean"},
+                    "message": {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dev/tasks": {
+      "get": {
+        "tags": ["Desenvolvedor", "Tarefas"],
+        "summary": "Tarefas do desenvolvedor",
+        "description": "Retorna tarefas atribuídas ao desenvolvedor autenticado",
+        "operationId": "getMyTasks",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tarefas do desenvolvedor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {"$ref": "#/components/schemas/Task"}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dev/dashboard": {
+      "get": {
+        "tags": ["Desenvolvedor"],
+        "summary": "Dashboard do desenvolvedor",
+        "description": "Métricas e estatísticas do desenvolvedor (tarefas, progresso, conquistas)",
+        "operationId": "getDeveloperDashboard",
+        "security": [{"BearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Dashboard do desenvolvedor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total_tasks": {"type": "integer"},
+                    "completed_tasks": {"type": "integer"},
+                    "in_progress_tasks": {"type": "integer"},
+                    "overdue_tasks": {"type": "integer"},
+                    "completion_rate": {"type": "number"},
+                    "achievements": {"type": "array"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications": {
+      "get": {
+        "tags": ["Notificações"],
+        "summary": "Listar notificações",
+        "description": "Retorna notificações do usuário autenticado",
+        "operationId": "getNotifications",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "read",
+            "in": "query",
+            "schema": {"type": "boolean"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de notificações",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {"$ref": "#/components/schemas/Notification"}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/{id}": {
+      "put": {
+        "tags": ["Notificações"],
+        "summary": "Marcar notificação como lida",
+        "description": "Atualiza status da notificação para lida",
+        "operationId": "markNotificationRead",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notificação atualizada"
+          }
+        }
+      }
+    },
+    "/api/analytics/tasks": {
+      "get": {
+        "tags": ["Analytics", "Admin Cliente"],
+        "summary": "Analytics de tarefas",
+        "description": "Estatísticas avançadas sobre tarefas (distribuição, tendências, performance)",
+        "operationId": "getTaskAnalytics",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "schema": {"type": "string", "format": "date"}
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "schema": {"type": "string", "format": "date"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Analytics de tarefas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskAnalytics"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Token JWT obtido via endpoint /api/auth/login"
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Não autorizado - Token inválido ou ausente",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {"type": "string", "example": "Não autorizado"}
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Acesso negado - Permissão insuficiente",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {"type": "string", "example": "Acesso negado"}
+              }
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Recurso não encontrado",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {"type": "string", "example": "Recurso não encontrado"}
+              }
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "Requisição inválida",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {"type": "string"},
+                "details": {"type": "array", "items": {"type": "string"}}
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string", "format": "uuid"},
+          "email": {"type": "string", "format": "email"},
+          "name": {"type": "string"},
+          "role": {
+            "type": "string",
+            "enum": ["super_admin", "admin", "developer"]
+          },
+          "client_id": {"type": "string", "format": "uuid"},
+          "created_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "user": {"$ref": "#/components/schemas/User"},
+          "token": {"type": "string"},
+          "expires_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "Client": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string", "format": "uuid"},
+          "name": {"type": "string"},
+          "cnpj": {"type": "string"},
+          "license_expires_at": {"type": "string", "format": "date-time"},
+          "is_active": {"type": "boolean"},
+          "created_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "CreateClientRequest": {
+        "type": "object",
+        "required": ["name", "cnpj", "admin_email", "admin_password"],
+        "properties": {
+          "name": {"type": "string", "example": "Empresa XYZ Ltda"},
+          "cnpj": {"type": "string", "example": "12.345.678/0001-90"},
+          "admin_email": {"type": "string", "format": "email"},
+          "admin_password": {"type": "string", "format": "password"},
+          "license_days": {"type": "integer", "default": 365}
+        }
+      },
+      "UpdateClientRequest": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "is_active": {"type": "boolean"}
+        }
+      },
+      "Analysis": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string", "format": "uuid"},
+          "client_id": {"type": "string", "format": "uuid"},
+          "repository": {"type": "string"},
+          "status": {
+            "type": "string",
+            "enum": ["pending", "in_progress", "completed", "failed"]
+          },
+          "findings_count": {"type": "integer"},
+          "created_at": {"type": "string", "format": "date-time"},
+          "completed_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "StartAnalysisRequest": {
+        "type": "object",
+        "required": ["integration_id", "repositories"],
+        "properties": {
+          "integration_id": {"type": "string", "format": "uuid"},
+          "repositories": {
+            "type": "array",
+            "items": {"type": "string"},
+            "example": ["repo-frontend", "repo-backend"]
+          },
+          "include_database": {"type": "boolean", "default": false}
+        }
+      },
+      "AnalysisProgress": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string"},
+          "progress_percentage": {"type": "number", "minimum": 0, "maximum": 100},
+          "current_step": {"type": "string"},
+          "findings_count": {"type": "integer"},
+          "estimated_completion": {"type": "string", "format": "date-time"}
+        }
+      },
+      "Task": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string", "format": "uuid"},
+          "analysis_id": {"type": "string", "format": "uuid"},
+          "client_id": {"type": "string", "format": "uuid"},
+          "repository": {"type": "string"},
+          "file_path": {"type": "string"},
+          "line_number": {"type": "integer"},
+          "current_code": {"type": "string"},
+          "suggested_code": {"type": "string"},
+          "status": {
+            "type": "string",
+            "enum": ["pendente", "em_progresso", "concluida", "cancelada"]
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["baixa", "media", "alta", "critica"]
+          },
+          "assignee_id": {"type": "string", "format": "uuid"},
+          "external_id": {"type": "string", "description": "ID do Work Item no Azure DevOps"},
+          "external_url": {"type": "string", "format": "uri"},
+          "created_at": {"type": "string", "format": "date-time"},
+          "updated_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "CreateTaskRequest": {
+        "type": "object",
+        "required": ["repository", "file_path", "line_number", "current_code", "suggested_code"],
+        "properties": {
+          "repository": {"type": "string"},
+          "file_path": {"type": "string"},
+          "line_number": {"type": "integer"},
+          "current_code": {"type": "string"},
+          "suggested_code": {"type": "string"},
+          "priority": {"type": "string", "default": "media"},
+          "assignee_id": {"type": "string", "format": "uuid"}
+        }
+      },
+      "UpdateTaskRequest": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string"},
+          "priority": {"type": "string"},
+          "assignee_id": {"type": "string", "format": "uuid"}
+        }
+      },
+      "Developer": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string", "format": "uuid"},
+          "name": {"type": "string"},
+          "email": {"type": "string", "format": "email"},
+          "client_id": {"type": "string", "format": "uuid"},
+          "tasks_count": {"type": "integer"},
+          "completed_tasks_count": {"type": "integer"},
+          "is_active": {"type": "boolean"}
+        }
+      },
+      "CreateDeveloperRequest": {
+        "type": "object",
+        "required": ["name", "email", "password"],
+        "properties": {
+          "name": {"type": "string"},
+          "email": {"type": "string", "format": "email"},
+          "password": {"type": "string", "format": "password"}
+        }
+      },
+      "Report": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string", "format": "uuid"},
+          "analysis_id": {"type": "string", "format": "uuid"},
+          "total_findings": {"type": "integer"},
+          "by_repository": {"type": "object"},
+          "by_priority": {"type": "object"},
+          "by_status": {"type": "object"},
+          "generated_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "Integration": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string", "format": "uuid"},
+          "client_id": {"type": "string", "format": "uuid"},
+          "provider": {
+            "type": "string",
+            "enum": ["github", "azure_devops", "gitlab", "bitbucket"]
+          },
+          "name": {"type": "string"},
+          "organization": {"type": "string"},
+          "project": {"type": "string", "description": "Projeto Azure DevOps (opcional)"},
+          "is_active": {"type": "boolean"},
+          "created_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "CreateIntegrationRequest": {
+        "type": "object",
+        "required": ["provider", "name", "token"],
+        "properties": {
+          "provider": {"type": "string"},
+          "name": {"type": "string"},
+          "token": {"type": "string"},
+          "organization": {"type": "string"},
+          "project": {"type": "string", "description": "Projeto Azure DevOps"}
+        }
+      },
+      "Notification": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string", "format": "uuid"},
+          "user_id": {"type": "string", "format": "uuid"},
+          "title": {"type": "string"},
+          "message": {"type": "string"},
+          "type": {
+            "type": "string",
+            "enum": ["info", "success", "warning", "error"]
+          },
+          "read": {"type": "boolean"},
+          "created_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "TaskAnalytics": {
+        "type": "object",
+        "properties": {
+          "total_tasks": {"type": "integer"},
+          "by_status": {
+            "type": "object",
+            "properties": {
+              "pendente": {"type": "integer"},
+              "em_progresso": {"type": "integer"},
+              "concluida": {"type": "integer"},
+              "cancelada": {"type": "integer"}
+            }
+          },
+          "by_priority": {
+            "type": "object",
+            "properties": {
+              "baixa": {"type": "integer"},
+              "media": {"type": "integer"},
+              "alta": {"type": "integer"},
+              "critica": {"type": "integer"}
+            }
+          },
+          "completion_rate": {"type": "number"},
+          "average_completion_time_days": {"type": "number"},
+          "by_developer": {"type": "array"}
+        }
+      }
+    }
+  },
+  "security": [
+    {"BearerAuth": []}
+  ]
+}

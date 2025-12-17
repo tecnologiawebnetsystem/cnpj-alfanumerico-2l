@@ -1,0 +1,302 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "CNPJ Alfanumérico API",
+    "version": "2.0.0",
+    "description": "API REST completa para análise e gestão de CNPJs alfanuméricos em repositórios de código",
+    "contact": {
+      "name": "Suporte Técnico",
+      "email": "suporte@cnpj-alfanumerico.com.br"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://cnpj-alfa-phi.vercel.app/api",
+      "description": "Servidor de Produção"
+    },
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Servidor de Desenvolvimento"
+    }
+  ],
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "email": { "type": "string", "format": "email" },
+          "name": { "type": "string" },
+          "role": { "type": "string", "enum": ["super_admin", "admin", "dev"] },
+          "client_id": { "type": "string", "format": "uuid" }
+        }
+      },
+      "Analysis": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "status": { "type": "string", "enum": ["processing", "completed", "failed"] },
+          "repositories_count": { "type": "integer" },
+          "findings_count": { "type": "integer" },
+          "progress": { "type": "integer", "minimum": 0, "maximum": 100 },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Task": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "status": { "type": "string", "enum": ["pending", "in_progress", "completed"] },
+          "assigned_to": { "type": "string", "format": "uuid" },
+          "file_path": { "type": "string" },
+          "line_number": { "type": "integer" },
+          "code_current": { "type": "string" },
+          "code_suggested": { "type": "string" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": ["Autenticação"],
+        "summary": "Fazer login",
+        "description": "Autenticar usuário e receber token JWT",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "format": "email", "example": "admin@exemplo.com" },
+                  "password": { "type": "string", "example": "senha123" }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login realizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": { "type": "string" },
+                    "user": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciais inválidas"
+          }
+        }
+      }
+    },
+    "/analyze": {
+      "post": {
+        "tags": ["Análises"],
+        "summary": "Iniciar nova análise",
+        "description": "Criar e iniciar análise de repositórios",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "repositories": { "type": "array", "items": { "type": "string" } },
+                  "account": { "type": "string" },
+                  "provider": { "type": "string", "enum": ["azure", "github"] },
+                  "analysis_method": { "type": "string", "enum": ["cloud", "local"], "default": "cloud" }
+                },
+                "required": ["repositories", "account", "provider"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Análise iniciada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Analysis" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analyses/{id}": {
+      "get": {
+        "tags": ["Análises"],
+        "summary": "Obter análise por ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalhes da análise",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Analysis" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks": {
+      "get": {
+        "tags": ["Tarefas"],
+        "summary": "Listar tarefas",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["pending", "in_progress", "completed"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de tarefas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Task" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Tarefas"],
+        "summary": "Criar nova tarefa",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "description": { "type": "string" },
+                  "assigned_to": { "type": "string", "format": "uuid" },
+                  "file_path": { "type": "string" },
+                  "line_number": { "type": "integer" }
+                },
+                "required": ["title", "assigned_to"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tarefa criada",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Task" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/{id}": {
+      "patch": {
+        "tags": ["Tarefas"],
+        "summary": "Atualizar tarefa",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": { "type": "string", "enum": ["pending", "in_progress", "completed"] },
+                  "code_applied": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tarefa atualizada",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Task" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reports/{id}": {
+      "get": {
+        "tags": ["Relatórios"],
+        "summary": "Baixar relatório",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string", "enum": ["pdf", "json", "csv", "zip"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Arquivo de relatório",
+            "content": {
+              "application/pdf": {},
+              "application/json": {},
+              "text/csv": {},
+              "application/zip": {}
+            }
+          }
+        }
+      }
+    }
+  }
+}

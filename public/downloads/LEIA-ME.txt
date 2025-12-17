@@ -1,0 +1,42 @@
+╔════════════════════════════════════════════════════════════╗
+║                                                            ║
+║     WORKER LOCAL - SISTEMA DE ANÁLISE DE REPOSITÓRIOS    ║
+║                                                            ║
+╚════════════════════════════════════════════════════════════╝
+
+📦 INSTALAÇÃO ULTRA SIMPLES:
+
+1. Baixe o arquivo "INSTALAR-WORKER-AUTOMATICO.bat"
+2. Clique com botão direito → "Executar como administrador"
+3. Siga as instruções na tela
+4. Configure suas credenciais quando solicitado
+5. Pronto! O worker estará funcionando
+
+⚙️ O QUE O INSTALADOR FAZ AUTOMATICAMENTE:
+
+✓ Verifica se Node.js está instalado
+✓ Cria pastas em C:\WorkerLocal e C:\Projetos
+✓ Baixa e instala todas as dependências
+✓ Cria atalho na área de trabalho
+✓ Abre arquivo de configuração para você editar
+
+🔧 CONFIGURAÇÃO (Arquivo .env):
+
+Você precisará das seguintes credenciais:
+
+- SUPABASE_URL: URL do seu banco Supabase
+- SUPABASE_SERVICE_ROLE_KEY: Chave de serviço do Supabase
+- AZURE_DEVOPS_PAT: Token de acesso pessoal do Azure DevOps
+
+📞 SUPORTE:
+
+Se tiver problemas, verifique:
+
+1. Node.js instalado (https://nodejs.org/)
+2. Credenciais corretas no arquivo .env
+3. Indicador no sistema mostra "Worker Online" em verde
+
+💡 DICA: Após instalar, use o atalho "Iniciar Worker Local" 
+na área de trabalho para iniciar o worker rapidamente!
+
+════════════════════════════════════════════════════════════

@@ -1,0 +1,369 @@
+{
+  "info": {
+    "name": "CNPJ Alfanumérico API",
+    "_postman_id": "cnpj-alfa-2024",
+    "description": "Collection completa da API REST do CNPJ Detector",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://cnpj-alfa-phi.vercel.app/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Autenticação",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@exemplo.com\",\n  \"password\": \"senha123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.collectionVariables.set('token', jsonData.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Análises",
+      "item": [
+        {
+          "name": "Iniciar Análise",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"repositories\": [\"repo1\", \"repo2\"],\n  \"account\": \"minha-org\",\n  \"provider\": \"azure\",\n  \"analysis_method\": \"cloud\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/analyze",
+              "host": ["{{baseUrl}}"],
+              "path": ["analyze"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Análises",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analyses",
+              "host": ["{{baseUrl}}"],
+              "path": ["analyses"]
+            }
+          }
+        },
+        {
+          "name": "Obter Análise por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analyses/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["analyses", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "uuid-da-analise"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Progresso da Análise",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analyses/:id/progress",
+              "host": ["{{baseUrl}}"],
+              "path": ["analyses", ":id", "progress"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "uuid-da-analise"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tarefas",
+      "item": [
+        {
+          "name": "Listar Tarefas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tasks?status=pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Criar Tarefa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Corrigir CNPJ no arquivo X\",\n  \"description\": \"Substituir CNPJ numérico por formato alfanumérico\",\n  \"assigned_to\": \"uuid-do-dev\",\n  \"file_path\": \"src/config/constants.ts\",\n  \"line_number\": 42\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Tarefa",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "uuid-da-tarefa"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Relatórios",
+      "item": [
+        {
+          "name": "Download PDF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/:id?format=pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", ":id"],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "pdf"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "uuid-da-analise"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Download Excel/CSV",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/:id?format=csv",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", ":id"],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "csv"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "uuid-da-analise"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Download ZIP Completo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/:id?format=zip",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", ":id"],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "zip"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "uuid-da-analise"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Relatório JSON",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/:id?format=json",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", ":id"],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "json"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "uuid-da-analise"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Desenvolvedores",
+      "item": [
+        {
+          "name": "Listar Desenvolvedores",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/client/devs",
+              "host": ["{{baseUrl}}"],
+              "path": ["client", "devs"]
+            }
+          }
+        },
+        {
+          "name": "Criar Desenvolvedor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"João Silva\",\n  \"email\": \"joao.silva@empresa.com\",\n  \"password\": \"senha_segura_123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/client/devs",
+              "host": ["{{baseUrl}}"],
+              "path": ["client", "devs"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
