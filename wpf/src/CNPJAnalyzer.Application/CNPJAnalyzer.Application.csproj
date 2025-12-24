@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CNPJAnalyzer.Domain\CNPJAnalyzer.Domain.csproj" />
+    <!-- Adicionando referência ao Infrastructure para resolver CS0234 e CS0246 -->
+    <ProjectReference Include="..\CNPJAnalyzer.Infrastructure\CNPJAnalyzer.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

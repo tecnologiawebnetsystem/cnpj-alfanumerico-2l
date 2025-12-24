@@ -2,7 +2,7 @@ using CNPJAnalyzer.Domain.Entities;
 using CNPJAnalyzer.Domain.Interfaces;
 using CNPJAnalyzer.Infrastructure.Data;
 using System;
-using SystemTask = System.Threading.Tasks.Task;
+using System.Threading.Tasks;
 
 namespace CNPJAnalyzer.Application.Services
 {
@@ -20,7 +20,7 @@ namespace CNPJAnalyzer.Application.Services
 
         public User? CurrentUser => _currentUser;
 
-        public async SystemTask<(bool Success, string Message, User? User)> LoginAsync(string email, string password)
+        public async Task<(bool Success, string Message, User? User)> LoginAsync(string email, string password)
         {
             try
             {
@@ -45,7 +45,7 @@ namespace CNPJAnalyzer.Application.Services
             }
         }
 
-        public async SystemTask<bool> LogoutAsync()
+        public async Task<bool> LogoutAsync()
         {
             try
             {

@@ -4,7 +4,6 @@ using CNPJAnalyzer.Infrastructure.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SystemTask = System.Threading.Tasks.Task;
 
 namespace CNPJAnalyzer.Infrastructure.Repositories
 {
@@ -17,7 +16,7 @@ namespace CNPJAnalyzer.Infrastructure.Repositories
             _supabase = SupabaseClient.Instance;
         }
 
-        public async SystemTask<WorkTask?> GetByIdAsync(Guid id)
+        public async System.Threading.Tasks.Task<WorkTask?> GetByIdAsync(Guid id)
         {
             var response = await _supabase.Client
                 .From<WorkTask>()
@@ -26,7 +25,7 @@ namespace CNPJAnalyzer.Infrastructure.Repositories
             return response;
         }
 
-        public async SystemTask<IEnumerable<WorkTask>> GetByClientIdAsync(Guid clientId)
+        public async System.Threading.Tasks.Task<IEnumerable<WorkTask>> GetByClientIdAsync(Guid clientId)
         {
             var response = await _supabase.Client
                 .From<WorkTask>()
@@ -35,7 +34,7 @@ namespace CNPJAnalyzer.Infrastructure.Repositories
             return response.Models;
         }
 
-        public async SystemTask<IEnumerable<WorkTask>> GetByDeveloperIdAsync(Guid developerId)
+        public async System.Threading.Tasks.Task<IEnumerable<WorkTask>> GetByDeveloperIdAsync(Guid developerId)
         {
             var response = await _supabase.Client
                 .From<WorkTask>()
@@ -44,7 +43,7 @@ namespace CNPJAnalyzer.Infrastructure.Repositories
             return response.Models;
         }
 
-        public async SystemTask<IEnumerable<WorkTask>> GetAllAsync()
+        public async System.Threading.Tasks.Task<IEnumerable<WorkTask>> GetAllAsync()
         {
             var response = await _supabase.Client
                 .From<WorkTask>()
@@ -52,7 +51,7 @@ namespace CNPJAnalyzer.Infrastructure.Repositories
             return response.Models;
         }
 
-        public async SystemTask<WorkTask> CreateAsync(WorkTask task)
+        public async System.Threading.Tasks.Task<WorkTask> CreateAsync(WorkTask task)
         {
             var response = await _supabase.Client
                 .From<WorkTask>()
@@ -60,7 +59,7 @@ namespace CNPJAnalyzer.Infrastructure.Repositories
             return response.Models.First();
         }
 
-        public async SystemTask<WorkTask> UpdateAsync(WorkTask task)
+        public async System.Threading.Tasks.Task<WorkTask> UpdateAsync(WorkTask task)
         {
             var response = await _supabase.Client
                 .From<WorkTask>()
@@ -68,7 +67,7 @@ namespace CNPJAnalyzer.Infrastructure.Repositories
             return response.Models.First();
         }
 
-        public async SystemTask DeleteAsync(Guid id)
+        public async System.Threading.Tasks.Task DeleteAsync(Guid id)
         {
             await _supabase.Client
                 .From<WorkTask>()
