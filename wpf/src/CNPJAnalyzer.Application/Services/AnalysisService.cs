@@ -2,7 +2,7 @@ using CNPJAnalyzer.Domain.Entities;
 using CNPJAnalyzer.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using SystemTask = System.Threading.Tasks.Task;
 
 namespace CNPJAnalyzer.Application.Services
 {
@@ -15,17 +15,17 @@ namespace CNPJAnalyzer.Application.Services
             _analysisRepository = analysisRepository;
         }
 
-        public async Task<IEnumerable<Analysis>> GetClientAnalysesAsync(Guid clientId)
+        public async SystemTask<IEnumerable<Analysis>> GetClientAnalysesAsync(Guid clientId)
         {
             return await _analysisRepository.GetByClientIdAsync(clientId);
         }
 
-        public async Task<Analysis?> GetAnalysisDetailsAsync(Guid analysisId)
+        public async SystemTask<Analysis?> GetAnalysisDetailsAsync(Guid analysisId)
         {
             return await _analysisRepository.GetByIdAsync(analysisId);
         }
 
-        public async Task<Analysis> CreateAnalysisAsync(Guid clientId, Guid accountId, string repositoryUrl, string analysisType)
+        public async SystemTask<Analysis> CreateAnalysisAsync(Guid clientId, Guid accountId, string repositoryUrl, string analysisType)
         {
             var analysis = new Analysis
             {
@@ -43,7 +43,7 @@ namespace CNPJAnalyzer.Application.Services
             return await _analysisRepository.CreateAsync(analysis);
         }
 
-        public async Task<Analysis> UpdateAnalysisStatusAsync(Guid analysisId, string status)
+        public async SystemTask<Analysis> UpdateAnalysisStatusAsync(Guid analysisId, string status)
         {
             var analysis = await _analysisRepository.GetByIdAsync(analysisId);
             if (analysis == null)

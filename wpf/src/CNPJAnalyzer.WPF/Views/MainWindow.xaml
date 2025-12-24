@@ -32,103 +32,93 @@
                 </Border>
 
                 <!-- Menu Items -->
-                <ListBox Style="{StaticResource MaterialDesignNavigationListBox}"
-                         Margin="0,20,0,0"
-                         Background="Transparent"
-                         Foreground="White">
+                <!-- Removed Command binding from ListBoxItem, using Button instead -->
+                <StackPanel Margin="0,20,0,0">
                     
-                    <ListBoxItem Content="Dashboard" 
-                                 Command="{Binding NavigateToDashboardCommand}">
-                        <ListBoxItem.ContentTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon Kind="ViewDashboard" 
-                                                            Width="24" 
-                                                            Height="24" 
-                                                            Margin="0,0,15,0"/>
-                                    <TextBlock Text="Dashboard" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBoxItem.ContentTemplate>
-                    </ListBoxItem>
+                    <Button Command="{Binding NavigateToDashboardCommand}"
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            Foreground="White"
+                            HorizontalContentAlignment="Left"
+                            Padding="20,15">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ViewDashboard" 
+                                                    Width="24" 
+                                                    Height="24" 
+                                                    Margin="0,0,15,0"/>
+                            <TextBlock Text="Dashboard" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
 
-                    <ListBoxItem Content="Análises" 
-                                 Command="{Binding NavigateToAnalysesCommand}">
-                        <ListBoxItem.ContentTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon Kind="ChartLine" 
-                                                            Width="24" 
-                                                            Height="24" 
-                                                            Margin="0,0,15,0"/>
-                                    <TextBlock Text="Análises" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBoxItem.ContentTemplate>
-                    </ListBoxItem>
+                    <Button Command="{Binding NavigateToAnalysesCommand}"
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            Foreground="White"
+                            HorizontalContentAlignment="Left"
+                            Padding="20,15">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ChartLine" 
+                                                    Width="24" 
+                                                    Height="24" 
+                                                    Margin="0,0,15,0"/>
+                            <TextBlock Text="Análises" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
 
-                    <ListBoxItem Content="Desenvolvedores" 
-                                 Command="{Binding NavigateToDevelopersCommand}"
-                                 Visibility="{Binding CurrentUser.Role, Converter={StaticResource RoleToVisibilityConverter}, ConverterParameter=ADMIN_CLIENT}">
-                        <ListBoxItem.ContentTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon Kind="AccountGroup" 
-                                                            Width="24" 
-                                                            Height="24" 
-                                                            Margin="0,0,15,0"/>
-                                    <TextBlock Text="Desenvolvedores" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBoxItem.ContentTemplate>
-                    </ListBoxItem>
+                    <Button Command="{Binding NavigateToDevelopersCommand}"
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            Foreground="White"
+                            HorizontalContentAlignment="Left"
+                            Padding="20,15">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="AccountGroup" 
+                                                    Width="24" 
+                                                    Height="24" 
+                                                    Margin="0,0,15,0"/>
+                            <TextBlock Text="Desenvolvedores" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
 
-                    <ListBoxItem Content="Tarefas" 
-                                 Command="{Binding NavigateToTasksCommand}">
-                        <ListBoxItem.ContentTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon Kind="CheckboxMarkedCircleOutline" 
-                                                            Width="24" 
-                                                            Height="24" 
-                                                            Margin="0,0,15,0"/>
-                                    <TextBlock Text="Tarefas" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBoxItem.ContentTemplate>
-                    </ListBoxItem>
+                    <Button Command="{Binding NavigateToTasksCommand}"
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            Foreground="White"
+                            HorizontalContentAlignment="Left"
+                            Padding="20,15">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="CheckboxMarkedCircleOutline" 
+                                                    Width="24" 
+                                                    Height="24" 
+                                                    Margin="0,0,15,0"/>
+                            <TextBlock Text="Tarefas" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
 
-                    <ListBoxItem Content="Contas" 
-                                 Command="{Binding NavigateToAccountsCommand}"
-                                 Visibility="{Binding CurrentUser.Role, Converter={StaticResource RoleToVisibilityConverter}, ConverterParameter=ADMIN_CLIENT}">
-                        <ListBoxItem.ContentTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon Kind="Connection" 
-                                                            Width="24" 
-                                                            Height="24" 
-                                                            Margin="0,0,15,0"/>
-                                    <TextBlock Text="Contas Conectadas" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBoxItem.ContentTemplate>
-                    </ListBoxItem>
+                    <Button Command="{Binding NavigateToAccountsCommand}"
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            Foreground="White"
+                            HorizontalContentAlignment="Left"
+                            Padding="20,15">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Connection" 
+                                                    Width="24" 
+                                                    Height="24" 
+                                                    Margin="0,0,15,0"/>
+                            <TextBlock Text="Contas Conectadas" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
 
-                    <ListBoxItem Content="Configurações" 
-                                 Command="{Binding NavigateToSettingsCommand}">
-                        <ListBoxItem.ContentTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon Kind="Settings" 
-                                                            Width="24" 
-                                                            Height="24" 
-                                                            Margin="0,0,15,0"/>
-                                    <TextBlock Text="Configurações" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBoxItem.ContentTemplate>
-                    </ListBoxItem>
-                </ListBox>
+                    <Button Command="{Binding NavigateToSettingsCommand}"
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            Foreground="White"
+                            HorizontalContentAlignment="Left"
+                            Padding="20,15">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Settings" 
+                                                    Width="24" 
+                                                    Height="24" 
+                                                    Margin="0,0,15,0"/>
+                            <TextBlock Text="Configurações" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
 
                 <!-- Logout Button -->
                 <Button Content="Sair" 
