@@ -1,15 +1,14 @@
 using CNPJAnalyzer.Domain.Entities;
-using SystemTask = System.Threading.Tasks.Task;
 
 namespace CNPJAnalyzer.Domain.Interfaces
 {
     public interface IAccountRepository
     {
-        SystemTask<Account?> GetByIdAsync(Guid id);
-        SystemTask<IEnumerable<Account>> GetByClientIdAsync(Guid clientId);
-        SystemTask<IEnumerable<Account>> GetAllAsync();
-        SystemTask<Account> CreateAsync(Account account);
-        SystemTask<Account> UpdateAsync(Account account);
-        SystemTask DeleteAsync(Guid id);
+        System.Threading.Tasks.Task<Account?> GetByIdAsync(Guid id);
+        System.Threading.Tasks.Task<IEnumerable<Account>> GetByClientIdAsync(Guid clientId);
+        System.Threading.Tasks.Task<IEnumerable<Account>> GetAllAsync();
+        System.Threading.Tasks.Task<Account> CreateAsync(Account account);
+        System.Threading.Tasks.Task<Account> UpdateAsync(Account account);
+        System.Threading.Tasks.Task DeleteAsync(Guid id);
     }
 }
