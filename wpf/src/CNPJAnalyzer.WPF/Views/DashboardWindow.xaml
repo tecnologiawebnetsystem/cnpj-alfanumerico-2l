@@ -1,0 +1,265 @@
+<Window x:Class="CNPJAnalyzer.WPF.Views.DashboardWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Dashboard - Cliente" Height="800" Width="1400"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{materialDesign:MaterialDesignFont}">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <materialDesign:ColorZone Grid.Row="0" Mode="PrimaryMid" Padding="16" materialDesign:ElevationAssist.Elevation="Dp4">
+            <DockPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <Image Source="/images/act-logo-square.jfif" Width="48" Height="48" Margin="0,0,16,0" 
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Dashboard do Cliente" FontSize="20" FontWeight="Bold"/>
+                        <TextBlock Text="Visão completa do sistema" FontSize="12" Opacity="0.8"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right">
+                    <TextBlock Text="{Binding UserName}" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                    <Button Content="Sair" Command="{Binding LogoutCommand}" 
+                            Style="{StaticResource MaterialDesignOutlinedButton}"/>
+                </StackPanel>
+            </DockPanel>
+        </materialDesign:ColorZone>
+
+        <!-- Main Content with Tabs -->
+        <TabControl Grid.Row="1" Style="{StaticResource MaterialDesignFilledTabControl}" Margin="16">
+            
+            <!-- Overview Tab -->
+            <TabItem Header="Visão Geral">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="16">
+                        <!-- Statistics Cards -->
+                        <UniformGrid Columns="4" Rows="1" Margin="0,0,0,24">
+                            <materialDesign:Card Margin="8" Padding="16">
+                                <StackPanel>
+                                    <materialDesign:PackIcon Kind="ChartBar" Width="32" Height="32" 
+                                                           Foreground="{StaticResource PrimaryHueMidBrush}"/>
+                                    <TextBlock Text="{Binding TotalAnalyses}" FontSize="32" FontWeight="Bold" Margin="0,8,0,0"/>
+                                    <TextBlock Text="Total de Análises" Opacity="0.7"/>
+                                </StackPanel>
+                            </materialDesign:Card>
+
+                            <materialDesign:Card Margin="8" Padding="16">
+                                <StackPanel>
+                                    <materialDesign:PackIcon Kind="AlertCircle" Width="32" Height="32" 
+                                                           Foreground="Orange"/>
+                                    <TextBlock Text="{Binding TotalFindings}" FontSize="32" FontWeight="Bold" Margin="0,8,0,0"/>
+                                    <TextBlock Text="Total de Achados" Opacity="0.7"/>
+                                </StackPanel>
+                            </materialDesign:Card>
+
+                            <materialDesign:Card Margin="8" Padding="16">
+                                <StackPanel>
+                                    <materialDesign:PackIcon Kind="AccountGroup" Width="32" Height="32" 
+                                                           Foreground="Green"/>
+                                    <TextBlock Text="{Binding TotalDevelopers}" FontSize="32" FontWeight="Bold" Margin="0,8,0,0"/>
+                                    <TextBlock Text="Desenvolvedores" Opacity="0.7"/>
+                                </StackPanel>
+                            </materialDesign:Card>
+
+                            <materialDesign:Card Margin="8" Padding="16">
+                                <StackPanel>
+                                    <materialDesign:PackIcon Kind="CheckCircle" Width="32" Height="32" 
+                                                           Foreground="Blue"/>
+                                    <TextBlock Text="{Binding CompletedTasks}" FontSize="32" FontWeight="Bold" Margin="0,8,0,0"/>
+                                    <TextBlock Text="Tarefas Concluídas" Opacity="0.7"/>
+                                </StackPanel>
+                            </materialDesign:Card>
+                        </UniformGrid>
+
+                        <!-- Recent Analyses -->
+                        <materialDesign:Card Padding="16" Margin="0,0,0,16">
+                            <StackPanel>
+                                <TextBlock Text="Análises Recentes" FontSize="18" FontWeight="Bold" Margin="0,0,0,16"/>
+                                <DataGrid ItemsSource="{Binding RecentAnalyses}" AutoGenerateColumns="False"
+                                        IsReadOnly="True" CanUserAddRows="False" CanUserDeleteRows="False">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="200"/>
+                                        <DataGridTextColumn Header="Repositório" Binding="{Binding RepositoryName}" Width="*"/>
+                                        <DataGridTextColumn Header="Achados" Binding="{Binding FindingsCount}" Width="100"/>
+                                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="150"/>
+                                        <DataGridTextColumn Header="Data" Binding="{Binding CreatedAt, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Width="180"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </StackPanel>
+                        </materialDesign:Card>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Analyses Tab -->
+            <TabItem Header="Análises">
+                <Grid Margin="16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Button Grid.Row="0" Content="Nova Análise" Command="{Binding NewAnalysisCommand}"
+                            Style="{StaticResource MaterialDesignRaisedButton}" HorizontalAlignment="Right" Margin="0,0,0,16"/>
+
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Analyses}" AutoGenerateColumns="False"
+                            IsReadOnly="True" CanUserAddRows="False" CanUserDeleteRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="250"/>
+                            <DataGridTextColumn Header="Conta" Binding="{Binding AccountName}" Width="200"/>
+                            <DataGridTextColumn Header="Repositório" Binding="{Binding RepositoryName}" Width="*"/>
+                            <DataGridTextColumn Header="Achados" Binding="{Binding FindingsCount}" Width="100"/>
+                            <DataGridTextColumn Header="Arquivos" Binding="{Binding TotalFiles}" Width="100"/>
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="150"/>
+                            <DataGridTextColumn Header="Data" Binding="{Binding CreatedAt, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Width="180"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- Developers Tab -->
+            <TabItem Header="Desenvolvedores">
+                <Grid Margin="16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Button Grid.Row="0" Content="Adicionar Desenvolvedor" Command="{Binding AddDeveloperCommand}"
+                            Style="{StaticResource MaterialDesignRaisedButton}" HorizontalAlignment="Right" Margin="0,0,0,16"/>
+
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Developers}" AutoGenerateColumns="False"
+                            IsReadOnly="True" CanUserAddRows="False" CanUserDeleteRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Nome" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="250"/>
+                            <DataGridTextColumn Header="Tarefas Ativas" Binding="{Binding ActiveTasksCount}" Width="150"/>
+                            <DataGridTextColumn Header="Tarefas Concluídas" Binding="{Binding CompletedTasksCount}" Width="180"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- Tasks Tab -->
+            <TabItem Header="Tarefas">
+                <Grid Margin="16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Button Grid.Row="0" Content="Nova Tarefa" Command="{Binding AddTaskCommand}"
+                            Style="{StaticResource MaterialDesignRaisedButton}" HorizontalAlignment="Right" Margin="0,0,0,16"/>
+
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Tasks}" AutoGenerateColumns="False"
+                            IsReadOnly="True" CanUserAddRows="False" CanUserDeleteRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Título" Binding="{Binding Title}" Width="*"/>
+                            <DataGridTextColumn Header="Desenvolvedor" Binding="{Binding DeveloperName}" Width="200"/>
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="150"/>
+                            <DataGridTextColumn Header="Prioridade" Binding="{Binding Priority}" Width="120"/>
+                            <DataGridTextColumn Header="Prazo" Binding="{Binding DueDate, StringFormat={}{0:dd/MM/yyyy}}" Width="120"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- Reports Tab -->
+            <TabItem Header="Relatórios">
+                <StackPanel Margin="16">
+                    <materialDesign:Card Padding="16" Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="Gerar Relatórios" FontSize="18" FontWeight="Bold" Margin="0,0,0,16"/>
+                            <UniformGrid Columns="2" Rows="2">
+                                <Button Content="Relatório de Análises" Command="{Binding GenerateAnalysisReportCommand}"
+                                       Style="{StaticResource MaterialDesignRaisedButton}" Margin="8"/>
+                                <Button Content="Relatório de Desenvolvedores" Command="{Binding GenerateDeveloperReportCommand}"
+                                       Style="{StaticResource MaterialDesignRaisedButton}" Margin="8"/>
+                                <Button Content="Relatório de Tarefas" Command="{Binding GenerateTaskReportCommand}"
+                                       Style="{StaticResource MaterialDesignRaisedButton}" Margin="8"/>
+                                <Button Content="Relatório Completo PDF" Command="{Binding GenerateFullPDFReportCommand}"
+                                       Style="{StaticResource MaterialDesignRaisedButton}" Margin="8"/>
+                            </UniformGrid>
+                        </StackPanel>
+                    </materialDesign:Card>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Settings Tab -->
+            <TabItem Header="Configurações">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="16">
+                        <!-- GitHub Connection -->
+                        <materialDesign:Card Padding="16" Margin="0,0,0,16">
+                            <StackPanel>
+                                <TextBlock Text="Conexões GitHub" FontSize="18" FontWeight="Bold" Margin="0,0,0,16"/>
+                                <Button Content="Adicionar Conta GitHub" Command="{Binding AddGitHubAccountCommand}"
+                                       Style="{StaticResource MaterialDesignRaisedButton}"/>
+                                <ListBox ItemsSource="{Binding GitHubAccounts}" Margin="0,16,0,0">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding AccountName}" VerticalAlignment="Center"/>
+                                                <Button Content="Remover" Command="{Binding DataContext.RemoveGitHubAccountCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                       CommandParameter="{Binding}" Style="{StaticResource MaterialDesignFlatButton}" Margin="16,0,0,0"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </StackPanel>
+                        </materialDesign:Card>
+
+                        <!-- GitLab Connection -->
+                        <materialDesign:Card Padding="16" Margin="0,0,0,16">
+                            <StackPanel>
+                                <TextBlock Text="Conexões GitLab" FontSize="18" FontWeight="Bold" Margin="0,0,0,16"/>
+                                <Button Content="Adicionar Conta GitLab" Command="{Binding AddGitLabAccountCommand}"
+                                       Style="{StaticResource MaterialDesignRaisedButton}"/>
+                                <ListBox ItemsSource="{Binding GitLabAccounts}" Margin="0,16,0,0">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding AccountName}" VerticalAlignment="Center"/>
+                                                <Button Content="Remover" Command="{Binding DataContext.RemoveGitLabAccountCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                       CommandParameter="{Binding}" Style="{StaticResource MaterialDesignFlatButton}" Margin="16,0,0,0"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </StackPanel>
+                        </materialDesign:Card>
+
+                        <!-- Azure DevOps Connection -->
+                        <materialDesign:Card Padding="16">
+                            <StackPanel>
+                                <TextBlock Text="Conexões Azure DevOps" FontSize="18" FontWeight="Bold" Margin="0,0,0,16"/>
+                                <Button Content="Adicionar Conta Azure" Command="{Binding AddAzureAccountCommand}"
+                                       Style="{StaticResource MaterialDesignRaisedButton}"/>
+                                <ListBox ItemsSource="{Binding AzureAccounts}" Margin="0,16,0,0">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Organization}" VerticalAlignment="Center"/>
+                                                <Button Content="Remover" Command="{Binding DataContext.RemoveAzureAccountCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                       CommandParameter="{Binding}" Style="{StaticResource MaterialDesignFlatButton}" Margin="16,0,0,0"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </StackPanel>
+                        </materialDesign:Card>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</Window>

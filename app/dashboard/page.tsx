@@ -54,35 +54,35 @@ export default function DashboardPage() {
   const isAdmin = userRole === "admin"
 
   return (
-    <div className="min-h-screen bg-background pb-20 md:pb-8">
+    <div className="min-h-screen bg-background pb-20 md:pb-6 lg:pb-8">
       <DashboardHeader user={user} />
 
-      <main className="container mx-auto px-4 py-6 md:py-8">
+      <main className="container mx-auto px-4 py-4 md:py-6 lg:py-8 max-w-[1400px]">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="hidden md:inline-flex w-auto mx-auto mb-8">
-            <TabsTrigger value="overview">
+          <TabsList className="hidden md:inline-flex md:flex-wrap md:h-auto lg:h-10 w-full md:w-auto md:max-w-full lg:max-w-none mx-auto mb-6 md:mb-6 lg:mb-8 md:gap-2 lg:gap-0 md:p-2 lg:p-1">
+            <TabsTrigger value="overview" className="md:flex-1 lg:flex-initial md:min-w-[140px] lg:min-w-0">
               <BarChart3 className="h-4 w-4 mr-2" />
-              Visão Geral
+              <span className="hidden md:inline">Visão Geral</span>
             </TabsTrigger>
-            <TabsTrigger value="analises">
+            <TabsTrigger value="analises" className="md:flex-1 lg:flex-initial md:min-w-[140px] lg:min-w-0">
               <Search className="h-4 w-4 mr-2" />
-              Análises
+              <span className="hidden md:inline">Análises</span>
             </TabsTrigger>
-            <TabsTrigger value="configuracoes">
+            <TabsTrigger value="configuracoes" className="md:flex-1 lg:flex-initial md:min-w-[140px] lg:min-w-0">
               <Settings className="h-4 w-4 mr-2" />
-              Configurações
+              <span className="hidden md:inline">Configurações</span>
             </TabsTrigger>
-            <TabsTrigger value="devs">
+            <TabsTrigger value="devs" className="md:flex-1 lg:flex-initial md:min-w-[140px] lg:min-w-0">
               <Users className="h-4 w-4 mr-2" />
-              Desenvolvedores
+              <span className="hidden md:inline">Desenvolvedores</span>
             </TabsTrigger>
-            <TabsTrigger value="tarefas">
+            <TabsTrigger value="tarefas" className="md:flex-1 lg:flex-initial md:min-w-[140px] lg:min-w-0">
               <ListTodo className="h-4 w-4 mr-2" />
-              Tarefas
+              <span className="hidden md:inline">Tarefas</span>
             </TabsTrigger>
-            <TabsTrigger value="relatorios">
+            <TabsTrigger value="relatorios" className="md:flex-1 lg:flex-initial md:min-w-[140px] lg:min-w-0">
               <FileText className="h-4 w-4 mr-2" />
-              Relatórios
+              <span className="hidden md:inline">Relatórios</span>
             </TabsTrigger>
           </TabsList>
 

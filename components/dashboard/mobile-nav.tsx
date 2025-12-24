@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, CheckSquare, FileText, FileBarChart, Users, Settings, Search } from 'lucide-react'
+import { Home, CheckSquare, FileText, Users, Settings, Search } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface MobileNavProps {

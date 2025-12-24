@@ -138,14 +138,14 @@ export function ClientOverview({ onChangeTab, userRole }: ClientOverviewTabProps
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-3 mb-8">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-6 md:mb-8">
         <Card className="cursor-pointer hover:shadow-lg transition-all border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <div className="p-3 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600">
+          <CardHeader className="pb-2 md:pb-3">
+            <CardTitle className="text-sm md:text-base font-medium text-gray-700 flex items-center gap-2">
+              <div className="p-2 md:p-3 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-white"
+                  className="h-5 w-5 md:h-6 md:w-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -158,14 +158,16 @@ export function ClientOverview({ onChangeTab, userRole }: ClientOverviewTabProps
                   />
                 </svg>
               </div>
-              <span className="text-base font-semibold">Gerenciar Contas</span>
+              <span className="text-sm md:text-base font-semibold">Gerenciar Contas</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-gray-600 mb-4">Cadastre contas do GitHub, GitLab, Bitbucket ou Azure DevOps</p>
+            <p className="text-xs md:text-sm text-gray-600 mb-3 md:mb-4">
+              Cadastre contas do GitHub, GitLab, Bitbucket ou Azure DevOps
+            </p>
             <Button
               variant="ghost"
-              className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 p-0 h-auto"
+              className="inline-flex items-center text-xs md:text-sm font-medium text-blue-600 hover:text-blue-700 p-0 h-auto"
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
@@ -173,7 +175,7 @@ export function ClientOverview({ onChangeTab, userRole }: ClientOverviewTabProps
               }}
             >
               Acessar
-              <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="ml-1 h-3 w-3 md:h-4 md:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Button>
@@ -181,12 +183,12 @@ export function ClientOverview({ onChangeTab, userRole }: ClientOverviewTabProps
         </Card>
 
         <Card className="cursor-pointer hover:shadow-lg transition-all border-0 bg-gradient-to-br from-purple-50 to-pink-50">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <div className="p-3 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600">
+          <CardHeader className="pb-2 md:pb-3">
+            <CardTitle className="text-sm md:text-base font-medium text-gray-700 flex items-center gap-2">
+              <div className="p-2 md:p-3 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-white"
+                  className="h-5 w-5 md:h-6 md:w-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -199,14 +201,16 @@ export function ClientOverview({ onChangeTab, userRole }: ClientOverviewTabProps
                   />
                 </svg>
               </div>
-              <span className="text-base font-semibold">Analisar Repositório</span>
+              <span className="text-sm md:text-base font-semibold">Analisar Repositório</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-gray-600 mb-4">Envie um repositório para identificar campos CNPJ</p>
+            <p className="text-xs md:text-sm text-gray-600 mb-3 md:mb-4">
+              Envie um repositório para identificar campos CNPJ
+            </p>
             <Button
               variant="ghost"
-              className="inline-flex items-center text-sm font-medium text-purple-600 hover:text-purple-700 p-0 h-auto"
+              className="inline-flex items-center text-xs md:text-sm font-medium text-purple-600 hover:text-purple-700 p-0 h-auto"
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
@@ -214,20 +218,20 @@ export function ClientOverview({ onChangeTab, userRole }: ClientOverviewTabProps
               }}
             >
               Iniciar
-              <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="ml-1 h-3 w-3 md:h-4 md:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:shadow-lg transition-all border-0 bg-gradient-to-br from-teal-50 to-green-50">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <div className="p-3 rounded-lg bg-gradient-to-br from-teal-500 to-green-600">
+        <Card className="cursor-pointer hover:shadow-lg transition-all border-0 bg-gradient-to-br from-teal-50 to-green-50 md:col-span-2 lg:col-span-1">
+          <CardHeader className="pb-2 md:pb-3">
+            <CardTitle className="text-sm md:text-base font-medium text-gray-700 flex items-center gap-2">
+              <div className="p-2 md:p-3 rounded-lg bg-gradient-to-br from-teal-500 to-green-600">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-white"
+                  className="h-5 w-5 md:h-6 md:w-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -240,14 +244,14 @@ export function ClientOverview({ onChangeTab, userRole }: ClientOverviewTabProps
                   />
                 </svg>
               </div>
-              <span className="text-base font-semibold">Banco de Dados</span>
+              <span className="text-sm md:text-base font-semibold">Banco de Dados</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-gray-600 mb-4">Analisar tabelas e campos do banco de dados</p>
+            <p className="text-xs md:text-sm text-gray-600 mb-3 md:mb-4">Analisar tabelas e campos do banco de dados</p>
             <Button
               variant="ghost"
-              className="inline-flex items-center text-sm font-medium text-teal-600 hover:text-teal-700 p-0 h-auto"
+              className="inline-flex items-center text-xs md:text-sm font-medium text-teal-600 hover:text-teal-700 p-0 h-auto"
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
@@ -255,7 +259,7 @@ export function ClientOverview({ onChangeTab, userRole }: ClientOverviewTabProps
               }}
             >
               Acessar
-              <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="ml-1 h-3 w-3 md:h-4 md:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Button>
@@ -272,19 +276,21 @@ export function ClientOverview({ onChangeTab, userRole }: ClientOverviewTabProps
               className={`cursor-pointer hover:shadow-lg transition-all border-0 bg-gradient-to-br ${stat.bgGradient}`}
               onClick={stat.onClick}
             >
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                  <div className={`p-2 rounded-lg bg-gradient-to-br ${stat.gradient}`}>
-                    <Icon className="h-4 w-4 text-white" />
+              <CardHeader className="pb-2 md:pb-3">
+                <CardTitle className="text-sm md:text-base font-medium text-gray-700 flex items-center gap-2">
+                  <div className={`p-2 md:p-2.5 rounded-lg bg-gradient-to-br ${stat.gradient}`}>
+                    <Icon className="h-4 w-4 md:h-5 md:w-5 text-white" />
                   </div>
-                  {stat.title}
+                  <span className="text-sm md:text-base">{stat.title}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className={`text-3xl font-bold bg-gradient-to-br ${stat.gradient} bg-clip-text text-transparent`}>
+                <div
+                  className={`text-2xl md:text-3xl font-bold bg-gradient-to-br ${stat.gradient} bg-clip-text text-transparent`}
+                >
                   {stat.value}
                 </div>
-                <p className="text-xs text-gray-600 mt-1">{stat.subtitle}</p>
+                <p className="text-xs md:text-sm text-gray-600 mt-1">{stat.subtitle}</p>
               </CardContent>
             </Card>
           )

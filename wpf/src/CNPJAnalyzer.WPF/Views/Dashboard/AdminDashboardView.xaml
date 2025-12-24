@@ -1,0 +1,120 @@
+<UserControl x:Class="CNPJAnalyzer.WPF.Views.Dashboard.AdminDashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="30">
+            <!-- Header -->
+            <TextBlock Text="Dashboard Admin" 
+                       FontSize="32" 
+                       FontWeight="Bold" 
+                       Margin="0,0,0,30"/>
+
+            <!-- Statistics Cards -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Total Clients Card -->
+                <materialDesign:Card Grid.Column="0" Margin="0,0,15,0" Padding="20">
+                    <StackPanel>
+                        <materialDesign:PackIcon Kind="AccountGroup" 
+                                                Width="48" 
+                                                Height="48" 
+                                                Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                        <TextBlock Text="{Binding TotalClients}" 
+                                   FontSize="36" 
+                                   FontWeight="Bold" 
+                                   Margin="0,10,0,5"/>
+                        <TextBlock Text="Total Clientes" 
+                                   FontSize="14" 
+                                   Foreground="#666"/>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- Total Analyses Card -->
+                <materialDesign:Card Grid.Column="1" Margin="0,0,15,0" Padding="20">
+                    <StackPanel>
+                        <materialDesign:PackIcon Kind="ChartLine" 
+                                                Width="48" 
+                                                Height="48" 
+                                                Foreground="{DynamicResource SecondaryHueMidBrush}"/>
+                        <TextBlock Text="{Binding TotalAnalyses}" 
+                                   FontSize="36" 
+                                   FontWeight="Bold" 
+                                   Margin="0,10,0,5"/>
+                        <TextBlock Text="Total Análises" 
+                                   FontSize="14" 
+                                   Foreground="#666"/>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- Total Developers Card -->
+                <materialDesign:Card Grid.Column="2" Margin="0,0,15,0" Padding="20">
+                    <StackPanel>
+                        <materialDesign:PackIcon Kind="CodeTags" 
+                                                Width="48" 
+                                                Height="48" 
+                                                Foreground="#4CAF50"/>
+                        <TextBlock Text="{Binding TotalDevelopers}" 
+                                   FontSize="36" 
+                                   FontWeight="Bold" 
+                                   Margin="0,10,0,5"/>
+                        <TextBlock Text="Desenvolvedores" 
+                                   FontSize="14" 
+                                   Foreground="#666"/>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- Total Findings Card -->
+                <materialDesign:Card Grid.Column="3" Padding="20">
+                    <StackPanel>
+                        <materialDesign:PackIcon Kind="AlertCircle" 
+                                                Width="48" 
+                                                Height="48" 
+                                                Foreground="#FF5722"/>
+                        <TextBlock Text="{Binding TotalFindings}" 
+                                   FontSize="36" 
+                                   FontWeight="Bold" 
+                                   Margin="0,10,0,5"/>
+                        <TextBlock Text="Total Findings" 
+                                   FontSize="14" 
+                                   Foreground="#666"/>
+                    </StackPanel>
+                </materialDesign:Card>
+            </Grid>
+
+            <!-- Recent Analyses -->
+            <materialDesign:Card Margin="0,30,0,0" Padding="20">
+                <StackPanel>
+                    <TextBlock Text="Análises Recentes" 
+                               FontSize="20" 
+                               FontWeight="SemiBold" 
+                               Margin="0,0,0,15"/>
+                    
+                    <DataGrid ItemsSource="{Binding RecentAnalyses}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              HeadersVisibility="Column">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto"/>
+                            <DataGridTextColumn Header="Cliente" Binding="{Binding ClientName}" Width="*"/>
+                            <DataGridTextColumn Header="Repositório" Binding="{Binding RepositoryUrl}" Width="2*"/>
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="Auto"/>
+                            <DataGridTextColumn Header="Findings" Binding="{Binding TotalFindings}" Width="Auto"/>
+                            <DataGridTextColumn Header="Data" Binding="{Binding CreatedAt, StringFormat='dd/MM/yyyy HH:mm'}" Width="Auto"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </materialDesign:Card>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
