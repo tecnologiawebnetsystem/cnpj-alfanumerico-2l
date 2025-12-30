@@ -14,7 +14,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (batchData) {
       console.log("[v0] Found batch analysis:", batchData.id, "progress:", batchData.progress)
 
-      // Get all analyses in this batch
       const { data: analyses } = await supabase
         .from("analyses")
         .select("id, status, progress, error_message")
@@ -32,7 +31,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
         return NextResponse.json({
           id: batchData.id,
-          status: batchData.status,
+          status: completed === total ? "completed" : failed === total ? "failed" : "processing",
           progress: actualProgress,
           current_step: batchData.current_step || `Analisando ${completed}/${total} repositórios`,
           total_steps: 100,
@@ -66,41 +65,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       })
     }
 
-    const { data: batchAnalyses } = await supabase
-      .from("analyses")
-      .select("id, status, progress, current_step, error_message")
-      .eq("batch_id", id)
-
-    if (!batchAnalyses || batchAnalyses.length === 0) {
-      console.log("[v0] Analysis not found:", id)
-      return NextResponse.json({ error: "Analysis not found" }, { status: 404 })
-    }
-
-    const completed = batchAnalyses.filter((a) => a.status === "completed").length
-    const processing = batchAnalyses.filter((a) => a.status === "processing").length
-    const failed = batchAnalyses.filter((a) => a.status === "failed").length
-    const total = batchAnalyses.length
-
-    const actualProgress = Math.round((completed / total) * 100)
-
-    const overallStatus = completed === total ? "completed" : failed === total ? "failed" : "processing"
-
-    console.log("[v0] Batch from analyses table:", { total, completed, processing, failed, actualProgress })
-
-    return NextResponse.json({
-      id: id,
-      status: overallStatus,
-      progress: actualProgress,
-      current_step: `Analisando ${completed}/${total} repositórios`,
-      total_steps: 100,
-      batch_details: {
-        total,
-        completed,
-        processing,
-        failed,
-        errors: batchAnalyses.filter((a) => a.error_message).map((a) => a.error_message),
-      },
-    })
+    console.log("[v0] Analysis not found:", id)
+    return NextResponse.json({ error: "Analysis not found" }, { status: 404 })
   } catch (error) {
     console.error("[v0] Error fetching analysis progress:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

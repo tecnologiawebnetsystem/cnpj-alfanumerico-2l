@@ -20,9 +20,11 @@ export const maxDuration = 300
 export async function POST(request: NextRequest) {
   console.log("[v0] ========== ANALYZE API START ==========")
 
+  let supabase: any // Declare supabase variable
+
   try {
     console.log("[v0] Step 1: Creating Supabase client...")
-    const supabase = await createServerClient()
+    supabase = await createServerClient()
     console.log("[v0] Step 1: ✓ Supabase client created")
 
     console.log("[v0] Step 2: Parsing request body...")
@@ -344,10 +346,11 @@ export async function POST(request: NextRequest) {
         .from("batch_analyses")
         .update({
           status: "completed",
+          error_message: rpcError.message,
           completed_at: new Date().toISOString(),
           total_findings: totalFindings,
           total_files: totalFiles,
-          progress: 100,
+          progress: 100, // Garantir 100% ao invés de 99%
         })
         .eq("id", batchId)
     }
@@ -370,6 +373,22 @@ export async function POST(request: NextRequest) {
     console.log("[v0] Error message:", error.message)
     console.log("[v0] Error stack:", error.stack)
     console.log("[v0] =====================================")
+
+    try {
+      const batchId = error.batchId || null
+      if (batchId) {
+        await supabase
+          .from("batch_analyses")
+          .update({
+            status: "failed",
+            error_message: error.message,
+            completed_at: new Date().toISOString(),
+          })
+          .eq("id", batchId)
+      }
+    } catch (updateError) {
+      console.error("[v0] Failed to update batch status:", updateError)
+    }
 
     return NextResponse.json(
       {

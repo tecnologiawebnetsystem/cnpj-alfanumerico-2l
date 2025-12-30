@@ -95,9 +95,22 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
         analysis?.progress || 0,
       )
 
+      let pollCount = 0
+      const MAX_POLLS = 1800 // 1 hora (2 segundos cada)
+
       const progressInterval = setInterval(async () => {
         try {
-          console.log("[v0] Polling progress for analysis:", id)
+          pollCount++
+
+          // Add security timeout
+          if (pollCount > MAX_POLLS) {
+            console.log("[v0] Polling timeout reached, stopping...")
+            clearInterval(progressInterval)
+            setError("Tempo limite de análise excedido. Por favor, tente novamente.")
+            return
+          }
+
+          console.log("[v0] Polling progress for analysis:", id, `(attempt ${pollCount}/${MAX_POLLS})`)
           const response = await fetch(`/api/analyses/${id}/progress`)
           if (response.ok) {
             const data = await response.json()
@@ -118,15 +131,29 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
               ])
             }
 
-            if (data.status === "completed" || data.progress >= 99) {
-              console.log("[v0] Analysis completed (status or progress), reloading full data...")
+            // Correct stop condition for 100%
+            if (data.status === "completed" || data.progress >= 100) {
+              console.log("[v0] Analysis completed (status or progress >= 100), reloading full data...")
               clearInterval(progressInterval)
               setTimeout(() => {
                 loadAnalysisData()
               }, 1000)
             }
+
+            // Add handling for stuck analyses
+            if (data.status === "failed") {
+              console.log("[v0] Analysis failed, stopping polling")
+              clearInterval(progressInterval)
+              setError(data.error_message || "Análise falhou")
+              loadAnalysisData()
+            }
           } else {
             console.log("[v0] Progress API returned non-OK status:", response.status)
+            // After 3 consecutive errors, stop polling
+            if (pollCount % 3 === 0) {
+              console.warn("[v0] Multiple progress fetch failures, reloading data...")
+              loadAnalysisData()
+            }
           }
         } catch (error) {
           console.error("[v0] Error fetching progress:", error)
