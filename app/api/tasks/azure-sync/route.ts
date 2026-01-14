@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { task_id, user_id } = body
 
-    console.log("[v0] Azure DevOps sync request:", { task_id, user_id })
+    console.log(" Azure DevOps sync request:", { task_id, user_id })
 
     const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     const projectName = task.clients.azure_project || "DefaultProject"
 
-    console.log("[v0] Creating Azure DevOps work item:", { baseUrl, orgName, projectName })
+    console.log(" Creating Azure DevOps work item:", { baseUrl, orgName, projectName })
 
     const workItemUrl = `${baseUrl}/${orgName}/${projectName}/_apis/wit/workitems/$Task?api-version=7.0`
 
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error("[v0] Azure DevOps API error:", errorText)
+      console.error(" Azure DevOps API error:", errorText)
       return NextResponse.json(
         {
           error: "Failed to create work item in Azure DevOps",
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     }
 
     const workItem = await response.json()
-    console.log("[v0] Work item created:", workItem.id)
+    console.log(" Work item created:", workItem.id)
 
     await supabase
       .from("tasks")
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
       work_item_url: workItem._links.html.href,
     })
   } catch (error) {
-    console.error("[v0] Error syncing with Azure DevOps:", error)
+    console.error(" Error syncing with Azure DevOps:", error)
     return NextResponse.json(
       {
         error: "Internal server error",

@@ -48,12 +48,12 @@ export async function compressAndSaveFindings(
       1
     )
     console.log(
-      `[v0] Compressed ${findings.length} findings: ${originalSize}B → ${compressedSize}B (${compressionRatio}% reduction)`
+      ` Compressed ${findings.length} findings: ${originalSize}B → ${compressedSize}B (${compressionRatio}% reduction)`
     )
 
     return true
   } catch (error: any) {
-    console.error("[v0] Error compressing findings:", error)
+    console.error(" Error compressing findings:", error)
     return false
   }
 }
@@ -77,10 +77,10 @@ export async function decompressFindings(
     const decompressed = await gunzipAsync(Buffer.from(data.compressed_data))
     const findings = JSON.parse(decompressed.toString())
 
-    console.log(`[v0] Decompressed ${findings.length} findings`)
+    console.log(` Decompressed ${findings.length} findings`)
     return findings
   } catch (error: any) {
-    console.error("[v0] Error decompressing findings:", error)
+    console.error(" Error decompressing findings:", error)
     return null
   }
 }
@@ -134,10 +134,10 @@ export async function archiveOldFindings(daysOld: number = 7): Promise<number> {
       }
     }
 
-    console.log(`[v0] Archived ${archived} old analyses`)
+    console.log(` Archived ${archived} old analyses`)
     return archived
   } catch (error: any) {
-    console.error("[v0] Error archiving old findings:", error)
+    console.error(" Error archiving old findings:", error)
     return 0
   }
 }

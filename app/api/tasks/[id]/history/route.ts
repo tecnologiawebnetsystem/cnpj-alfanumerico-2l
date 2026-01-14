@@ -25,7 +25,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
     return NextResponse.json({ history })
   } catch (error: any) {
-    console.error("[v0] Error fetching task history:", error)
+    console.error(" Error fetching task history:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

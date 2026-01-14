@@ -32,7 +32,7 @@ export class GitHubClient {
   }
 
   private async request(endpoint: string, options: RequestInit = {}) {
-    console.log(`[v0] GitHub API Request: ${options.method || 'GET'} ${endpoint}`)
+    console.log(` GitHub API Request: ${options.method || 'GET'} ${endpoint}`)
     
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       ...options,
@@ -47,16 +47,16 @@ export class GitHubClient {
     const data = await response.json()
     
     if (!response.ok) {
-      console.error('[v0] GitHub API Error:', data)
+      console.error(' GitHub API Error:', data)
       throw new Error(`GitHub API error: ${data.message || response.statusText}`)
     }
 
-    console.log('[v0] GitHub API Response:', data)
+    console.log(' GitHub API Response:', data)
     return data
   }
 
   async getMainBranchSHA(baseBranch: string = 'main'): Promise<string> {
-    console.log(`[v0] Getting SHA for branch: ${baseBranch}`)
+    console.log(` Getting SHA for branch: ${baseBranch}`)
     
     try {
       const data = await this.request(`/repos/${this.config.owner}/${this.config.repo}/git/refs/heads/${baseBranch}`)
@@ -64,7 +64,7 @@ export class GitHubClient {
     } catch (error) {
       // Try 'master' if 'main' fails
       if (baseBranch === 'main') {
-        console.log('[v0] Branch "main" not found, trying "master"...')
+        console.log(' Branch "main" not found, trying "master"...')
         const data = await this.request(`/repos/${this.config.owner}/${this.config.repo}/git/refs/heads/master`)
         return data.object.sha
       }
@@ -73,7 +73,7 @@ export class GitHubClient {
   }
 
   async createBranch({ branchName, baseBranch = 'main' }: CreateBranchParams): Promise<string> {
-    console.log(`[v0] Creating branch: ${branchName} from ${baseBranch}`)
+    console.log(` Creating branch: ${branchName} from ${baseBranch}`)
     
     const sha = await this.getMainBranchSHA(baseBranch)
     
@@ -85,26 +85,26 @@ export class GitHubClient {
       }),
     })
 
-    console.log(`[v0] Branch created successfully: ${branchName}`)
+    console.log(` Branch created successfully: ${branchName}`)
     return branchName
   }
 
   async getFileContent(filePath: string, branch?: string): Promise<{ content: string; sha: string }> {
-    console.log(`[v0] Reading file: ${filePath}${branch ? ` from branch: ${branch}` : ''}`)
+    console.log(` Reading file: ${filePath}${branch ? ` from branch: ${branch}` : ''}`)
     
     const params = branch ? `?ref=${branch}` : ''
     const data = await this.request(`/repos/${this.config.owner}/${this.config.repo}/contents/${filePath}${params}`)
     
     const content = Buffer.from(data.content, 'base64').toString('utf-8')
     
-    console.log(`[v0] File content retrieved (${content.length} bytes)`)
+    console.log(` File content retrieved (${content.length} bytes)`)
     return { content, sha: data.sha }
   }
 
   async createCommit({ branch, filePath, content, message }: CreateCommitParams): Promise<string> {
-    console.log(`[v0] Creating commit on branch: ${branch}`)
-    console.log(`[v0] File: ${filePath}`)
-    console.log(`[v0] Message: ${message}`)
+    console.log(` Creating commit on branch: ${branch}`)
+    console.log(` File: ${filePath}`)
+    console.log(` Message: ${message}`)
     
     const { sha } = await this.getFileContent(filePath, branch)
     
@@ -118,13 +118,13 @@ export class GitHubClient {
       }),
     })
 
-    console.log(`[v0] Commit created: ${data.commit.sha}`)
+    console.log(` Commit created: ${data.commit.sha}`)
     return data.commit.sha
   }
 
   async createPullRequest({ title, body, head, base }: CreatePullRequestParams): Promise<{ number: number; url: string }> {
-    console.log(`[v0] Creating Pull Request: ${title}`)
-    console.log(`[v0] From: ${head} → To: ${base}`)
+    console.log(` Creating Pull Request: ${title}`)
+    console.log(` From: ${head} → To: ${base}`)
     
     const data = await this.request(`/repos/${this.config.owner}/${this.config.repo}/pulls`, {
       method: 'POST',
@@ -136,8 +136,8 @@ export class GitHubClient {
       }),
     })
 
-    console.log(`[v0] Pull Request created: #${data.number}`)
-    console.log(`[v0] URL: ${data.html_url}`)
+    console.log(` Pull Request created: #${data.number}`)
+    console.log(` URL: ${data.html_url}`)
     
     return {
       number: data.number,

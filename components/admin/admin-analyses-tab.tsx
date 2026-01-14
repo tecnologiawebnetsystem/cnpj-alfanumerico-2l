@@ -73,7 +73,7 @@ export function AdminAnalysesTab() {
       setAnalyses(data)
       setFilteredAnalyses(data)
     } catch (error) {
-      console.error("[v0] Error loading analyses:", error)
+      console.error(" Error loading analyses:", error)
     } finally {
       setIsLoading(false)
     }
@@ -98,7 +98,7 @@ export function AdminAnalysesTab() {
       const data = await response.json()
       setFindings(data)
     } catch (error) {
-      console.error("[v0] Error loading findings:", error)
+      console.error(" Error loading findings:", error)
     } finally {
       setLoadingFindings(false)
     }

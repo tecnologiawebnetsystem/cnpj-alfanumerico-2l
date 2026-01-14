@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ comments })
   } catch (error: any) {
-    console.error("[v0] Error fetching comments:", error)
+    console.error(" Error fetching comments:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ comment })
   } catch (error: any) {
-    console.error("[v0] Error creating comment:", error)
+    console.error(" Error creating comment:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

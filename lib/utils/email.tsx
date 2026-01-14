@@ -18,12 +18,12 @@ export async function sendEmail({
   const resendApiKey = await getClientSetting("resend_api_key", clientId)
 
   if (!resendApiKey) {
-    console.log("[v0] Email sending disabled - no API key configured")
+    console.log(" Email sending disabled - no API key configured")
     return { success: false, error: "Email not configured" }
   }
 
   // TODO: Integrate with Resend
-  console.log("[v0] Email would be sent:", { to, subject, hasApiKey: !!resendApiKey })
+  console.log(" Email would be sent:", { to, subject, hasApiKey: !!resendApiKey })
 
   // In production, use:
   // const resend = new Resend(resendApiKey)

@@ -61,7 +61,7 @@ export function IntegrationAccountSelector({
         setIntegrations(filtered)
       }
     } catch (error) {
-      console.error("[v0] Error loading integrations:", error)
+      console.error(" Error loading integrations:", error)
     } finally {
       setLoading(false)
     }

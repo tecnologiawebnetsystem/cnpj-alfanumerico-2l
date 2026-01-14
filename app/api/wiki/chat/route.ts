@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ response: text })
   } catch (error) {
-    console.error("[v0] Error in wiki chat:", error)
+    console.error(" Error in wiki chat:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

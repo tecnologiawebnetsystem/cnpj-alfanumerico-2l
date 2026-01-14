@@ -21,12 +21,12 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public static getDerivedStateFromError(error: Error): State {
-    console.error("[v0] ErrorBoundary caught error:", error)
+    console.error(" ErrorBoundary caught error:", error)
     return { hasError: true, error }
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("[v0] ErrorBoundary details:", error, errorInfo)
+    console.error(" ErrorBoundary details:", error, errorInfo)
   }
 
   private handleReset = () => {

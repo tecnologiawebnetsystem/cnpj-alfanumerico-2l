@@ -55,7 +55,7 @@ Responda de forma clara, objetiva e profissional.`
 
     return result.toUIMessageStreamResponse()
   } catch (error: any) {
-    console.error("[v0] Error in chat:", error)
+    console.error(" Error in chat:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

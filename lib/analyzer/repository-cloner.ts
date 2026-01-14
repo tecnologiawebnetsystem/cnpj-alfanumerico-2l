@@ -13,7 +13,7 @@ export async function cloneRepositoryLocally(
   const tempDir = path.join("/tmp", `analysis-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`)
 
   try {
-    console.log(`[v0] Cloning repository ${repo.name} to ${tempDir}...`)
+    console.log(` Cloning repository ${repo.name} to ${tempDir}...`)
 
     // Prepare clone URL based on provider
     let cloneUrl = ""
@@ -40,7 +40,7 @@ export async function cloneRepositoryLocally(
     const git = simpleGit()
     await git.clone(authenticatedUrl, tempDir, ["--depth", "1"])
 
-    console.log(`[v0] Repository cloned successfully to ${tempDir}`)
+    console.log(` Repository cloned successfully to ${tempDir}`)
 
     // Walk through directory and find files matching extensions
     const walkDir = (dir: string, relativePath = "") => {
@@ -69,7 +69,7 @@ export async function cloneRepositoryLocally(
                 repository: repo.name,
               })
             } catch (error) {
-              console.error(`[v0] Error reading file ${fullPath}:`, error)
+              console.error(` Error reading file ${fullPath}:`, error)
             }
           }
         }
@@ -77,22 +77,22 @@ export async function cloneRepositoryLocally(
     }
 
     walkDir(tempDir)
-    console.log(`[v0] Found ${files.length} files matching extensions: ${allowedExtensions.join(", ")}`)
+    console.log(` Found ${files.length} files matching extensions: ${allowedExtensions.join(", ")}`)
 
     return files
   } catch (error) {
-    console.error(`[v0] Error cloning/analyzing repository ${repo.name}:`, error)
+    console.error(` Error cloning/analyzing repository ${repo.name}:`, error)
     return files
   } finally {
     // Clean up temporary directory
     try {
       if (fs.existsSync(tempDir)) {
-        console.log(`[v0] Cleaning up temporary directory ${tempDir}...`)
+        console.log(` Cleaning up temporary directory ${tempDir}...`)
         execSync(`rm -rf "${tempDir}"`, { stdio: "ignore" })
-        console.log(`[v0] Temporary directory cleaned up`)
+        console.log(` Temporary directory cleaned up`)
       }
     } catch (cleanupError) {
-      console.error(`[v0] Error cleaning up temporary directory ${tempDir}:`, cleanupError)
+      console.error(` Error cleaning up temporary directory ${tempDir}:`, cleanupError)
     }
   }
 }

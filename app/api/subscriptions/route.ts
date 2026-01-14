@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ subscription: subscription || null })
   } catch (error: any) {
-    console.error("[v0] Error fetching subscription:", error)
+    console.error(" Error fetching subscription:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

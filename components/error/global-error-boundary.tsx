@@ -27,7 +27,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
   }
 
   async componentDidCatch(error: Error, errorInfo: any) {
-    console.error("[v0] GlobalErrorBoundary caught error:", error, errorInfo)
+    console.error(" GlobalErrorBoundary caught error:", error, errorInfo)
 
     try {
       await logError({
@@ -43,7 +43,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
         severity: "high",
       })
     } catch (logError) {
-      console.error("[v0] Failed to log error:", logError)
+      console.error(" Failed to log error:", logError)
     }
 
     this.setState({ errorInfo })

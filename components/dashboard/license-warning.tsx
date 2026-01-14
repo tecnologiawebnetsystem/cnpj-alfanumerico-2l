@@ -13,12 +13,12 @@ export function LicenseWarning() {
   useEffect(() => {
     const loadLicense = async () => {
       try {
-        console.log("[v0] LicenseWarning - checking license status")
+        console.log(" LicenseWarning - checking license status")
         const status = await checkLicense()
-        console.log("[v0] LicenseWarning - license status:", status)
+        console.log(" LicenseWarning - license status:", status)
         setLicense(status)
       } catch (err) {
-        console.error("[v0] LicenseWarning - error checking license:", err)
+        console.error(" LicenseWarning - error checking license:", err)
         setError(true)
         // Don't block the dashboard if license check fails
       }

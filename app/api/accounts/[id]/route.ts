@@ -114,8 +114,8 @@ export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  console.log("[v0] DELETE /api/accounts/[id] - Start")
-  console.log("[v0] Account ID:", params.id)
+  console.log(" DELETE /api/accounts/[id] - Start")
+  console.log(" Account ID:", params.id)
   
   try {
     const cookieStore = await cookies()
@@ -134,11 +134,11 @@ export async function DELETE(
       }
     )
 
-    console.log("[v0] Supabase client created with SERVICE_ROLE_KEY")
+    console.log(" Supabase client created with SERVICE_ROLE_KEY")
 
     const url = new URL(request.url)
     let user_id: string | null = url.searchParams.get("user_id")
-    console.log("[v0] User ID from query param:", user_id)
+    console.log(" User ID from query param:", user_id)
 
     if (!user_id) {
       const authHeader = request.headers.get("authorization")
@@ -147,9 +147,9 @@ export async function DELETE(
           const token = authHeader.substring(7)
           const decoded = JSON.parse(atob(token))
           user_id = decoded.id
-          console.log("[v0] User ID from Authorization header:", user_id)
+          console.log(" User ID from Authorization header:", user_id)
         } catch (e) {
-          console.error("[v0] Failed to decode auth token:", e)
+          console.error(" Failed to decode auth token:", e)
         }
       }
     }
@@ -161,15 +161,15 @@ export async function DELETE(
         try {
           const userData = JSON.parse(userCookie.value)
           user_id = userData.id
-          console.log("[v0] User ID from cookie:", user_id)
+          console.log(" User ID from cookie:", user_id)
         } catch (e) {
-          console.error("[v0] Failed to parse user cookie:", e)
+          console.error(" Failed to parse user cookie:", e)
         }
       }
     }
 
     if (!user_id) {
-      console.log("[v0] No user ID found - unauthorized")
+      console.log(" No user ID found - unauthorized")
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -180,10 +180,10 @@ export async function DELETE(
       .eq("id", user_id)
       .single()
 
-    console.log("[v0] User role:", user?.role)
+    console.log(" User role:", user?.role)
 
     if (!user) {
-      console.log("[v0] User not found")
+      console.log(" User not found")
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
@@ -191,29 +191,29 @@ export async function DELETE(
     const canManage = userRole === "admin" || userRole === "super_admin" || userRole === "admin_client"
 
     if (!canManage) {
-      console.log("[v0] User does not have permission to delete accounts")
+      console.log(" User does not have permission to delete accounts")
       return NextResponse.json({ 
         error: "Forbidden - Only Admin users can delete accounts" 
       }, { status: 403 })
     }
 
-    console.log("[v0] Executing database delete...")
+    console.log(" Executing database delete...")
     const { error } = await supabase
       .from("github_tokens")
       .delete()
       .eq("id", params.id)
 
-    console.log("[v0] Delete completed, error:", error)
+    console.log(" Delete completed, error:", error)
 
     if (error) {
-      console.error("[v0] Database error:", error)
+      console.error(" Database error:", error)
       throw error
     }
 
-    console.log("[v0] Account deleted successfully")
+    console.log(" Account deleted successfully")
     return NextResponse.json({ message: "Account deleted successfully" })
   } catch (error: any) {
-    console.error("[v0] Error deleting account:", error)
+    console.error(" Error deleting account:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
@@ -222,8 +222,8 @@ export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  console.log("[v0] PUT /api/accounts/[id] - Start")
-  console.log("[v0] Account ID:", params.id)
+  console.log(" PUT /api/accounts/[id] - Start")
+  console.log(" Account ID:", params.id)
   
   try {
     const cookieStore = await cookies()
@@ -242,16 +242,16 @@ export async function PUT(
       }
     )
 
-    console.log("[v0] Supabase client created with SERVICE_ROLE_KEY")
+    console.log(" Supabase client created with SERVICE_ROLE_KEY")
 
     const body = await request.json()
-    console.log("[v0] Request body:", { ...body, access_token: body.access_token ? "[REDACTED]" : undefined })
+    console.log(" Request body:", { ...body, access_token: body.access_token ? "[REDACTED]" : undefined })
 
     const user_id = body.user_id || request.headers.get("x-user-id")
-    console.log("[v0] User ID from request:", user_id ? "Found" : "Not found")
+    console.log(" User ID from request:", user_id ? "Found" : "Not found")
 
     if (!user_id) {
-      console.log("[v0] No user ID provided")
+      console.log(" No user ID provided")
       return NextResponse.json({ error: "Unauthorized - No user ID" }, { status: 401 })
     }
 
@@ -261,10 +261,10 @@ export async function PUT(
       .eq("id", user_id)
       .single()
 
-    console.log("[v0] User role:", user?.role)
+    console.log(" User role:", user?.role)
 
     if (!user) {
-      console.log("[v0] User not found")
+      console.log(" User not found")
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
@@ -272,36 +272,36 @@ export async function PUT(
     const canManage = userRole === "admin" || userRole === "super_admin" || userRole === "admin_client"
 
     if (!canManage) {
-      console.log("[v0] User does not have permission to manage tokens")
+      console.log(" User does not have permission to manage tokens")
       return NextResponse.json({ 
         error: "Forbidden - Only Admin users can manage tokens" 
       }, { status: 403 })
     }
 
     const { account_name, access_token } = body
-    console.log("[v0] Parsed fields - account_name:", !!account_name, "access_token:", !!access_token)
+    console.log(" Parsed fields - account_name:", !!account_name, "access_token:", !!access_token)
 
     const updateData: any = {}
     
     if (account_name !== undefined) {
       if (!account_name || account_name.trim() === "") {
-        console.log("[v0] Account name is required but empty")
+        console.log(" Account name is required but empty")
         return NextResponse.json(
           { error: "Account name is required" },
           { status: 400 }
         )
       }
       updateData.account_name = account_name.trim()
-      console.log("[v0] Will update account_name")
+      console.log(" Will update account_name")
     }
 
     if (access_token !== undefined && access_token.trim() !== "") {
       updateData.access_token = access_token.trim()
-      console.log("[v0] Will update access_token")
+      console.log(" Will update access_token")
     }
 
-    console.log("[v0] Update fields:", Object.keys(updateData))
-    console.log("[v0] Executing database update...")
+    console.log(" Update fields:", Object.keys(updateData))
+    console.log(" Executing database update...")
 
     const { data, error } = await supabase
       .from("github_tokens")
@@ -310,27 +310,27 @@ export async function PUT(
       .select()
       .single()
 
-    console.log("[v0] Database update completed")
-    console.log("[v0] Error:", error)
-    console.log("[v0] Data returned:", !!data)
+    console.log(" Database update completed")
+    console.log(" Error:", error)
+    console.log(" Data returned:", !!data)
 
     if (error) {
-      console.error("[v0] Database error:", error)
+      console.error(" Database error:", error)
       throw error
     }
 
     if (!data) {
-      console.log("[v0] No data returned - account not found")
+      console.log(" No data returned - account not found")
       return NextResponse.json({ error: "Account not found" }, { status: 404 })
     }
 
-    console.log("[v0] Account updated successfully")
+    console.log(" Account updated successfully")
     return NextResponse.json({
       message: "Account updated successfully",
       account: data,
     })
   } catch (error: any) {
-    console.error("[v0] Error updating account:", error)
+    console.error(" Error updating account:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

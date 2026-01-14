@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
-  console.log('[v0] Debug ENV endpoint called')
+  console.log(' Debug ENV endpoint called')
   
   const envVars = {
     SUPABASE_URL: {
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     },
   }
 
-  console.log('[v0] Environment variables check:', JSON.stringify(envVars, null, 2))
+  console.log(' Environment variables check:', JSON.stringify(envVars, null, 2))
 
   return NextResponse.json({
     message: 'Environment variables diagnostic',

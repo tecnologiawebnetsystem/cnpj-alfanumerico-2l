@@ -42,7 +42,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       message: testSuccess ? "Conexão testada com sucesso!" : "Falha ao conectar",
     })
   } catch (error: any) {
-    console.error("[v0] Error testing database connection:", error)
+    console.error(" Error testing database connection:", error)
     return NextResponse.json(
       { success: false, message: "Erro ao testar conexão", error: error.message },
       { status: 500 },

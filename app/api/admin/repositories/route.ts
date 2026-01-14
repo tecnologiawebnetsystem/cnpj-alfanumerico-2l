@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(repositories)
   } catch (error: any) {
-    console.error("[v0] Error loading repositories:", error)
+    console.error(" Error loading repositories:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

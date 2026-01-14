@@ -41,7 +41,7 @@ export function ScheduledReportsManager({ clientId }: ScheduledReportsManagerPro
         setSchedules(data.schedules || [])
       }
     } catch (error) {
-      console.error("[v0] Error loading schedules:", error)
+      console.error(" Error loading schedules:", error)
     }
   }
 
@@ -63,7 +63,7 @@ export function ScheduledReportsManager({ clientId }: ScheduledReportsManagerPro
         loadSchedules()
       }
     } catch (error) {
-      console.error("[v0] Error creating schedule:", error)
+      console.error(" Error creating schedule:", error)
       toast({
         title: "Erro",
         description: "Não foi possível criar o agendamento",
@@ -87,7 +87,7 @@ export function ScheduledReportsManager({ clientId }: ScheduledReportsManagerPro
         loadSchedules()
       }
     } catch (error) {
-      console.error("[v0] Error deleting schedule:", error)
+      console.error(" Error deleting schedule:", error)
     }
   }
 

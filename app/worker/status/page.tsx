@@ -55,7 +55,7 @@ export default function WorkerStatusPage() {
       }
       setLastCheck(new Date())
     } catch (error) {
-      console.error("[v0] Error checking workers:", error)
+      console.error(" Error checking workers:", error)
     } finally {
       setLoading(false)
     }

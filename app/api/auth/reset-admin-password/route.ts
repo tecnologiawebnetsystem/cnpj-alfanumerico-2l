@@ -27,13 +27,13 @@ export async function POST() {
     })
 
     if (hashError || !hashData) {
-      console.error("[v0] Error hashing password:", hashError)
+      console.error(" Error hashing password:", hashError)
       return NextResponse.json({ success: false, error: "Erro ao processar senha" }, { status: 500 })
     }
 
     const passwordHash = hashData
 
-    console.log("[v0] Generated new password hash:", passwordHash)
+    console.log(" Generated new password hash:", passwordHash)
 
     // Atualizar senha do admin
     const { data, error } = await supabase
@@ -43,11 +43,11 @@ export async function POST() {
       .select()
 
     if (error) {
-      console.error("[v0] Error updating password:", error)
+      console.error(" Error updating password:", error)
       return NextResponse.json({ success: false, error: error.message }, { status: 500 })
     }
 
-    console.log("[v0] Password reset successful for admin")
+    console.log(" Password reset successful for admin")
 
     return NextResponse.json({
       success: true,
@@ -57,7 +57,7 @@ export async function POST() {
       hash: passwordHash,
     })
   } catch (error) {
-    console.error("[v0] Reset password error:", error)
+    console.error(" Reset password error:", error)
     return NextResponse.json({ success: false, error: "Erro ao resetar senha" }, { status: 500 })
   }
 }

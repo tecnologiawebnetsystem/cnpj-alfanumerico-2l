@@ -8,7 +8,7 @@ export const maxDuration = 60
  * Gera tarefas automaticamente a partir dos findings de uma análise
  */
 export async function POST(request: Request) {
-  console.log("[v0] === TASK GENERATION API START ===")
+  console.log(" === TASK GENERATION API START ===")
 
   try {
     const body = await request.json()
@@ -38,11 +38,11 @@ export async function POST(request: Request) {
       .eq("analysis_id", batch_id)
 
     if (findingsError) {
-      console.error("[v0] Error fetching findings:", findingsError)
+      console.error(" Error fetching findings:", findingsError)
       return NextResponse.json({ error: "Failed to fetch findings" }, { status: 500 })
     }
 
-    console.log(`[v0] Found ${findings?.length || 0} findings to convert to tasks`)
+    console.log(` Found ${findings?.length || 0} findings to convert to tasks`)
 
     if (!findings || findings.length === 0) {
       return NextResponse.json({ success: true, tasks_created: 0, message: "No findings to convert" })
@@ -92,17 +92,17 @@ export async function POST(request: Request) {
         const { error: insertError } = await supabase.from("tasks").insert(tasksToInsert)
 
         if (insertError) {
-          console.error(`[v0] Error creating tasks for ${repoName}:`, insertError)
+          console.error(` Error creating tasks for ${repoName}:`, insertError)
         } else {
           tasksCreated += tasksToInsert.length
-          console.log(`[v0] Created ${tasksToInsert.length} tasks for ${repoName}`)
+          console.log(` Created ${tasksToInsert.length} tasks for ${repoName}`)
         }
       } catch (error) {
-        console.error(`[v0] Exception creating tasks for ${repoName}:`, error)
+        console.error(` Exception creating tasks for ${repoName}:`, error)
       }
     }
 
-    console.log(`[v0] === TASK GENERATION COMPLETE: ${tasksCreated} tasks created ===`)
+    console.log(` === TASK GENERATION COMPLETE: ${tasksCreated} tasks created ===`)
 
     return NextResponse.json({
       success: true,
@@ -110,7 +110,7 @@ export async function POST(request: Request) {
       repositories_processed: Object.keys(findingsByRepo).length,
     })
   } catch (error: any) {
-    console.error("[v0] Task generation error:", error)
+    console.error(" Task generation error:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

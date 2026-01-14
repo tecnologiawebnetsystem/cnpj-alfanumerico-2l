@@ -71,12 +71,12 @@ export async function logError(data: ErrorLogData): Promise<void> {
     })
 
     if (!response.ok) {
-      console.error("[v0] Failed to log error to database:", response.statusText)
+      console.error(" Failed to log error to database:", response.statusText)
     }
   } catch (err) {
     // Fallback: at least log to console if database logging fails
-    console.error("[v0] Error logger failed:", err)
-    console.error("[v0] Original error:", data)
+    console.error(" Error logger failed:", err)
+    console.error(" Original error:", data)
   }
 }
 

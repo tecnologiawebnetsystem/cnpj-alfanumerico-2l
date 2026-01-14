@@ -74,7 +74,7 @@ export function AdminClientsTab() {
       const user = userStr ? JSON.parse(userStr) : null
       const userId = user?.id || ""
 
-      console.log("[v0] Loading clients for user:", userId)
+      console.log(" Loading clients for user:", userId)
 
       const response = await fetch(`/api/admin/clients?user_id=${userId}`, {
         credentials: "include",
@@ -83,7 +83,7 @@ export function AdminClientsTab() {
         const data = await response.json()
         setClients(data)
       } else {
-        console.error("[v0] Failed to load clients, status:", response.status)
+        console.error(" Failed to load clients, status:", response.status)
       }
     } catch (error) {
       console.error("Erro ao carregar clientes:", error)
@@ -91,8 +91,8 @@ export function AdminClientsTab() {
   }
 
   const handleSave = async () => {
-    console.log("[v0] handleSave called with formData:", formData)
-    console.log("[v0] editingClient:", editingClient)
+    console.log(" handleSave called with formData:", formData)
+    console.log(" editingClient:", editingClient)
 
     try {
       const userStr = localStorage.getItem("user")
@@ -104,7 +104,7 @@ export function AdminClientsTab() {
         : `/api/admin/clients?user_id=${userId}`
       const method = editingClient ? "PUT" : "POST"
 
-      console.log("[v0] Sending request to:", url, "Method:", method)
+      console.log(" Sending request to:", url, "Method:", method)
 
       const response = await fetch(url, {
         method,
@@ -113,7 +113,7 @@ export function AdminClientsTab() {
         credentials: "include",
       })
 
-      console.log("[v0] Response status:", response.status)
+      console.log(" Response status:", response.status)
 
       if (!response.ok) {
         const contentType = response.headers.get("content-type")
@@ -122,13 +122,13 @@ export function AdminClientsTab() {
           throw new Error(errorData.error || "Erro ao salvar cliente")
         } else {
           const errorText = await response.text()
-          console.error("[v0] Non-JSON error response:", errorText)
+          console.error(" Non-JSON error response:", errorText)
           throw new Error("Erro no servidor ao salvar cliente")
         }
       }
 
       const responseData = await response.json()
-      console.log("[v0] Response data:", responseData)
+      console.log(" Response data:", responseData)
 
       toast({
         title: "Sucesso",
@@ -137,7 +137,7 @@ export function AdminClientsTab() {
       setIsDialogOpen(false)
       loadClients()
     } catch (error: any) {
-      console.error("[v0] Error in handleSave:", error)
+      console.error(" Error in handleSave:", error)
       toast({
         title: "Erro",
         description: error.message || "Não foi possível salvar o cliente",

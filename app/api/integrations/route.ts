@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       .order("created_at", { ascending: false })
 
     if (error) {
-      console.error("[v0] Error fetching integrations:", error)
+      console.error(" Error fetching integrations:", error)
       return NextResponse.json({ error: "Erro ao buscar integrações" }, { status: 500 })
     }
 
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ integrations: sanitizedIntegrations })
   } catch (error) {
-    console.error("[v0] Error in GET /api/integrations:", error)
+    console.error(" Error in GET /api/integrations:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error("[v0] Error creating integration:", error)
+      console.error(" Error creating integration:", error)
       return NextResponse.json({ error: "Erro ao criar integração" }, { status: 500 })
     }
 
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ integration: sanitizedIntegration }, { status: 201 })
   } catch (error) {
-    console.error("[v0] Error in POST /api/integrations:", error)
+    console.error(" Error in POST /api/integrations:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

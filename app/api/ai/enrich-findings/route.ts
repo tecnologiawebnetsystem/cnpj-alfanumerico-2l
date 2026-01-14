@@ -6,7 +6,7 @@ import { createClient } from "@supabase/supabase-js"
 import { analyzeWithGemini } from "@/lib/ai/gemini-analyzer"
 
 export async function POST(request: NextRequest) {
-  console.log("[v0] Starting background AI enrichment")
+  console.log(" Starting background AI enrichment")
 
   try {
     const body = await request.json()
@@ -26,16 +26,16 @@ export async function POST(request: NextRequest) {
       .limit(100)
 
     if (findingsError) {
-      console.error("[v0] Error fetching findings:", findingsError)
+      console.error(" Error fetching findings:", findingsError)
       return NextResponse.json({ error: findingsError.message }, { status: 500 })
     }
 
     if (!findings || findings.length === 0) {
-      console.log("[v0] No findings to enrich")
+      console.log(" No findings to enrich")
       return NextResponse.json({ success: true, processed: 0 })
     }
 
-    console.log(`[v0] Enriching ${findings.length} findings with Gemini`)
+    console.log(` Enriching ${findings.length} findings with Gemini`)
 
     let processed = 0
     let failed = 0
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       const promises = batch.map(async (finding) => {
         try {
           if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
-            console.warn("[v0] Gemini API key not configured, using fallback suggestion")
+            console.warn(" Gemini API key not configured, using fallback suggestion")
             await supabase
               .from("findings")
               .update({
@@ -79,10 +79,10 @@ export async function POST(request: NextRequest) {
             .eq("id", finding.id)
 
           processed++
-          console.log(`[v0] Enriched finding ${finding.id}`)
+          console.log(` Enriched finding ${finding.id}`)
         } catch (error) {
           failed++
-          console.error(`[v0] Failed to enrich finding ${finding.id}:`, error)
+          console.error(` Failed to enrich finding ${finding.id}:`, error)
         }
       })
 
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    console.log(`[v0] AI enrichment complete: ${processed} success, ${failed} failed`)
+    console.log(` AI enrichment complete: ${processed} success, ${failed} failed`)
 
     return NextResponse.json({
       success: true,
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
       failed,
     })
   } catch (error) {
-    console.error("[v0] Error in AI enrichment:", error)
+    console.error(" Error in AI enrichment:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

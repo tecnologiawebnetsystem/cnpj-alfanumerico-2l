@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error("[v0] Error tracking analytics event:", error)
+    console.error(" Error tracking analytics event:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ events })
   } catch (error: any) {
-    console.error("[v0] Error fetching analytics events:", error)
+    console.error(" Error fetching analytics events:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

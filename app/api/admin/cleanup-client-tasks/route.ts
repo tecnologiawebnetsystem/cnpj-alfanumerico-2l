@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Client ID is required" }, { status: 400 })
     }
 
-    console.log("[v0] Starting cleanup of all tasks for client:", client_id)
+    console.log(" Starting cleanup of all tasks for client:", client_id)
 
     // Get all tasks for this client
     const { data: tasks, error: tasksError } = await supabase
@@ -24,12 +24,12 @@ export async function POST(request: Request) {
       .eq("client_id", client_id)
 
     if (tasksError) {
-      console.error("[v0] Error fetching tasks:", tasksError)
+      console.error(" Error fetching tasks:", tasksError)
       return NextResponse.json({ error: "Failed to fetch tasks" }, { status: 500 })
     }
 
     if (!tasks || tasks.length === 0) {
-      console.log("[v0] No tasks found for client")
+      console.log(" No tasks found for client")
       return NextResponse.json({
         message: "No tasks to delete",
         deleted_tasks: 0,
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     }
 
     const taskIds = tasks.map(t => t.id)
-    console.log("[v0] Found tasks to delete:", taskIds.length)
+    console.log(" Found tasks to delete:", taskIds.length)
 
     // Delete comments
     const { error: commentsError, count: commentsCount } = await supabase
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       .in("task_id", taskIds)
 
     if (commentsError) {
-      console.error("[v0] Error deleting comments:", commentsError)
+      console.error(" Error deleting comments:", commentsError)
     }
 
     // Delete task_history
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
       .in("task_id", taskIds)
 
     if (historyError) {
-      console.error("[v0] Error deleting history:", historyError)
+      console.error(" Error deleting history:", historyError)
     }
 
     // Delete task_progress
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
       .in("task_id", taskIds)
 
     if (progressError) {
-      console.error("[v0] Error deleting progress:", progressError)
+      console.error(" Error deleting progress:", progressError)
     }
 
     // Finally, delete the tasks themselves
@@ -79,11 +79,11 @@ export async function POST(request: Request) {
       .eq("client_id", client_id)
 
     if (tasksDeleteError) {
-      console.error("[v0] Error deleting tasks:", tasksDeleteError)
+      console.error(" Error deleting tasks:", tasksDeleteError)
       return NextResponse.json({ error: "Failed to delete tasks" }, { status: 500 })
     }
 
-    console.log("[v0] Cleanup completed successfully")
+    console.log(" Cleanup completed successfully")
 
     return NextResponse.json({
       message: "All tasks deleted successfully",
@@ -93,7 +93,7 @@ export async function POST(request: Request) {
       deleted_comments: commentsCount || 0
     })
   } catch (error) {
-    console.error("[v0] Error in cleanup-client-tasks:", error)
+    console.error(" Error in cleanup-client-tasks:", error)
     return NextResponse.json(
       { error: "Internal server error", details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

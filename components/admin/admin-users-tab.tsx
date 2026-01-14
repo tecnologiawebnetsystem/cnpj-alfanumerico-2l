@@ -56,29 +56,29 @@ export function AdminUsersTab() {
 
   const loadUsers = async () => {
     try {
-      console.log("[v0] Loading users...")
+      console.log(" Loading users...")
       const user = await getCurrentUser()
       if (!user) {
-        console.log("[v0] No current user found")
+        console.log(" No current user found")
         return
       }
 
-      console.log("[v0] Current user ID:", user.id)
+      console.log(" Current user ID:", user.id)
       const response = await fetch(`/api/admin/users?user_id=${user.id}`, {
         credentials: "include",
       })
 
-      console.log("[v0] Users API response status:", response.status)
+      console.log(" Users API response status:", response.status)
 
       if (response.ok) {
         const data = await response.json()
-        console.log("[v0] Users loaded:", data.length, "users")
+        console.log(" Users loaded:", data.length, "users")
         setUsers(data)
       } else {
-        console.error("[v0] Error loading users, status:", response.status)
+        console.error(" Error loading users, status:", response.status)
       }
     } catch (error) {
-      console.error("[v0] Error loading users:", error)
+      console.error(" Error loading users:", error)
     }
   }
 

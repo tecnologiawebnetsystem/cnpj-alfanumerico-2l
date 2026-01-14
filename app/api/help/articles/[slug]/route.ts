@@ -23,7 +23,7 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
 
     return NextResponse.json({ article })
   } catch (error: any) {
-    console.error("[v0] Error fetching help article:", error)
+    console.error(" Error fetching help article:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

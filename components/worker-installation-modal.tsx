@@ -104,7 +104,7 @@ export function WorkerInstallationModal({ open, onClose }: WorkerInstallationMod
         }
       }
     } catch (error) {
-      console.error("[v0] Error checking worker:", error)
+      console.error(" Error checking worker:", error)
     }
   }
 

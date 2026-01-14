@@ -35,54 +35,54 @@ export function ClientSettingsTab({ clientId }: ClientSettingsTabProps) {
 
   const loadSettings = async () => {
     try {
-      console.log("[v0] Loading settings for client:", clientId)
+      console.log(" Loading settings for client:", clientId)
       const response = await fetch(`/api/client/settings?client_id=${clientId}`)
-      console.log("[v0] Settings API response status:", response.status)
-      console.log("[v0] Settings API response ok:", response.ok)
+      console.log(" Settings API response status:", response.status)
+      console.log(" Settings API response ok:", response.ok)
 
       if (!response.ok) {
         const errorText = await response.text()
-        console.error("[v0] Settings API error response:", errorText)
+        console.error(" Settings API error response:", errorText)
         throw new Error("Erro ao carregar configurações")
       }
 
       const data = await response.json()
-      console.log("[v0] Settings data received:", data)
-      console.log("[v0] Settings data type:", typeof data)
-      console.log("[v0] Settings data keys:", Object.keys(data))
+      console.log(" Settings data received:", data)
+      console.log(" Settings data type:", typeof data)
+      console.log(" Settings data keys:", Object.keys(data))
 
       const cnpjFieldsValue = data.cnpj_field_names || []
-      console.log("[v0] Raw CNPJ fields value:", cnpjFieldsValue)
-      console.log("[v0] CNPJ fields type:", typeof cnpjFieldsValue)
-      console.log("[v0] CNPJ fields is array?:", Array.isArray(cnpjFieldsValue))
+      console.log(" Raw CNPJ fields value:", cnpjFieldsValue)
+      console.log(" CNPJ fields type:", typeof cnpjFieldsValue)
+      console.log(" CNPJ fields is array?:", Array.isArray(cnpjFieldsValue))
 
       const parsedCnpjFields = Array.isArray(cnpjFieldsValue)
         ? cnpjFieldsValue
         : typeof cnpjFieldsValue === "string"
           ? cnpjFieldsValue.split(",").filter((f: string) => f.trim())
           : []
-      console.log("[v0] Parsed CNPJ fields:", parsedCnpjFields)
-      console.log("[v0] Parsed CNPJ fields length:", parsedCnpjFields.length)
+      console.log(" Parsed CNPJ fields:", parsedCnpjFields)
+      console.log(" Parsed CNPJ fields length:", parsedCnpjFields.length)
       setCnpjFields(parsedCnpjFields)
 
       const extensionsValue = data.file_extensions || []
-      console.log("[v0] Raw extensions value:", extensionsValue)
-      console.log("[v0] Extensions type:", typeof extensionsValue)
-      console.log("[v0] Extensions is array?:", Array.isArray(extensionsValue))
+      console.log(" Raw extensions value:", extensionsValue)
+      console.log(" Extensions type:", typeof extensionsValue)
+      console.log(" Extensions is array?:", Array.isArray(extensionsValue))
 
       const parsedExtensions = Array.isArray(extensionsValue)
         ? extensionsValue
         : typeof extensionsValue === "string"
           ? extensionsValue.split(",").filter((e: string) => e.trim())
           : []
-      console.log("[v0] Parsed extensions:", parsedExtensions)
-      console.log("[v0] Parsed extensions length:", parsedExtensions.length)
+      console.log(" Parsed extensions:", parsedExtensions)
+      console.log(" Parsed extensions length:", parsedExtensions.length)
       setFileExtensions(parsedExtensions)
 
-      console.log("[v0] Final state - CNPJ fields:", parsedCnpjFields, "Extensions:", parsedExtensions)
+      console.log(" Final state - CNPJ fields:", parsedCnpjFields, "Extensions:", parsedExtensions)
       setLoading(false)
     } catch (error) {
-      console.error("[v0] Erro ao carregar configurações:", error)
+      console.error(" Erro ao carregar configurações:", error)
       toast({
         title: "Erro",
         description: "Não foi possível carregar as configurações",
@@ -95,9 +95,9 @@ export function ClientSettingsTab({ clientId }: ClientSettingsTabProps) {
   const saveSettings = async () => {
     setSaving(true)
     try {
-      console.log("[v0] ========== SAVE SETTINGS START ==========")
-      console.log("[v0] Current CNPJ fields state:", cnpjFields)
-      console.log("[v0] Current file extensions state:", fileExtensions)
+      console.log(" ========== SAVE SETTINGS START ==========")
+      console.log(" Current CNPJ fields state:", cnpjFields)
+      console.log(" Current file extensions state:", fileExtensions)
 
       const cleanedCnpjFields = cnpjFields.map((field) => {
         // Remove regex slashes if present: "/cnpj/i" -> "cnpj"
@@ -105,10 +105,10 @@ export function ClientSettingsTab({ clientId }: ClientSettingsTabProps) {
         return regexMatch ? regexMatch[1] : field
       })
 
-      console.log("[v0] Original CNPJ fields:", cnpjFields)
-      console.log("[v0] Cleaned CNPJ fields:", cleanedCnpjFields)
-      console.log("[v0] Fields to save (joined):", cleanedCnpjFields.join(","))
-      console.log("[v0] Extensions to save (joined):", fileExtensions.join(","))
+      console.log(" Original CNPJ fields:", cnpjFields)
+      console.log(" Cleaned CNPJ fields:", cleanedCnpjFields)
+      console.log(" Fields to save (joined):", cleanedCnpjFields.join(","))
+      console.log(" Extensions to save (joined):", fileExtensions.join(","))
 
       const response = await fetch("/api/client/settings", {
         method: "POST",
@@ -123,13 +123,13 @@ export function ClientSettingsTab({ clientId }: ClientSettingsTabProps) {
       if (!response.ok) throw new Error("Erro ao salvar configurações")
 
       const responseData = await response.json()
-      console.log("[v0] Save response:", responseData)
+      console.log(" Save response:", responseData)
 
       setCnpjFields(cleanedCnpjFields)
       setHasUnsavedChanges(false)
 
-      console.log("[v0] Settings saved successfully!")
-      console.log("[v0] ========== SAVE SETTINGS END ==========")
+      console.log(" Settings saved successfully!")
+      console.log(" ========== SAVE SETTINGS END ==========")
 
       toast({
         title: "Sucesso",

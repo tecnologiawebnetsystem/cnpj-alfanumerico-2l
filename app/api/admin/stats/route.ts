@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
       pendingTasks: pendingTasks || 0,
     })
   } catch (error: any) {
-    console.error("[v0] Error loading admin stats:", error)
+    console.error(" Error loading admin stats:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

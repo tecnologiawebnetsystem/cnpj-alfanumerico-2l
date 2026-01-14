@@ -5,16 +5,16 @@ export const dynamic = "force-dynamic"
 export const runtime = "nodejs"
 
 export async function GET() {
-  console.log("[v0] === TEST SUPABASE START ===")
+  console.log(" === TEST SUPABASE START ===")
 
   try {
     // Test 1: Create client with service role
     const supabaseUrl = process.env.SUPABASE_URL!
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
-    console.log("[v0] Creating Supabase client...")
-    console.log("[v0] URL exists:", !!supabaseUrl)
-    console.log("[v0] Service key exists:", !!serviceRoleKey)
+    console.log(" Creating Supabase client...")
+    console.log(" URL exists:", !!supabaseUrl)
+    console.log(" Service key exists:", !!serviceRoleKey)
 
     const supabase = createClient(supabaseUrl, serviceRoleKey, {
       auth: {
@@ -23,23 +23,23 @@ export async function GET() {
       },
     })
 
-    console.log("[v0] Client created successfully")
+    console.log(" Client created successfully")
 
     // Test 2: Simple query
-    console.log("[v0] Testing database query...")
+    console.log(" Testing database query...")
     const { data: clients, error: clientsError } = await supabase.from("clients").select("id, name").limit(1)
 
-    console.log("[v0] Query completed")
-    console.log("[v0] Error:", clientsError)
-    console.log("[v0] Data:", clients)
+    console.log(" Query completed")
+    console.log(" Error:", clientsError)
+    console.log(" Data:", clients)
 
     // Test 3: Users table
-    console.log("[v0] Testing users query...")
+    console.log(" Testing users query...")
     const { data: users, error: usersError } = await supabase.from("users").select("id, email").limit(1)
 
-    console.log("[v0] Users query completed")
-    console.log("[v0] Users error:", usersError)
-    console.log("[v0] Users data:", users)
+    console.log(" Users query completed")
+    console.log(" Users error:", usersError)
+    console.log(" Users data:", users)
 
     return NextResponse.json({
       success: true,
@@ -54,7 +54,7 @@ export async function GET() {
       },
     })
   } catch (error: any) {
-    console.error("[v0] === TEST FAILED ===", error)
+    console.error(" === TEST FAILED ===", error)
     return NextResponse.json(
       {
         success: false,

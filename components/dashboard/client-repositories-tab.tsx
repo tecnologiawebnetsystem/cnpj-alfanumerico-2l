@@ -38,11 +38,11 @@ export function ClientRepositoriesTab({ clientId }: ClientRepositoriesTabProps) 
     try {
       const currentUser = getCurrentUser()
       if (!currentUser) {
-        console.error("[v0] No current user found")
+        console.error(" No current user found")
         return
       }
 
-      console.log("[v0] Fetching repositories for client:", clientId)
+      console.log(" Fetching repositories for client:", clientId)
       const response = await fetch(
         `/api/client/repositories?client_id=${clientId}&user_id=${currentUser.id}&include_provider=true`,
         {
@@ -50,15 +50,15 @@ export function ClientRepositoriesTab({ clientId }: ClientRepositoriesTabProps) 
         },
       )
 
-      console.log("[v0] Repositories API response status:", response.status)
+      console.log(" Repositories API response status:", response.status)
 
       if (response.ok) {
         const data = await response.json()
-        console.log("[v0] Repositories loaded:", data.length)
+        console.log(" Repositories loaded:", data.length)
         setRepositories(data)
       }
     } catch (error) {
-      console.error("[v0] Error fetching repositories:", error)
+      console.error(" Error fetching repositories:", error)
     } finally {
       setLoading(false)
     }

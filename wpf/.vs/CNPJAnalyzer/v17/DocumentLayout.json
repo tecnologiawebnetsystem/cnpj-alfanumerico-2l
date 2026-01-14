@@ -1,0 +1,117 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Projeto\\cnpj-alfanumerico-2l\\wpf\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A3333333-3333-3333-3333-333333333333}|src\\CNPJAnalyzer.Infrastructure\\CNPJAnalyzer.Infrastructure.csproj|c:\\projeto\\cnpj-alfanumerico-2l\\wpf\\src\\cnpjanalyzer.infrastructure\\cnpjanalyzer.infrastructure.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{A3333333-3333-3333-3333-333333333333}|src\\CNPJAnalyzer.Infrastructure\\CNPJAnalyzer.Infrastructure.csproj|solutionrelative:src\\cnpjanalyzer.infrastructure\\cnpjanalyzer.infrastructure.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A4444444-4444-4444-4444-444444444444}|src\\CNPJAnalyzer.WPF\\CNPJAnalyzer.WPF.csproj|c:\\projeto\\cnpj-alfanumerico-2l\\wpf\\src\\cnpjanalyzer.wpf\\cnpjanalyzer.wpf.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{A4444444-4444-4444-4444-444444444444}|src\\CNPJAnalyzer.WPF\\CNPJAnalyzer.WPF.csproj|solutionrelative:src\\cnpjanalyzer.wpf\\cnpjanalyzer.wpf.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1111111-1111-1111-1111-111111111111}|src\\CNPJAnalyzer.Domain\\CNPJAnalyzer.Domain.csproj|c:\\projeto\\cnpj-alfanumerico-2l\\wpf\\src\\cnpjanalyzer.domain\\interfaces\\iaccountrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1111111-1111-1111-1111-111111111111}|src\\CNPJAnalyzer.Domain\\CNPJAnalyzer.Domain.csproj|solutionrelative:src\\cnpjanalyzer.domain\\interfaces\\iaccountrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A5555555-5555-5555-5555-555555555555}|tests\\CNPJAnalyzer.Tests\\CNPJAnalyzer.Tests.csproj|c:\\projeto\\cnpj-alfanumerico-2l\\wpf\\tests\\cnpjanalyzer.tests\\cnpjanalyzer.tests.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{A5555555-5555-5555-5555-555555555555}|tests\\CNPJAnalyzer.Tests\\CNPJAnalyzer.Tests.csproj|solutionrelative:tests\\cnpjanalyzer.tests\\cnpjanalyzer.tests.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2222222-2222-2222-2222-222222222222}|src\\CNPJAnalyzer.Application\\CNPJAnalyzer.Application.csproj|c:\\projeto\\cnpj-alfanumerico-2l\\wpf\\src\\cnpjanalyzer.application\\cnpjanalyzer.application.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{A2222222-2222-2222-2222-222222222222}|src\\CNPJAnalyzer.Application\\CNPJAnalyzer.Application.csproj|solutionrelative:src\\cnpjanalyzer.application\\cnpjanalyzer.application.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "IAccountRepository.cs",
+              "DocumentMoniker": "C:\\Projeto\\cnpj-alfanumerico-2l\\wpf\\src\\CNPJAnalyzer.Domain\\Interfaces\\IAccountRepository.cs",
+              "RelativeDocumentMoniker": "src\\CNPJAnalyzer.Domain\\Interfaces\\IAccountRepository.cs",
+              "ToolTip": "C:\\Projeto\\cnpj-alfanumerico-2l\\wpf\\src\\CNPJAnalyzer.Domain\\Interfaces\\IAccountRepository.cs",
+              "RelativeToolTip": "src\\CNPJAnalyzer.Domain\\Interfaces\\IAccountRepository.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAUwAoAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-24T04:24:01.907Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "CNPJAnalyzer.Infrastructure",
+              "DocumentMoniker": "C:\\Projeto\\cnpj-alfanumerico-2l\\wpf\\src\\CNPJAnalyzer.Infrastructure\\CNPJAnalyzer.Infrastructure.csproj",
+              "RelativeDocumentMoniker": "src\\CNPJAnalyzer.Infrastructure\\CNPJAnalyzer.Infrastructure.csproj",
+              "ToolTip": "C:\\Projeto\\cnpj-alfanumerico-2l\\wpf\\src\\CNPJAnalyzer.Infrastructure\\CNPJAnalyzer.Infrastructure.csproj",
+              "RelativeToolTip": "src\\CNPJAnalyzer.Infrastructure\\CNPJAnalyzer.Infrastructure.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-12-24T04:06:48.41Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "CNPJAnalyzer.Tests",
+              "DocumentMoniker": "C:\\Projeto\\cnpj-alfanumerico-2l\\wpf\\tests\\CNPJAnalyzer.Tests\\CNPJAnalyzer.Tests.csproj",
+              "RelativeDocumentMoniker": "tests\\CNPJAnalyzer.Tests\\CNPJAnalyzer.Tests.csproj",
+              "ToolTip": "C:\\Projeto\\cnpj-alfanumerico-2l\\wpf\\tests\\CNPJAnalyzer.Tests\\CNPJAnalyzer.Tests.csproj",
+              "RelativeToolTip": "tests\\CNPJAnalyzer.Tests\\CNPJAnalyzer.Tests.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-12-24T04:05:16.493Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CNPJAnalyzer.WPF",
+              "DocumentMoniker": "C:\\Projeto\\cnpj-alfanumerico-2l\\wpf\\src\\CNPJAnalyzer.WPF\\CNPJAnalyzer.WPF.csproj",
+              "RelativeDocumentMoniker": "src\\CNPJAnalyzer.WPF\\CNPJAnalyzer.WPF.csproj",
+              "ToolTip": "C:\\Projeto\\cnpj-alfanumerico-2l\\wpf\\src\\CNPJAnalyzer.WPF\\CNPJAnalyzer.WPF.csproj",
+              "RelativeToolTip": "src\\CNPJAnalyzer.WPF\\CNPJAnalyzer.WPF.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-12-24T04:06:39.999Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "CNPJAnalyzer.Application",
+              "DocumentMoniker": "C:\\Projeto\\cnpj-alfanumerico-2l\\wpf\\src\\CNPJAnalyzer.Application\\CNPJAnalyzer.Application.csproj",
+              "RelativeDocumentMoniker": "src\\CNPJAnalyzer.Application\\CNPJAnalyzer.Application.csproj",
+              "ToolTip": "C:\\Projeto\\cnpj-alfanumerico-2l\\wpf\\src\\CNPJAnalyzer.Application\\CNPJAnalyzer.Application.csproj",
+              "RelativeToolTip": "src\\CNPJAnalyzer.Application\\CNPJAnalyzer.Application.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-12-24T03:22:25.459Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

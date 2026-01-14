@@ -79,11 +79,11 @@ export default function ClientAnalysesTab({ clientId }: ClientAnalysesTabProps) 
 
   const loadAnalyses = async () => {
     try {
-      console.log("[v0] Loading analyses for client:", clientId)
+      console.log(" Loading analyses for client:", clientId)
       const supabase = getSupabaseClient()
 
       if (!supabase) {
-        console.error("[v0] Supabase client not available")
+        console.error(" Supabase client not available")
         return
       }
 
@@ -94,11 +94,11 @@ export default function ClientAnalysesTab({ clientId }: ClientAnalysesTabProps) 
         .order("created_at", { ascending: false })
 
       if (error) {
-        console.error("[v0] Error loading analyses:", error)
+        console.error(" Error loading analyses:", error)
         throw error
       }
 
-      console.log("[v0] Loaded analyses:", analysesData?.length)
+      console.log(" Loaded analyses:", analysesData?.length)
 
       const analysisGroups = new Map<string, any[]>()
 
@@ -128,7 +128,7 @@ export default function ClientAnalysesTab({ clientId }: ClientAnalysesTabProps) 
       let accountLookup = new Map()
 
       if (accountIds.length > 0) {
-        console.log("[v0] Fetching account names for connection_ids:", accountIds)
+        console.log(" Fetching account names for connection_ids:", accountIds)
 
         const { data: accountsData, error: accountsError } = await supabase
           .from("github_tokens")
@@ -136,9 +136,9 @@ export default function ClientAnalysesTab({ clientId }: ClientAnalysesTabProps) 
           .in("id", accountIds)
 
         if (accountsError) {
-          console.error("[v0] Error fetching accounts:", accountsError)
+          console.error(" Error fetching accounts:", accountsError)
         } else {
-          console.log("[v0] Found accounts:", accountsData)
+          console.log(" Found accounts:", accountsData)
         }
 
         accountLookup = new Map(
@@ -206,7 +206,7 @@ export default function ClientAnalysesTab({ clientId }: ClientAnalysesTabProps) 
         }
 
         console.log(
-          "[v0] Analysis",
+          " Analysis",
           key,
           "- connection_id:",
           firstAnalysis.connection_id,
@@ -243,7 +243,7 @@ export default function ClientAnalysesTab({ clientId }: ClientAnalysesTabProps) 
           (previousStatus === "pending" || previousStatus === "processing" || previousStatus === "in_progress") &&
           currentStatus === "completed"
         ) {
-          console.log("[v0] Analysis completed, showing notification:", analysis.id)
+          console.log(" Analysis completed, showing notification:", analysis.id)
           toast({
             title: "Análise Concluída! 🎉",
             description: `A análise de ${analysis.repository_count} ${analysis.repository_count === 1 ? "repositório foi concluída" : "repositórios foi concluída"} com sucesso. Clique em "Exibir Detalhes" para ver os resultados.`,
@@ -256,7 +256,7 @@ export default function ClientAnalysesTab({ clientId }: ClientAnalysesTabProps) 
           (previousStatus === "pending" || previousStatus === "processing" || previousStatus === "in_progress") &&
           (currentStatus === "failed" || currentStatus === "error")
         ) {
-          console.log("[v0] Analysis failed, showing error notification:", analysis.id)
+          console.log(" Analysis failed, showing error notification:", analysis.id)
           toast({
             title: "Erro na Análise",
             description: `A análise de ${analysis.repository_count} ${analysis.repository_count === 1 ? "repositório falhou" : "repositórios falhou"}. Verifique os logs para mais detalhes.`,
@@ -270,7 +270,7 @@ export default function ClientAnalysesTab({ clientId }: ClientAnalysesTabProps) 
 
       setAnalyses(formattedAnalyses)
     } catch (error) {
-      console.error("[v0] Failed to load analyses:", error)
+      console.error(" Failed to load analyses:", error)
     } finally {
       setLoading(false)
     }
@@ -339,7 +339,7 @@ export default function ClientAnalysesTab({ clientId }: ClientAnalysesTabProps) 
   const inProgressAnalyses = analyses.filter((a) => a.status === "pending" || a.status === "in_progress").length
 
   const handleDeleteAnalysis = async (analysisId: string) => {
-    console.log("[v0] Delete button clicked for analysis:", analysisId)
+    console.log(" Delete button clicked for analysis:", analysisId)
     setAnalysisToDelete(analysisId)
     setDeleteDialogOpen(true)
   }
@@ -348,7 +348,7 @@ export default function ClientAnalysesTab({ clientId }: ClientAnalysesTabProps) 
     if (!analysisToDelete) return
 
     try {
-      console.log("[v0] Deleting analysis:", analysisToDelete)
+      console.log(" Deleting analysis:", analysisToDelete)
       setDeleting(true)
 
       const response = await fetch(`/api/analyses/${analysisToDelete}`, {
@@ -359,13 +359,13 @@ export default function ClientAnalysesTab({ clientId }: ClientAnalysesTabProps) 
         throw new Error("Erro ao excluir análise")
       }
 
-      console.log("[v0] Analysis deleted successfully")
+      console.log(" Analysis deleted successfully")
       setDeleteDialogOpen(false)
       setAnalysisToDelete(null)
 
       await loadAnalyses()
     } catch (error) {
-      console.error("[v0] Error deleting analysis:", error)
+      console.error(" Error deleting analysis:", error)
       alert("Erro ao excluir análise. Tente novamente.")
     } finally {
       setDeleting(false)
@@ -373,11 +373,11 @@ export default function ClientAnalysesTab({ clientId }: ClientAnalysesTabProps) 
   }
 
   const handleShowProgress = (batchId: string, repoCount: number) => {
-    console.log("[v0] handleShowProgress called - batchId:", batchId, "repoCount:", repoCount) // Debug log
+    console.log(" handleShowProgress called - batchId:", batchId, "repoCount:", repoCount) // Debug log
     setSelectedBatchId(batchId)
     setSelectedRepoCount(repoCount)
     setProgressModalOpen(true)
-    console.log("[v0] Modal state set to open") // Debug log
+    console.log(" Modal state set to open") // Debug log
   }
 
   if (loading) {

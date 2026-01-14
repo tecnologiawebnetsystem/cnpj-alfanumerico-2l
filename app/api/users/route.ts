@@ -40,13 +40,13 @@ export async function GET(request: NextRequest) {
     const { data: users, error } = await query
 
     if (error) {
-      console.error("[v0] Error fetching users:", error)
+      console.error(" Error fetching users:", error)
       return NextResponse.json({ error: "Erro ao buscar usuários" }, { status: 500 })
     }
 
     return NextResponse.json({ users })
   } catch (error) {
-    console.error("[v0] Error in GET /api/users:", error)
+    console.error(" Error in GET /api/users:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (authError) {
-      console.error("[v0] Error creating auth user:", authError)
+      console.error(" Error creating auth user:", authError)
       return NextResponse.json({ error: "Erro ao criar usuário" }, { status: 500 })
     }
 
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (userError) {
-      console.error("[v0] Error creating user:", userError)
+      console.error(" Error creating user:", userError)
       // Tentar deletar o usuário do Auth se falhar
       await supabase.auth.admin.deleteUser(authData.user.id)
       return NextResponse.json({ error: "Erro ao criar usuário" }, { status: 500 })
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ user }, { status: 201 })
   } catch (error) {
-    console.error("[v0] Error in POST /api/users:", error)
+    console.error(" Error in POST /api/users:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

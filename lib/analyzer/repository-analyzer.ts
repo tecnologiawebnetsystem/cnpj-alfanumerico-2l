@@ -13,8 +13,8 @@ export async function analyzeRepository(
   repositoryName?: string, // Add repositoryName parameter
   allowedExtensions?: string[], // Added allowedExtensions parameter
 ) {
-  console.log(`[v0] [${analysisId}] ========== REPOSITORY ANALYZER CALLED ==========`)
-  console.log(`[v0] [${analysisId}] Parameters:`, {
+  console.log(` [${analysisId}] ========== REPOSITORY ANALYZER CALLED ==========`)
+  console.log(` [${analysisId}] Parameters:`, {
     type,
     hasFile: !!file,
     hasGithubUrl: !!githubUrl,
@@ -28,16 +28,16 @@ export async function analyzeRepository(
 
   const updateProgress = async (progress: number, step: string) => {
     const timestamp = new Date().toISOString()
-    console.log(`[v0] [${analysisId}] [${timestamp}] Progress: ${progress}% - ${step}`)
+    console.log(` [${analysisId}] [${timestamp}] Progress: ${progress}% - ${step}`)
     await supabase.from("analyses").update({ progress, current_step: step }).eq("id", analysisId)
   }
 
   try {
-    console.log(`[v0] [${analysisId}] ========== REPOSITORY ANALYZER STARTED ==========`)
-    console.log(`[v0] [${analysisId}] Type: ${type}`)
-    console.log(`[v0] [${analysisId}] Local files provided: ${localFiles?.length || 0}`)
-    console.log(`[v0] [${analysisId}] CNPJ fields: ${cnpjFieldNames?.join(", ") || "DEFAULT"}`)
-    console.log(`[v0] [${analysisId}] Repository name: ${repositoryName || "UNKNOWN"}`)
+    console.log(` [${analysisId}] ========== REPOSITORY ANALYZER STARTED ==========`)
+    console.log(` [${analysisId}] Type: ${type}`)
+    console.log(` [${analysisId}] Local files provided: ${localFiles?.length || 0}`)
+    console.log(` [${analysisId}] CNPJ fields: ${cnpjFieldNames?.join(", ") || "DEFAULT"}`)
+    console.log(` [${analysisId}] Repository name: ${repositoryName || "UNKNOWN"}`)
 
     await updateProgress(5, "Preparando análise...")
 
@@ -61,9 +61,9 @@ export async function analyzeRepository(
       extractedFiles.forEach((content, path) => {
         filesMap.set(path, { content })
       })
-      console.log(`[v0] [${analysisId}] Extracted files from ZIP:`, filesMap.size)
+      console.log(` [${analysisId}] Extracted files from ZIP:`, filesMap.size)
     } else if (type === "github" && githubUrl) {
-      console.log(`[v0] [${analysisId}] GitHub analysis not yet implemented`)
+      console.log(` [${analysisId}] GitHub analysis not yet implemented`)
       await supabase
         .from("analyses")
         .update({ status: "failed", error_message: "GitHub clone não implementado ainda", progress: 0 })
@@ -77,14 +77,14 @@ export async function analyzeRepository(
           repository: file.repository,
         })
       })
-      console.log(`[v0] [${analysisId}] Processed ${filesMap.size} files from local folder`)
+      console.log(` [${analysisId}] Processed ${filesMap.size} files from local folder`)
       if (localFiles.length > 0 && localFiles[0].project) {
-        console.log(`[v0] [${analysisId}] First file project: ${localFiles[0].project}`)
+        console.log(` [${analysisId}] First file project: ${localFiles[0].project}`)
       }
     }
 
     if (filesMap.size === 0) {
-      console.error(`[v0] [${analysisId}] No files to analyze!`)
+      console.error(` [${analysisId}] No files to analyze!`)
       await supabase
         .from("analyses")
         .update({
@@ -98,10 +98,10 @@ export async function analyzeRepository(
 
     await updateProgress(20, "Detectando linguagens...")
 
-    console.log(`[v0] [${analysisId}] ========== INITIALIZING CNPJ DETECTOR ==========`)
-    console.log(`[v0] [${analysisId}] Passing CNPJ fields to detector:`, cnpjFieldNames)
+    console.log(` [${analysisId}] ========== INITIALIZING CNPJ DETECTOR ==========`)
+    console.log(` [${analysisId}] Passing CNPJ fields to detector:`, cnpjFieldNames)
     const cnpjDetector = new CNPJDetector(cnpjFieldNames)
-    console.log(`[v0] [${analysisId}] CNPJDetector initialized`)
+    console.log(` [${analysisId}] CNPJDetector initialized`)
 
     const databaseDetector = new DatabaseDetector()
 
@@ -113,9 +113,9 @@ export async function analyzeRepository(
     const totalFiles = filesMap.size
     let processedFiles = 0
 
-    console.log(`[v0] [${analysisId}] ========== STARTING FILE ANALYSIS LOOP ==========`)
-    console.log(`[v0] [${analysisId}] Total files to analyze: ${totalFiles}`)
-    console.log(`[v0] [${analysisId}] Allowed extensions: ${allowedExtensions?.join(", ") || "ALL FILES"}`)
+    console.log(` [${analysisId}] ========== STARTING FILE ANALYSIS LOOP ==========`)
+    console.log(` [${analysisId}] Total files to analyze: ${totalFiles}`)
+    console.log(` [${analysisId}] Allowed extensions: ${allowedExtensions?.join(", ") || "ALL FILES"}`)
     await updateProgress(30, `Analisando ${totalFiles} arquivos...`)
 
     for (const [filePath, fileData] of filesMap.entries()) {
@@ -124,7 +124,7 @@ export async function analyzeRepository(
         const isAllowed = allowedExtensions.some((ext) => ext.toLowerCase().replace(".", "") === fileExtension)
 
         if (!isAllowed) {
-          console.log(`[v0] [${analysisId}] ⏭️  Skipping ${filePath} (extension .${fileExtension} not in allowed list)`)
+          console.log(` [${analysisId}] ⏭️  Skipping ${filePath} (extension .${fileExtension} not in allowed list)`)
           processedFiles++
           continue
         }
@@ -134,30 +134,30 @@ export async function analyzeRepository(
       const fileProgress = 30 + Math.round((processedFiles / totalFiles) * 50)
       await updateProgress(fileProgress, `Analisando: ${fileName} (${processedFiles + 1}/${totalFiles})`)
 
-      console.log(`[v0] [${analysisId}] 📄 Analyzing file ${processedFiles + 1}/${totalFiles}: ${filePath}`)
-      console.log(`[v0] [${analysisId}]    Content length: ${fileData.content.length} bytes`)
+      console.log(` [${analysisId}] 📄 Analyzing file ${processedFiles + 1}/${totalFiles}: ${filePath}`)
+      console.log(` [${analysisId}]    Content length: ${fileData.content.length} bytes`)
       if (fileData.project) {
-        console.log(`[v0] [${analysisId}]    Project: ${fileData.project}`)
+        console.log(` [${analysisId}]    Project: ${fileData.project}`)
       }
       if (fileData.repository) {
-        console.log(`[v0] [${analysisId}]    Repository: ${fileData.repository}`)
+        console.log(` [${analysisId}]    Repository: ${fileData.repository}`)
       }
 
       const zipProcessor = new ZipProcessor()
       const language = zipProcessor.detectLanguage(filePath)
-      console.log(`[v0] [${analysisId}]    Detected language: ${language}`)
+      console.log(` [${analysisId}]    Detected language: ${language}`)
 
       if (language !== "Unknown") {
         languagesFound.add(language)
         languageFileCount[language] = (languageFileCount[language] || 0) + 1
       }
 
-      console.log(`[v0] [${analysisId}]    Calling CNPJDetector.analyzeFile...`)
+      console.log(` [${analysisId}]    Calling CNPJDetector.analyzeFile...`)
       const findings = await cnpjDetector.analyzeFile(filePath, fileData.content, language)
-      console.log(`[v0] [${analysisId}]    ✅ Found ${findings.length} CNPJ occurrences in ${fileName}`)
+      console.log(` [${analysisId}]    ✅ Found ${findings.length} CNPJ occurrences in ${fileName}`)
 
       if (findings.length > 0) {
-        console.log(`[v0] [${analysisId}]    First finding:`, {
+        console.log(` [${analysisId}]    First finding:`, {
           line: findings[0].line,
           fieldName: findings[0].fieldName,
           type: findings[0].type,
@@ -205,19 +205,19 @@ export async function analyzeRepository(
       processedFiles++
     }
 
-    console.log(`[v0] [${analysisId}] ========== FILE ANALYSIS LOOP COMPLETE ==========`)
-    console.log(`[v0] [${analysisId}] Processed: ${processedFiles} files`)
-    console.log(`[v0] [${analysisId}] Total CNPJ findings: ${allFindings.length}`)
-    console.log(`[v0] [${analysisId}] Total DB findings: ${allDbFindings.length}`)
+    console.log(` [${analysisId}] ========== FILE ANALYSIS LOOP COMPLETE ==========`)
+    console.log(` [${analysisId}] Processed: ${processedFiles} files`)
+    console.log(` [${analysisId}] Total CNPJ findings: ${allFindings.length}`)
+    console.log(` [${analysisId}] Total DB findings: ${allDbFindings.length}`)
 
-    console.log(`[v0] [${analysisId}] ========== FINALIZING ANALYSIS ==========`)
-    console.log(`[v0] [${analysisId}] 🔄 BEFORE updating progress to 95%...`)
+    console.log(` [${analysisId}] ========== FINALIZING ANALYSIS ==========`)
+    console.log(` [${analysisId}] 🔄 BEFORE updating progress to 95%...`)
 
     const estimatedMinutes = allFindings.length * 3 + allDbFindings.length * 6
     const estimatedHours = Math.round((estimatedMinutes / 60) * 10) / 10 // Round to 1 decimal place
 
     console.log(
-      `[v0] [${analysisId}] Estimated effort: ${estimatedHours}h (based on ${allFindings.length} code + ${allDbFindings.length} DB findings)`,
+      ` [${analysisId}] Estimated effort: ${estimatedHours}h (based on ${allFindings.length} code + ${allDbFindings.length} DB findings)`,
     )
 
     await supabase
@@ -228,33 +228,33 @@ export async function analyzeRepository(
       })
       .eq("id", analysisId)
 
-    console.log(`[v0] [${analysisId}] ✅ AFTER updating progress to 95% - SUCCESS`)
+    console.log(` [${analysisId}] ✅ AFTER updating progress to 95% - SUCCESS`)
 
-    console.log(`[v0] [${analysisId}] 🔄 BEFORE inserting ${allFindings.length} findings...`)
+    console.log(` [${analysisId}] 🔄 BEFORE inserting ${allFindings.length} findings...`)
     if (allFindings.length > 0) {
       const { error: findingsError } = await supabase.from("findings").insert(allFindings)
 
       if (findingsError) {
-        console.error(`[v0] [${analysisId}] ❌ Error inserting findings:`, findingsError)
+        console.error(` [${analysisId}] ❌ Error inserting findings:`, findingsError)
         throw findingsError
       }
 
-      console.log(`[v0] [${analysisId}] ✅ Successfully inserted ${allFindings.length} findings`)
+      console.log(` [${analysisId}] ✅ Successfully inserted ${allFindings.length} findings`)
     }
 
-    console.log(`[v0] [${analysisId}] 🔄 BEFORE inserting ${allDbFindings.length} database findings...`)
+    console.log(` [${analysisId}] 🔄 BEFORE inserting ${allDbFindings.length} database findings...`)
     if (allDbFindings.length > 0) {
       const { error: dbFindingsError } = await supabase.from("database_findings").insert(allDbFindings)
 
       if (dbFindingsError) {
-        console.error(`[v0] [${analysisId}] ❌ Error inserting database findings:`, dbFindingsError)
+        console.error(` [${analysisId}] ❌ Error inserting database findings:`, dbFindingsError)
         throw dbFindingsError
       }
 
-      console.log(`[v0] [${analysisId}] ✅ Successfully inserted ${allDbFindings.length} database findings`)
+      console.log(` [${analysisId}] ✅ Successfully inserted ${allDbFindings.length} database findings`)
     }
 
-    console.log(`[v0] [${analysisId}] 🔄 BEFORE marking analysis as completed (100%)...`)
+    console.log(` [${analysisId}] 🔄 BEFORE marking analysis as completed (100%)...`)
 
     const { error: completeError } = await supabase
       .from("analyses")
@@ -286,18 +286,18 @@ export async function analyzeRepository(
       })
       .eq("id", analysisId)
 
-    console.log(`[v0] [${analysisId}] ✅✅✅ ANALYSIS COMPLETE - 100% ✅✅✅`)
+    console.log(` [${analysisId}] ✅✅✅ ANALYSIS COMPLETE - 100% ✅✅✅`)
 
-    console.log(`[v0] [${analysisId}] 🔄 BEFORE creating tasks in background...`)
+    console.log(` [${analysisId}] 🔄 BEFORE creating tasks in background...`)
     createTasksFromAnalysis(supabase, analysisId, clientId, userId, allFindings, allDbFindings)
-      .then(() => console.log(`[v0] [${analysisId}] ✅ Tasks created successfully`))
-      .catch((err) => console.error(`[v0] [${analysisId}] ⚠️ Task creation failed:`, err))
+      .then(() => console.log(` [${analysisId}] ✅ Tasks created successfully`))
+      .catch((err) => console.error(` [${analysisId}] ⚠️ Task creation failed:`, err))
 
-    console.log(`[v0] [${analysisId}] ✅ AFTER dispatching task creation - returning from analyzeRepository`)
-    console.log(`[v0] [${analysisId}] ========== ANALYSIS FUNCTION COMPLETE ==========`)
+    console.log(` [${analysisId}] ✅ AFTER dispatching task creation - returning from analyzeRepository`)
+    console.log(` [${analysisId}] ========== ANALYSIS FUNCTION COMPLETE ==========`)
   } catch (error) {
-    console.error(`[v0] [${analysisId}] ❌❌❌ FATAL ERROR IN ANALYZER ❌❌❌`)
-    console.error(`[v0] [${analysisId}] Error:`, error)
+    console.error(` [${analysisId}] ❌❌❌ FATAL ERROR IN ANALYZER ❌❌❌`)
+    console.error(` [${analysisId}] Error:`, error)
 
     await supabase
       .from("analyses")
@@ -328,11 +328,11 @@ export async function analyzeRepositoryCloud(
     database_fields_found: string[]
   }
 }> {
-  console.log(`[v0] ========== CLOUD REPOSITORY ANALYZER CALLED ==========`)
-  console.log(`[v0] Total files to analyze: ${files.length}`)
-  console.log(`[v0] CNPJ field names: ${cnpjFieldNames.join(", ")}`)
-  console.log(`[v0] Allowed extensions:`, allowedExtensions)
-  console.log(`[v0] Repository name: ${repositoryName}`)
+  console.log(` ========== CLOUD REPOSITORY ANALYZER CALLED ==========`)
+  console.log(` Total files to analyze: ${files.length}`)
+  console.log(` CNPJ field names: ${cnpjFieldNames.join(", ")}`)
+  console.log(` Allowed extensions:`, allowedExtensions)
+  console.log(` Repository name: ${repositoryName}`)
 
   const findings: any[] = []
   const detector = new CNPJDetector(cnpjFieldNames)
@@ -345,12 +345,12 @@ export async function analyzeRepositoryCloud(
     const ext = "." + file.path.split(".").pop()?.toLowerCase()
     const isAllowed = allowedExtensions.some((allowedExt) => allowedExt.toLowerCase() === ext)
     if (!isAllowed) {
-      console.log(`[v0] ⏭️ Skipping ${file.path} (extension ${ext} not in ${allowedExtensions.join(", ")})`)
+      console.log(` ⏭️ Skipping ${file.path} (extension ${ext} not in ${allowedExtensions.join(", ")})`)
     }
     return isAllowed
   })
 
-  console.log(`[v0] Files after extension filter: ${filesToAnalyze.length} (from ${files.length} total)`)
+  console.log(` Files after extension filter: ${filesToAnalyze.length} (from ${files.length} total)`)
 
   for (let i = 0; i < filesToAnalyze.length; i++) {
     const file = filesToAnalyze[i]
@@ -384,7 +384,7 @@ export async function analyzeRepositoryCloud(
         }
       }
     } catch (error) {
-      console.error(`[v0] Error analyzing file ${file.path}:`, error)
+      console.error(` Error analyzing file ${file.path}:`, error)
     }
   }
 
@@ -395,10 +395,10 @@ export async function analyzeRepositoryCloud(
     database_fields_found: Array.from(databaseFieldsSet),
   }
 
-  console.log(`[v0] ========== CLOUD ANALYSIS COMPLETE ==========`)
-  console.log(`[v0] Files analyzed: ${summary.total_files}`)
-  console.log(`[v0] Total findings: ${summary.total_findings}`)
-  console.log(`[v0] Files with findings: ${summary.files_with_findings}`)
+  console.log(` ========== CLOUD ANALYSIS COMPLETE ==========`)
+  console.log(` Files analyzed: ${summary.total_files}`)
+  console.log(` Total findings: ${summary.total_findings}`)
+  console.log(` Files with findings: ${summary.files_with_findings}`)
 
   return { findings, summary }
 }
@@ -412,8 +412,8 @@ async function createTasksFromAnalysis(
   dbFindings: any[],
 ) {
   try {
-    console.log(`[v0] [${analysisId}] ========== CREATING TASKS ==========`)
-    console.log(`[v0] [${analysisId}] Code findings: ${codeFindings.length}, DB findings: ${dbFindings.length}`)
+    console.log(` [${analysisId}] ========== CREATING TASKS ==========`)
+    console.log(` [${analysisId}] Code findings: ${codeFindings.length}, DB findings: ${dbFindings.length}`)
 
     const tasks: any[] = []
 
@@ -460,25 +460,25 @@ async function createTasksFromAnalysis(
     })
 
     if (tasks.length > 0) {
-      console.log(`[v0] [${analysisId}] Inserting ${tasks.length} tasks into database...`)
+      console.log(` [${analysisId}] Inserting ${tasks.length} tasks into database...`)
       const startTime = Date.now()
       const { error } = await supabase.from("tasks").insert(tasks)
       const duration = Date.now() - startTime
 
       if (error) {
-        console.error(`[v0] [${analysisId}] ❌ Error inserting tasks (took ${duration}ms):`, error.message)
-        console.error(`[v0] [${analysisId}] Error details:`, JSON.stringify(error, null, 2))
+        console.error(` [${analysisId}] ❌ Error inserting tasks (took ${duration}ms):`, error.message)
+        console.error(` [${analysisId}] Error details:`, JSON.stringify(error, null, 2))
         throw error
       } else {
-        console.log(`[v0] [${analysisId}] ✅ Successfully created ${tasks.length} tasks in ${duration}ms`)
+        console.log(` [${analysisId}] ✅ Successfully created ${tasks.length} tasks in ${duration}ms`)
       }
     } else {
-      console.log(`[v0] [${analysisId}] No tasks to create (no findings)`)
+      console.log(` [${analysisId}] No tasks to create (no findings)`)
     }
   } catch (error) {
-    console.error(`[v0] [${analysisId}] ❌ FATAL ERROR in createTasksFromAnalysis:`, error)
-    console.error(`[v0] [${analysisId}] Error type:`, error instanceof Error ? error.constructor.name : typeof error)
-    console.error(`[v0] [${analysisId}] Error message:`, error instanceof Error ? error.message : String(error))
+    console.error(` [${analysisId}] ❌ FATAL ERROR in createTasksFromAnalysis:`, error)
+    console.error(` [${analysisId}] Error type:`, error instanceof Error ? error.constructor.name : typeof error)
+    console.error(` [${analysisId}] Error message:`, error instanceof Error ? error.message : String(error))
     throw error
   }
 }

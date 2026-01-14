@@ -34,7 +34,7 @@ export function WorkerStatusIndicator() {
       setLastCheck(new Date())
 
       if (error) {
-        console.error("[v0] Worker status check error:", error)
+        console.error(" Worker status check error:", error)
         setWorkerStatus("offline")
         return
       }
@@ -47,7 +47,7 @@ export function WorkerStatusIndicator() {
         setWorkerId("")
       }
     } catch (error) {
-      console.error("[v0] Worker status check exception:", error)
+      console.error(" Worker status check exception:", error)
       setWorkerStatus("offline")
     }
   }

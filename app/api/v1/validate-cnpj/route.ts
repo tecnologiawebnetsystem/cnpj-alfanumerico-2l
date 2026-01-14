@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       message: validationResult.message,
     })
   } catch (error) {
-    console.error("[v0] Error validating CNPJ:", error)
+    console.error(" Error validating CNPJ:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
       cnpjs,
     })
   } catch (error) {
-    console.error("[v0] Error generating CNPJs:", error)
+    console.error(" Error generating CNPJs:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

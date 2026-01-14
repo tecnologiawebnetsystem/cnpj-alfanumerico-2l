@@ -32,7 +32,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     return NextResponse.json(data)
   } catch (error: any) {
-    console.error("[v0] Error updating license:", error)
+    console.error(" Error updating license:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

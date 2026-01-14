@@ -81,7 +81,7 @@ export function DevKanbanBoard({ tasks, onTaskUpdate }: DevKanbanBoardProps) {
     }),
   )
 
-  console.log("[v0] DevKanbanBoard rendering with tasks:", tasks)
+  console.log(" DevKanbanBoard rendering with tasks:", tasks)
 
   const pendingTasks = tasks.filter((t) => t.status === "pending")
   const inProgressTasks = tasks.filter((t) => t.status === "in_progress")
@@ -89,7 +89,7 @@ export function DevKanbanBoard({ tasks, onTaskUpdate }: DevKanbanBoardProps) {
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string)
-    console.log("[v0] Drag started for task:", event.active.id)
+    console.log(" Drag started for task:", event.active.id)
   }
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -97,7 +97,7 @@ export function DevKanbanBoard({ tasks, onTaskUpdate }: DevKanbanBoardProps) {
     setActiveId(null)
 
     if (!over) {
-      console.log("[v0] Drag ended with no drop target")
+      console.log(" Drag ended with no drop target")
       return
     }
 
@@ -105,28 +105,28 @@ export function DevKanbanBoard({ tasks, onTaskUpdate }: DevKanbanBoardProps) {
     const task = tasks.find((t) => t.id === taskId)
 
     if (!task) {
-      console.log("[v0] Task not found:", taskId)
+      console.log(" Task not found:", taskId)
       return
     }
 
     const newStatus = over.id as string
 
-    console.log("[v0] Drag ended - Task:", taskId, "Current status:", task.status, "New status:", newStatus)
+    console.log(" Drag ended - Task:", taskId, "Current status:", task.status, "New status:", newStatus)
 
     if (!["pending", "in_progress", "completed"].includes(newStatus)) {
-      console.log("[v0] Invalid drop target, ignoring")
+      console.log(" Invalid drop target, ignoring")
       return
     }
 
     // Don't update if dropped in same column
     if (task.status === newStatus) {
-      console.log("[v0] Task dropped in same column, no update needed")
+      console.log(" Task dropped in same column, no update needed")
       return
     }
 
     // Special handling for completed status - require commit hash and PR
     if (newStatus === "completed") {
-      console.log("[v0] Moving to completed, opening dialog")
+      console.log(" Moving to completed, opening dialog")
       setSelectedTask(task)
       setCompletionData({
         commit_hash: task.commit_hash || "",
@@ -138,14 +138,14 @@ export function DevKanbanBoard({ tasks, onTaskUpdate }: DevKanbanBoardProps) {
 
     // Update task status immediately for pending and in_progress
     try {
-      console.log("[v0] Updating task status from", task.status, "to:", newStatus)
+      console.log(" Updating task status from", task.status, "to:", newStatus)
       await onTaskUpdate(taskId, { status: newStatus })
       toast({
         title: "Tarefa movida!",
         description: `A tarefa foi movida para ${newStatus === "pending" ? "Pendentes" : "Em Desenvolvimento"}`,
       })
     } catch (error) {
-      console.error("[v0] Error updating task:", error)
+      console.error(" Error updating task:", error)
       toast({
         title: "Erro ao mover tarefa",
         description: "Não foi possível atualizar a tarefa",

@@ -8,7 +8,7 @@ export const maxDuration = 120
  * Gera relatório completo de uma análise
  */
 export async function POST(request: Request) {
-  console.log("[v0] === REPORT GENERATION API START ===")
+  console.log(" === REPORT GENERATION API START ===")
 
   try {
     const body = await request.json()
@@ -90,10 +90,10 @@ export async function POST(request: Request) {
       .single()
 
     if (saveError) {
-      console.error("[v0] Error saving report:", saveError)
+      console.error(" Error saving report:", saveError)
     }
 
-    console.log(`[v0] === REPORT GENERATION COMPLETE ===`)
+    console.log(` === REPORT GENERATION COMPLETE ===`)
 
     return NextResponse.json({
       success: true,
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
       report,
     })
   } catch (error: any) {
-    console.error("[v0] Report generation error:", error)
+    console.error(" Report generation error:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

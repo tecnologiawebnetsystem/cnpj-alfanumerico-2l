@@ -77,7 +77,7 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
   useEffect(() => {
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(id)) {
-      console.log("[v0] Invalid UUID format:", id, "- redirecting to /analyzer")
+      console.log(" Invalid UUID format:", id, "- redirecting to /analyzer")
       window.location.href = "/analyzer"
       return
     }
@@ -89,7 +89,7 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
     // Only start polling if status is processing/pending or if analysis hasn't loaded yet
     if (!analysis || ((analysis.status === "processing" || analysis.status === "pending") && analysis.progress < 100)) {
       console.log(
-        "[v0] Starting progress polling - status:",
+        " Starting progress polling - status:",
         analysis?.status || "loading",
         "progress:",
         analysis?.progress || 0,
@@ -104,17 +104,17 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
 
           // Add security timeout
           if (pollCount > MAX_POLLS) {
-            console.log("[v0] Polling timeout reached, stopping...")
+            console.log(" Polling timeout reached, stopping...")
             clearInterval(progressInterval)
             setError("Tempo limite de análise excedido. Por favor, tente novamente.")
             return
           }
 
-          console.log("[v0] Polling progress for analysis:", id, `(attempt ${pollCount}/${MAX_POLLS})`)
+          console.log(" Polling progress for analysis:", id, `(attempt ${pollCount}/${MAX_POLLS})`)
           const response = await fetch(`/api/analyses/${id}/progress`)
           if (response.ok) {
             const data = await response.json()
-            console.log("[v0] Progress update:", data)
+            console.log(" Progress update:", data)
 
             setProgress(data.progress || 0)
             setCurrentStep(data.current_step || "Processando...")
@@ -133,7 +133,7 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
 
             // Correct stop condition for 100%
             if (data.status === "completed" || data.progress >= 100) {
-              console.log("[v0] Analysis completed (status or progress >= 100), reloading full data...")
+              console.log(" Analysis completed (status or progress >= 100), reloading full data...")
               clearInterval(progressInterval)
               setTimeout(() => {
                 loadAnalysisData()
@@ -142,30 +142,30 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
 
             // Add handling for stuck analyses
             if (data.status === "failed") {
-              console.log("[v0] Analysis failed, stopping polling")
+              console.log(" Analysis failed, stopping polling")
               clearInterval(progressInterval)
               setError(data.error_message || "Análise falhou")
               loadAnalysisData()
             }
           } else {
-            console.log("[v0] Progress API returned non-OK status:", response.status)
+            console.log(" Progress API returned non-OK status:", response.status)
             // After 3 consecutive errors, stop polling
             if (pollCount % 3 === 0) {
-              console.warn("[v0] Multiple progress fetch failures, reloading data...")
+              console.warn(" Multiple progress fetch failures, reloading data...")
               loadAnalysisData()
             }
           }
         } catch (error) {
-          console.error("[v0] Error fetching progress:", error)
+          console.error(" Error fetching progress:", error)
         }
       }, 2000)
 
       return () => {
-        console.log("[v0] Clearing progress polling interval")
+        console.log(" Clearing progress polling interval")
         clearInterval(progressInterval)
       }
     } else {
-      console.log("[v0] Not starting polling - status:", analysis?.status, "progress:", analysis?.progress)
+      console.log(" Not starting polling - status:", analysis?.status, "progress:", analysis?.progress)
     }
   }, [id, analysis]) // Updated dependency to include analysis
 
@@ -173,8 +173,8 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
     try {
       const supabase = getSupabaseClient()
 
-      console.log("[v0] Loading analysis:", id)
-      console.log("[v0] Loading findings for analysis:", id)
+      console.log(" Loading analysis:", id)
+      console.log(" Loading findings for analysis:", id)
 
       const [singleAnalysisResult, findingsResult, dbFindingsResult] = await Promise.all([
         supabase.from("analyses").select("*").eq("id", id).maybeSingle(),
@@ -183,13 +183,13 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
       ])
 
       if (!singleAnalysisResult.data) {
-        console.log("[v0] No analysis found with id:", id, "- checking if this is a batch_id")
+        console.log(" No analysis found with id:", id, "- checking if this is a batch_id")
 
         // Check if this is a batch analysis
         const { data: batchData } = await supabase.from("batch_analyses").select("*").eq("id", id).maybeSingle()
 
         if (batchData) {
-          console.log("[v0] This is a batch_id, fetching individual analyses")
+          console.log(" This is a batch_id, fetching individual analyses")
 
           // Get all analyses for this batch
           const { data: batchAnalyses } = await supabase
@@ -201,7 +201,7 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
           if (batchAnalyses && batchAnalyses.length > 0) {
             // Use the first (most recent) analysis
             const firstAnalysis = batchAnalyses[0]
-            console.log("[v0] Using first analysis from batch:", firstAnalysis.id)
+            console.log(" Using first analysis from batch:", firstAnalysis.id)
 
             // Redirect to the correct analysis page
             window.location.href = `/analysis/${firstAnalysis.id}`
@@ -209,16 +209,16 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
           }
         }
 
-        console.log("[v0] No analysis or batch found, redirecting to /analyzer")
+        console.log(" No analysis or batch found, redirecting to /analyzer")
         window.location.href = "/analyzer"
         return
       }
 
       if (singleAnalysisResult.data) {
         setAnalysis(singleAnalysisResult.data)
-        console.log("[v0] Single analysis loaded:", singleAnalysisResult.data)
+        console.log(" Single analysis loaded:", singleAnalysisResult.data)
         console.log(
-          "[v0] Analysis status:",
+          " Analysis status:",
           singleAnalysisResult.data.status,
           "progress:",
           singleAnalysisResult.data.progress,
@@ -256,7 +256,7 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
         }
 
         if (findingsResult.data) {
-          console.log("[v0] Code findings loaded:", findingsResult.data.length)
+          console.log(" Code findings loaded:", findingsResult.data.length)
           setCodeFindings(findingsResult.data)
 
           if (!totalEstimatedHours) {
@@ -273,16 +273,16 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
             grouped.get(filePath)!.push(finding)
           })
           setFindingsByFile(grouped)
-          console.log("[v0] Grouped findings into", grouped.size, "files")
+          console.log(" Grouped findings into", grouped.size, "files")
         } else {
-          console.log("[v0] No code findings found")
+          console.log(" No code findings found")
         }
 
         if (dbFindingsResult.data) {
-          console.log("[v0] DB findings loaded:", dbFindingsResult.data.length)
+          console.log(" DB findings loaded:", dbFindingsResult.data.length)
           setDbFindings(dbFindingsResult.data)
         } else {
-          console.log("[v0] No DB findings found")
+          console.log(" No DB findings found")
         }
 
         setLoading(false)
@@ -296,13 +296,13 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
         .order("created_at", { ascending: true })
 
       if (batchError || !batchAnalyses || batchAnalyses.length === 0) {
-        console.error("[v0] Error loading batch analysis:", batchError)
+        console.error(" Error loading batch analysis:", batchError)
         setError("Análise não encontrada")
         setLoading(false)
         return
       }
 
-      console.log("[v0] Batch analysis loaded with", batchAnalyses.length, "repositories")
+      console.log(" Batch analysis loaded with", batchAnalyses.length, "repositories")
 
       const totalFindings = batchAnalyses.reduce((sum, a) => sum + (a.total_findings || 0), 0)
       const totalHours = batchAnalyses.reduce((sum, a) => sum + (a.estimated_hours || 0), 0)
@@ -370,7 +370,7 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
           grouped.get(filePath)!.push(finding)
         })
         setFindingsByFile(grouped)
-        console.log("[v0] Grouped findings into", grouped.size, "files")
+        console.log(" Grouped findings into", grouped.size, "files")
       }
 
       const { data: allDbFindings } = await supabase
@@ -386,7 +386,7 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
 
       setLoading(false)
     } catch (err) {
-      console.error("[v0] Error loading analysis data:", err)
+      console.error(" Error loading analysis data:", err)
       setError(err instanceof Error ? err.message : "Erro ao carregar análise")
       setLoading(false)
     }
@@ -404,16 +404,16 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
   const downloadReport = async (format: string) => {
     try {
       if (!id) {
-        console.error("[v0] Analysis ID is undefined")
+        console.error(" Analysis ID is undefined")
         setErrorMessage("ID da análise não encontrado. Por favor, recarregue a página.")
         setShowErrorModal(true)
         return
       }
 
-      console.log("[v0] Starting download for analysis ID:", id, "format:", format)
+      console.log(" Starting download for analysis ID:", id, "format:", format)
 
       const userStr = localStorage.getItem("user")
-      console.log("[v0] User from localStorage:", userStr ? "exists" : "null")
+      console.log(" User from localStorage:", userStr ? "exists" : "null")
 
       if (!userStr) {
         setErrorMessage("Você precisa estar autenticado para baixar relatórios.")
@@ -422,7 +422,7 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
       }
 
       const user = JSON.parse(userStr)
-      console.log("[v0] Parsed user:", { email: user.email, id: user.id })
+      console.log(" Parsed user:", { email: user.email, id: user.id })
 
       const authToken = btoa(
         JSON.stringify({
@@ -432,10 +432,10 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
           timestamp: Date.now(),
         }),
       )
-      console.log("[v0] Generated auth token (first 20 chars):", authToken.substring(0, 20))
+      console.log(" Generated auth token (first 20 chars):", authToken.substring(0, 20))
 
       const apiUrl = `/api/reports/${id}?format=${format}`
-      console.log("[v0] Requesting:", apiUrl)
+      console.log(" Requesting:", apiUrl)
 
       const response = await fetch(apiUrl, {
         headers: {
@@ -443,7 +443,7 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
         },
       })
 
-      console.log("[v0] Download response status:", response.status)
+      console.log(" Download response status:", response.status)
 
       if (response.ok) {
         const blob = await response.blob()
@@ -474,15 +474,15 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
         if (contentType?.includes("application/json")) {
           try {
             const errorData = await response.json()
-            console.error("[v0] Error response (JSON):", errorData)
+            console.error(" Error response (JSON):", errorData)
             errorMessage = errorData.error || errorData.message || errorMessage
           } catch (e) {
-            console.error("[v0] Failed to parse error JSON:", e)
+            console.error(" Failed to parse error JSON:", e)
           }
         } else {
           // Response is not JSON (HTML error page, plain text, etc.)
           const errorText = await response.text()
-          console.error("[v0] Error response (text):", errorText.substring(0, 200))
+          console.error(" Error response (text):", errorText.substring(0, 200))
           errorMessage = "Erro ao gerar relatório. Por favor, tente novamente."
         }
 
@@ -490,7 +490,7 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
         setShowErrorModal(true)
       }
     } catch (error) {
-      console.error("[v0] Download error:", error)
+      console.error(" Download error:", error)
       setErrorMessage(error instanceof Error ? error.message : "Erro ao gerar relatório")
       setShowErrorModal(true)
     }
@@ -518,7 +518,7 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
             })
           }
         } catch (error) {
-          console.error("[v0] Error deleting analysis:", error)
+          console.error(" Error deleting analysis:", error)
           showNotification({
             title: "Erro ao Excluir",
             description: "Erro ao excluir análise. Tente novamente.",

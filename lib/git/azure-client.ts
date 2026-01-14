@@ -34,7 +34,7 @@ export class AzureDevOpsClient {
   }
 
   private async request(endpoint: string, options: RequestInit = {}) {
-    console.log(`[v0] Azure DevOps API Request: ${options.method || 'GET'} ${endpoint}`)
+    console.log(` Azure DevOps API Request: ${options.method || 'GET'} ${endpoint}`)
     
     const auth = Buffer.from(`:${this.config.token}`).toString('base64')
     
@@ -50,16 +50,16 @@ export class AzureDevOpsClient {
     const data = await response.json()
     
     if (!response.ok) {
-      console.error('[v0] Azure DevOps API Error:', data)
+      console.error(' Azure DevOps API Error:', data)
       throw new Error(`Azure DevOps API error: ${data.message || response.statusText}`)
     }
 
-    console.log('[v0] Azure DevOps API Response:', data)
+    console.log(' Azure DevOps API Response:', data)
     return data
   }
 
   async getMainBranchRef(baseBranch: string = 'main'): Promise<string> {
-    console.log(`[v0] Getting ref for branch: ${baseBranch}`)
+    console.log(` Getting ref for branch: ${baseBranch}`)
     
     const data = await this.request(`/git/repositories/${this.config.repository}/refs?filter=heads/${baseBranch}&api-version=7.0`)
     
@@ -71,7 +71,7 @@ export class AzureDevOpsClient {
   }
 
   async createBranch({ branchName, baseBranch = 'main' }: CreateBranchParams): Promise<string> {
-    console.log(`[v0] Creating branch: ${branchName} from ${baseBranch}`)
+    console.log(` Creating branch: ${branchName} from ${baseBranch}`)
     
     const baseObjectId = await this.getMainBranchRef(baseBranch)
     
@@ -84,25 +84,25 @@ export class AzureDevOpsClient {
       }]),
     })
 
-    console.log(`[v0] Branch created successfully: ${branchName}`)
+    console.log(` Branch created successfully: ${branchName}`)
     return branchName
   }
 
   async getFileContent(filePath: string): Promise<string> {
-    console.log(`[v0] Reading file: ${filePath}`)
+    console.log(` Reading file: ${filePath}`)
     
     const data = await this.request(
       `/git/repositories/${this.config.repository}/items?path=${encodeURIComponent(filePath)}&api-version=7.0`
     )
     
-    console.log(`[v0] File content retrieved`)
+    console.log(` File content retrieved`)
     return data.content || data
   }
 
   async createCommit({ branch, filePath, content, message }: CreateCommitParams): Promise<string> {
-    console.log(`[v0] Creating commit on branch: ${branch}`)
-    console.log(`[v0] File: ${filePath}`)
-    console.log(`[v0] Message: ${message}`)
+    console.log(` Creating commit on branch: ${branch}`)
+    console.log(` File: ${filePath}`)
+    console.log(` Message: ${message}`)
     
     const refName = `refs/heads/${branch}`
     const oldObjectId = await this.getMainBranchRef(branch)
@@ -128,13 +128,13 @@ export class AzureDevOpsClient {
       }),
     })
 
-    console.log(`[v0] Commit created: ${data.commits[0].commitId}`)
+    console.log(` Commit created: ${data.commits[0].commitId}`)
     return data.commits[0].commitId
   }
 
   async createPullRequest({ title, description, sourceBranch, targetBranch }: CreatePullRequestParams): Promise<{ number: number; url: string }> {
-    console.log(`[v0] Creating Pull Request: ${title}`)
-    console.log(`[v0] From: ${sourceBranch} → To: ${targetBranch}`)
+    console.log(` Creating Pull Request: ${title}`)
+    console.log(` From: ${sourceBranch} → To: ${targetBranch}`)
     
     const data = await this.request(`/git/repositories/${this.config.repository}/pullrequests?api-version=7.0`, {
       method: 'POST',
@@ -148,8 +148,8 @@ export class AzureDevOpsClient {
 
     const prUrl = `https://dev.azure.com/${this.config.organization}/${this.config.project}/_git/${this.config.repository}/pullrequest/${data.pullRequestId}`
 
-    console.log(`[v0] Pull Request created: #${data.pullRequestId}`)
-    console.log(`[v0] URL: ${prUrl}`)
+    console.log(` Pull Request created: #${data.pullRequestId}`)
+    console.log(` URL: ${prUrl}`)
     
     return {
       number: data.pullRequestId,

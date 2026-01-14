@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ plans })
   } catch (error: any) {
-    console.error("[v0] Error fetching plans:", error)
+    console.error(" Error fetching plans:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

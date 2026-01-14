@@ -77,10 +77,10 @@ export async function enqueueJob(params: {
 
     if (error) throw error
 
-    console.log(`[v0] Job enqueued: ${data.id} (type: ${params.job_type})`)
+    console.log(` Job enqueued: ${data.id} (type: ${params.job_type})`)
     return { job_id: data.id }
   } catch (error: any) {
-    console.error("[v0] Error enqueueing job:", error)
+    console.error(" Error enqueueing job:", error)
     return { job_id: "", error: error.message }
   }
 }
@@ -101,7 +101,7 @@ export async function getNextJob(
 
     const job = data[0]
     console.log(
-      `[v0] Worker ${worker_id} picked up job: ${job.job_id} (attempt ${job.attempts})`
+      ` Worker ${worker_id} picked up job: ${job.job_id} (attempt ${job.attempts})`
     )
 
     return {
@@ -111,7 +111,7 @@ export async function getNextJob(
       attempts: job.attempts,
     } as Job
   } catch (error: any) {
-    console.error("[v0] Error getting next job:", error)
+    console.error(" Error getting next job:", error)
     return null
   }
 }
@@ -135,7 +135,7 @@ export async function updateJobProgress(
     if (error) throw error
     return true
   } catch (error: any) {
-    console.error("[v0] Error updating job progress:", error)
+    console.error(" Error updating job progress:", error)
     return false
   }
 }
@@ -153,10 +153,10 @@ export async function completeJob(
     })
 
     if (error) throw error
-    console.log(`[v0] Job completed: ${job_id}`)
+    console.log(` Job completed: ${job_id}`)
     return true
   } catch (error: any) {
-    console.error("[v0] Error completing job:", error)
+    console.error(" Error completing job:", error)
     return false
   }
 }
@@ -176,10 +176,10 @@ export async function failJob(
     })
 
     if (error) throw error
-    console.log(`[v0] Job failed: ${job_id} - ${error_message}`)
+    console.log(` Job failed: ${job_id} - ${error_message}`)
     return true
   } catch (error: any) {
-    console.error("[v0] Error failing job:", error)
+    console.error(" Error failing job:", error)
     return false
   }
 }
@@ -193,10 +193,10 @@ export async function pauseJob(job_id: string): Promise<boolean> {
     })
 
     if (error) throw error
-    console.log(`[v0] Job paused: ${job_id}`)
+    console.log(` Job paused: ${job_id}`)
     return true
   } catch (error: any) {
-    console.error("[v0] Error pausing job:", error)
+    console.error(" Error pausing job:", error)
     return false
   }
 }
@@ -210,10 +210,10 @@ export async function resumeJob(job_id: string): Promise<boolean> {
     })
 
     if (error) throw error
-    console.log(`[v0] Job resumed: ${job_id}`)
+    console.log(` Job resumed: ${job_id}`)
     return true
   } catch (error: any) {
-    console.error("[v0] Error resuming job:", error)
+    console.error(" Error resuming job:", error)
     return false
   }
 }
@@ -227,10 +227,10 @@ export async function cancelJob(job_id: string): Promise<boolean> {
     })
 
     if (error) throw error
-    console.log(`[v0] Job cancelled: ${job_id}`)
+    console.log(` Job cancelled: ${job_id}`)
     return true
   } catch (error: any) {
-    console.error("[v0] Error cancelling job:", error)
+    console.error(" Error cancelling job:", error)
     return false
   }
 }
@@ -254,7 +254,7 @@ export async function logJob(
     if (error) throw error
     return true
   } catch (error: any) {
-    console.error("[v0] Error logging job:", error)
+    console.error(" Error logging job:", error)
     return false
   }
 }
@@ -275,7 +275,7 @@ export async function getJobLogs(
     if (error) throw error
     return data || []
   } catch (error: any) {
-    console.error("[v0] Error getting job logs:", error)
+    console.error(" Error getting job logs:", error)
     return []
   }
 }
@@ -293,7 +293,7 @@ export async function getJobStatus(job_id: string): Promise<Job | null> {
     if (error) throw error
     return data
   } catch (error: any) {
-    console.error("[v0] Error getting job status:", error)
+    console.error(" Error getting job status:", error)
     return null
   }
 }
@@ -330,7 +330,7 @@ export async function listClientJobs(
     if (error) throw error
     return data || []
   } catch (error: any) {
-    console.error("[v0] Error listing client jobs:", error)
+    console.error(" Error listing client jobs:", error)
     return []
   }
 }

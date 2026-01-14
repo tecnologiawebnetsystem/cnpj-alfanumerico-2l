@@ -24,7 +24,7 @@ export function BatchProgressModal({ open, onClose, batchId, repositoryCount }: 
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    console.log("[v0] BatchProgressModal - open:", open, "batchId:", batchId)
+    console.log(" BatchProgressModal - open:", open, "batchId:", batchId)
     if (open && batchId) {
       fetchDistribution()
     }
@@ -32,15 +32,15 @@ export function BatchProgressModal({ open, onClose, batchId, repositoryCount }: 
 
   const fetchDistribution = async () => {
     setLoading(true)
-    console.log("[v0] Fetching distribution for batch:", batchId) // Debug log
+    console.log(" Fetching distribution for batch:", batchId) // Debug log
     try {
       const response = await fetch(`/api/analyses/${batchId}/progress`)
-      console.log("[v0] Distribution API response status:", response.status) // Debug log
+      console.log(" Distribution API response status:", response.status) // Debug log
       const data = await response.json()
-      console.log("[v0] Distribution data:", data) // Debug log
+      console.log(" Distribution data:", data) // Debug log
       setDistribution(data.distribution)
     } catch (error) {
-      console.error("[v0] Error fetching distribution:", error)
+      console.error(" Error fetching distribution:", error)
     } finally {
       setLoading(false)
     }

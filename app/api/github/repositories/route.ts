@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       .single()
 
     if (tokenError || !tokenData) {
-      console.error("[v0] Error fetching token:", tokenError?.message || "Token not found")
+      console.error(" Error fetching token:", tokenError?.message || "Token not found")
       return NextResponse.json({ error: "Token not found" }, { status: 404 })
     }
 
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       })
 
       if (!githubResponse.ok) {
-        console.error("[v0] GitHub API error:", githubResponse.status, await githubResponse.text())
+        console.error(" GitHub API error:", githubResponse.status, await githubResponse.text())
         return NextResponse.json(
           { error: "Erro ao buscar repositórios do GitHub. Verifique se o token é válido." },
           { status: githubResponse.status },
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
         default_branch: repo.default_branch,
       }))
 
-      console.log(`[v0] Fetched ${repositories.length} GitHub repositories`)
+      console.log(` Fetched ${repositories.length} GitHub repositories`)
     } else if (provider === "azure") {
       const organization = tokenData.scope
 
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
       const isOnPremise = organization.includes("://") && !organization.includes("dev.azure.com")
 
       if (isOnPremise) {
-        console.log("[v0] DETECTED ON-PREMISE Azure DevOps:", organization)
+        console.log(" DETECTED ON-PREMISE Azure DevOps:", organization)
         return NextResponse.json(
           {
             error: "azure_onpremise_requires_worker",
@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
         if (urlMatch) {
           baseUrl = urlMatch[1]
           org = urlMatch[2]
-          console.log(`[v0] Using custom Azure base URL: ${baseUrl}, org: ${org}`)
+          console.log(` Using custom Azure base URL: ${baseUrl}, org: ${org}`)
         }
       } else if (organization.includes("dev.azure.com/")) {
         const match = organization.match(/dev\.azure\.com\/([^/]+)/i)
@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      console.log(`[v0] Using Azure DevOps organization: ${org}`)
+      console.log(` Using Azure DevOps organization: ${org}`)
 
       // Azure DevOps API: List all projects first
       const projectsResponse = await fetch(`${baseUrl}/${org}/_apis/projects?api-version=7.0`, {
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
 
       if (!projectsResponse.ok) {
         const errorText = await projectsResponse.text()
-        console.error("[v0] Azure DevOps API error:", projectsResponse.status, errorText)
+        console.error(" Azure DevOps API error:", projectsResponse.status, errorText)
 
         if (projectsResponse.status === 401) {
           return NextResponse.json(
@@ -140,7 +140,7 @@ export async function GET(request: NextRequest) {
       const projectsContentType = projectsResponse.headers.get("content-type")
       if (!projectsContentType?.includes("application/json")) {
         const errorText = await projectsResponse.text()
-        console.error("[v0] Azure DevOps returned non-JSON for projects:", errorText.substring(0, 200))
+        console.error(" Azure DevOps returned non-JSON for projects:", errorText.substring(0, 200))
         return NextResponse.json(
           {
             error: `Azure DevOps retornou resposta inválida. Verifique se a URL está correta: ${baseUrl}/${org}/_apis/projects. Resposta: ${errorText.substring(0, 100)}`,
@@ -152,7 +152,7 @@ export async function GET(request: NextRequest) {
       const projects = await projectsResponse.json()
 
       if (!projects || !projects.value || !Array.isArray(projects.value)) {
-        console.error("[v0] Invalid projects data structure:", projects)
+        console.error(" Invalid projects data structure:", projects)
         return NextResponse.json(
           {
             error: "Estrutura de dados inválida retornada pelo Azure DevOps. Verifique se a organização existe.",
@@ -178,26 +178,26 @@ export async function GET(request: NextRequest) {
           )
 
           if (reposResponse.status === 429) {
-            console.warn(`[v0] Rate limit hit for project ${project.name}, skipping remaining projects`)
+            console.warn(` Rate limit hit for project ${project.name}, skipping remaining projects`)
             break
           }
 
           if (!reposResponse.ok) {
-            console.warn(`[v0] Error fetching repos for project ${project.name}: ${reposResponse.status}`)
+            console.warn(` Error fetching repos for project ${project.name}: ${reposResponse.status}`)
             continue
           }
 
           const contentType = reposResponse.headers.get("content-type")
           if (!contentType?.includes("application/json")) {
             const errorText = await reposResponse.text()
-            console.warn(`[v0] Non-JSON response for project ${project.name}: ${errorText.substring(0, 100)}`)
+            console.warn(` Non-JSON response for project ${project.name}: ${errorText.substring(0, 100)}`)
             continue
           }
 
           const reposData = await reposResponse.json()
 
           if (!reposData || !Array.isArray(reposData.value)) {
-            console.warn(`[v0] Invalid repos data structure for project ${project.name}`)
+            console.warn(` Invalid repos data structure for project ${project.name}`)
             continue
           }
 
@@ -218,13 +218,13 @@ export async function GET(request: NextRequest) {
 
           fetchedProjectsCount++
         } catch (projectError) {
-          console.warn(`[v0] Error processing project ${project.name}:`, projectError)
+          console.warn(` Error processing project ${project.name}:`, projectError)
           continue
         }
       }
 
       console.log(
-        `[v0] Fetched ${repositories.length} Azure DevOps repositories from ${fetchedProjectsCount}/${projects.value?.length || 0} projects`,
+        ` Fetched ${repositories.length} Azure DevOps repositories from ${fetchedProjectsCount}/${projects.value?.length || 0} projects`,
       )
     } else if (provider === "gitlab") {
       // GitLab API: List user's projects
@@ -239,7 +239,7 @@ export async function GET(request: NextRequest) {
       )
 
       if (!gitlabResponse.ok) {
-        console.error("[v0] GitLab API error:", gitlabResponse.status, await gitlabResponse.text())
+        console.error(" GitLab API error:", gitlabResponse.status, await gitlabResponse.text())
         return NextResponse.json(
           { error: "Erro ao buscar repositórios do GitLab. Verifique se o token é válido." },
           { status: gitlabResponse.status },
@@ -260,12 +260,12 @@ export async function GET(request: NextRequest) {
         default_branch: project.default_branch || "main",
       }))
 
-      console.log(`[v0] Fetched ${repositories.length} GitLab repositories`)
+      console.log(` Fetched ${repositories.length} GitLab repositories`)
     }
 
     return NextResponse.json({ repositories })
   } catch (error) {
-    console.error("[v0] Error in GET /api/github/repositories:", error)
+    console.error(" Error in GET /api/github/repositories:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

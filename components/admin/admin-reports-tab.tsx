@@ -37,7 +37,7 @@ export function AdminReportsTab() {
       try {
         const currentUser = await getCurrentUser()
         if (!currentUser?.id) {
-          console.error("[v0] No user found in reports tab")
+          console.error(" No user found in reports tab")
           return
         }
 
@@ -56,7 +56,7 @@ export function AdminReportsTab() {
           setUsers(usersData.filter((u: User) => u.client_id))
         }
       } catch (error) {
-        console.error("[v0] Error loading data:", error)
+        console.error(" Error loading data:", error)
       }
     }
 
@@ -65,7 +65,7 @@ export function AdminReportsTab() {
 
   const generateReport = async (type: string, format: "pdf" | "excel", clientId?: string, devId?: string) => {
     setLoading(`${type}-${format}`)
-    console.log(`[v0] Generating ${type} report in ${format} format, client: ${clientId}, dev: ${devId}`)
+    console.log(` Generating ${type} report in ${format} format, client: ${clientId}, dev: ${devId}`)
 
     try {
       let url = `/api/admin/reports/generate?type=${type}&format=${format}`
@@ -92,9 +92,9 @@ export function AdminReportsTab() {
       window.URL.revokeObjectURL(downloadUrl)
       document.body.removeChild(a)
 
-      console.log(`[v0] Report downloaded successfully`)
+      console.log(` Report downloaded successfully`)
     } catch (error) {
-      console.error("[v0] Error generating report:", error)
+      console.error(" Error generating report:", error)
       alert("Erro ao gerar relatório. Tente novamente.")
     } finally {
       setLoading(null)

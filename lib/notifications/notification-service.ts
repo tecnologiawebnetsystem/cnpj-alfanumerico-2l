@@ -39,7 +39,7 @@ export async function createNotification(notification: Notification) {
     .single()
 
   if (error) {
-    console.error("[v0] Error creating notification:", error)
+    console.error(" Error creating notification:", error)
     throw error
   }
 
@@ -85,7 +85,7 @@ export async function sendEmail(
   data?: any
 ) {
   // Aqui você pode integrar com serviços como SendGrid, AWS SES, etc
-  console.log("[v0] Sending email:", { to, subject, body, data })
+  console.log(" Sending email:", { to, subject, body, data })
   
   // Exemplo: usando fetch para API externa
   // const response = await fetch('https://api.sendgrid.com/v3/mail/send', {...})

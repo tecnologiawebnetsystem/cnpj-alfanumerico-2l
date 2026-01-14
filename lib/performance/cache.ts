@@ -34,15 +34,15 @@ export async function checkCache(
 
     if (data && data.length > 0) {
       console.log(
-        `[v0] Cache HIT: ${repositoryUrl} (age: ${data[0].age_minutes}min)`
+        ` Cache HIT: ${repositoryUrl} (age: ${data[0].age_minutes}min)`
       )
       return data[0]
     }
 
-    console.log(`[v0] Cache MISS: ${repositoryUrl}`)
+    console.log(` Cache MISS: ${repositoryUrl}`)
     return null
   } catch (error: any) {
-    console.error("[v0] Error checking cache:", error)
+    console.error(" Error checking cache:", error)
     return null
   }
 }
@@ -81,10 +81,10 @@ export async function saveToCache(params: {
 
     if (error) throw error
 
-    console.log(`[v0] Saved to cache: ${params.repositoryUrl}`)
+    console.log(` Saved to cache: ${params.repositoryUrl}`)
     return data
   } catch (error: any) {
-    console.error("[v0] Error saving to cache:", error)
+    console.error(" Error saving to cache:", error)
     return null
   }
 }
@@ -97,10 +97,10 @@ export async function cleanupExpiredCache(): Promise<number> {
 
     if (error) throw error
 
-    console.log(`[v0] Cleaned up ${data} expired cache entries`)
+    console.log(` Cleaned up ${data} expired cache entries`)
     return data
   } catch (error: any) {
-    console.error("[v0] Error cleaning cache:", error)
+    console.error(" Error cleaning cache:", error)
     return 0
   }
 }
@@ -117,7 +117,7 @@ export async function getCacheStatistics(): Promise<any> {
     if (error) throw error
     return data
   } catch (error: any) {
-    console.error("[v0] Error getting cache statistics:", error)
+    console.error(" Error getting cache statistics:", error)
     return null
   }
 }
@@ -135,10 +135,10 @@ export async function invalidateRepositoryCache(
 
     if (error) throw error
 
-    console.log(`[v0] Invalidated cache for repository: ${repositoryId}`)
+    console.log(` Invalidated cache for repository: ${repositoryId}`)
     return true
   } catch (error: any) {
-    console.error("[v0] Error invalidating cache:", error)
+    console.error(" Error invalidating cache:", error)
     return false
   }
 }

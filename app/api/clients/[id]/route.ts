@@ -28,13 +28,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       .single()
 
     if (error) {
-      console.error("[v0] Error updating client:", error)
+      console.error(" Error updating client:", error)
       return NextResponse.json({ error: "Erro ao atualizar cliente" }, { status: 500 })
     }
 
     return NextResponse.json({ client })
   } catch (error) {
-    console.error("[v0] Error in PUT /api/clients/[id]:", error)
+    console.error(" Error in PUT /api/clients/[id]:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }
@@ -64,13 +64,13 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     const { error } = await supabase.from("clients").delete().eq("id", params.id)
 
     if (error) {
-      console.error("[v0] Error deleting client:", error)
+      console.error(" Error deleting client:", error)
       return NextResponse.json({ error: "Erro ao deletar cliente" }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("[v0] Error in DELETE /api/clients/[id]:", error)
+    console.error(" Error in DELETE /api/clients/[id]:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

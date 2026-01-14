@@ -44,7 +44,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     return NextResponse.json({ task })
   } catch (error: any) {
-    console.error("[v0] Error updating task:", error)
+    console.error(" Error updating task:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
@@ -98,7 +98,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
     return NextResponse.json({ task })
   } catch (error: any) {
-    console.error("[v0] Error updating task:", error)
+    console.error(" Error updating task:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
@@ -123,7 +123,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error("[v0] Error deleting task:", error)
+    console.error(" Error deleting task:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

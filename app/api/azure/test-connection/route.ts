@@ -4,9 +4,9 @@ export async function POST(request: Request) {
   try {
     const { organization, pat, project } = await request.json()
 
-    console.log("[v0] Testing Azure connection...")
-    console.log("[v0] Organization:", organization)
-    console.log("[v0] Project:", project)
+    console.log(" Testing Azure connection...")
+    console.log(" Organization:", organization)
+    console.log(" Project:", project)
 
     // Detect if on-premise
     let baseUrl = "https://dev.azure.com"
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       if (urlMatch) {
         baseUrl = urlMatch[1]
         org = urlMatch[2]
-        console.log("[v0] Detected on-premise - Base:", baseUrl, "Org:", org)
+        console.log(" Detected on-premise - Base:", baseUrl, "Org:", org)
       }
     }
 
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     // Step 1: Test base URL
     try {
       const testUrl = `${baseUrl}/_apis/connectionData?api-version=6.0`
-      console.log("[v0] Step 1 - Testing connection:", testUrl)
+      console.log(" Step 1 - Testing connection:", testUrl)
 
       const response = await fetch(testUrl, {
         headers: {
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
     // Step 2: Test projects endpoint
     try {
       const projectsUrl = `${baseUrl}/${org}/_apis/projects?api-version=6.0`
-      console.log("[v0] Step 2 - Testing projects:", projectsUrl)
+      console.log(" Step 2 - Testing projects:", projectsUrl)
 
       const response = await fetch(projectsUrl, {
         headers: {
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
     if (project) {
       try {
         const reposUrl = `${baseUrl}/${org}/${project}/_apis/git/repositories?api-version=6.0`
-        console.log("[v0] Step 3 - Testing repos:", reposUrl)
+        console.log(" Step 3 - Testing repos:", reposUrl)
 
         const response = await fetch(reposUrl, {
           headers: {
@@ -116,7 +116,7 @@ export async function POST(request: Request) {
           : "Conexão OK! Todos os testes passaram.",
     })
   } catch (error) {
-    console.error("[v0] Test connection error:", error)
+    console.error(" Test connection error:", error)
     return Response.json({ error: error.message }, { status: 500 })
   }
 }

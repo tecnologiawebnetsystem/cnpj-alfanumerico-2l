@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     // Fetch repositories from Azure DevOps
     const repos = await fetchAzureRepositoriesComplete(token, token.access_token)
 
-    console.log("[v0] Fetched", repos.length, "repositories from Azure DevOps")
+    console.log(" Fetched", repos.length, "repositories from Azure DevOps")
 
     // Upsert repositories into database
     const reposToUpsert = repos.map((repo: any) => ({
@@ -50,11 +50,11 @@ export async function POST(request: Request) {
       .select()
 
     if (upsertError) {
-      console.error("[v0] Error upserting repositories:", upsertError)
+      console.error(" Error upserting repositories:", upsertError)
       return NextResponse.json({ error: "Failed to sync repositories" }, { status: 500 })
     }
 
-    console.log("[v0] Synced", upserted?.length || reposToUpsert.length, "repositories to database")
+    console.log(" Synced", upserted?.length || reposToUpsert.length, "repositories to database")
 
     return NextResponse.json({
       success: true,
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
       repositories: upserted || reposToUpsert,
     })
   } catch (error: any) {
-    console.error("[v0] Error in sync-repositories:", error)
+    console.error(" Error in sync-repositories:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
@@ -117,7 +117,7 @@ async function fetchAzureRepositoriesComplete(token: any, accessToken: string) {
 
     return allRepositories
   } catch (error: any) {
-    console.error("[v0] Error fetching Azure repositories:", error)
+    console.error(" Error fetching Azure repositories:", error)
     return []
   }
 }

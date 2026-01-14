@@ -30,7 +30,7 @@ export function ComparisonView({ clientId }: ComparisonViewProps) {
         setAnalyses(data.analyses || [])
       }
     } catch (error) {
-      console.error("[v0] Error loading analyses:", error)
+      console.error(" Error loading analyses:", error)
     }
   }
 
@@ -48,7 +48,7 @@ export function ComparisonView({ clientId }: ComparisonViewProps) {
         setComparison(data)
       }
     } catch (error) {
-      console.error("[v0] Error loading comparison:", error)
+      console.error(" Error loading comparison:", error)
     } finally {
       setLoading(false)
     }

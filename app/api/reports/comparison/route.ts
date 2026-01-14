@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
       changes: [...resolved, ...newFindings],
     })
   } catch (error) {
-    console.error("[v0] Error comparing analyses:", error)
+    console.error(" Error comparing analyses:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

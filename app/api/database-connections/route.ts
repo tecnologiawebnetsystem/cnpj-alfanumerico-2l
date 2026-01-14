@@ -4,17 +4,17 @@ import { getCurrentUser } from "@/lib/auth-actions"
 
 export async function GET(request: NextRequest) {
   try {
-    console.log("[v0] GET /api/database-connections called")
+    console.log(" GET /api/database-connections called")
 
     const user = await getCurrentUser()
-    console.log("[v0] User:", user ? `${user.email} (client_id: ${user.client_id})` : "null")
+    console.log(" User:", user ? `${user.email} (client_id: ${user.client_id})` : "null")
 
     if (!user) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
 
     const supabase = await createClient()
-    console.log("[v0] Supabase client created, querying database_connections...")
+    console.log(" Supabase client created, querying database_connections...")
 
     const { data: connections, error } = await supabase
       .from("database_connections")
@@ -23,25 +23,25 @@ export async function GET(request: NextRequest) {
       .order("created_at", { ascending: false })
 
     if (error) {
-      console.error("[v0] Supabase error:", error)
+      console.error(" Supabase error:", error)
       if (error.code === "42P01" || error.message.includes("does not exist")) {
-        console.log("[v0] Table database_connections does not exist yet, returning empty array")
+        console.log(" Table database_connections does not exist yet, returning empty array")
         return NextResponse.json({ connections: [] })
       }
       throw error
     }
 
-    console.log("[v0] Found", connections?.length || 0, "connections")
+    console.log(" Found", connections?.length || 0, "connections")
     return NextResponse.json({ connections: connections || [] })
   } catch (error: any) {
-    console.error("[v0] Error fetching database connections:", error)
+    console.error(" Error fetching database connections:", error)
     return NextResponse.json({ error: error.message || "Erro ao buscar conexões" }, { status: 500 })
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    console.log("[v0] POST /api/database-connections called")
+    console.log(" POST /api/database-connections called")
 
     const user = await getCurrentUser()
     if (!user) {
@@ -82,14 +82,14 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error("[v0] Error creating connection:", error)
+      console.error(" Error creating connection:", error)
       throw error
     }
 
-    console.log("[v0] Connection created successfully:", connection.id)
+    console.log(" Connection created successfully:", connection.id)
     return NextResponse.json({ connection }, { status: 201 })
   } catch (error: any) {
-    console.error("[v0] Error creating database connection:", error)
+    console.error(" Error creating database connection:", error)
     return NextResponse.json({ error: error.message || "Erro ao criar conexão" }, { status: 500 })
   }
 }

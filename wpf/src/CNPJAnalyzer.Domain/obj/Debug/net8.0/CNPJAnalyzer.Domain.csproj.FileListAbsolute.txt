@@ -1,0 +1,12 @@
+C:\Projeto\cnpj-alfanumerico-2l\wpf\src\CNPJAnalyzer.Domain\bin\Debug\net8.0\CNPJAnalyzer.Domain.deps.json
+C:\Projeto\cnpj-alfanumerico-2l\wpf\src\CNPJAnalyzer.Domain\bin\Debug\net8.0\CNPJAnalyzer.Domain.dll
+C:\Projeto\cnpj-alfanumerico-2l\wpf\src\CNPJAnalyzer.Domain\bin\Debug\net8.0\CNPJAnalyzer.Domain.pdb
+C:\Projeto\cnpj-alfanumerico-2l\wpf\src\CNPJAnalyzer.Domain\obj\Debug\net8.0\CNPJAnalyzer.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Projeto\cnpj-alfanumerico-2l\wpf\src\CNPJAnalyzer.Domain\obj\Debug\net8.0\CNPJAnalyzer.Domain.AssemblyInfoInputs.cache
+C:\Projeto\cnpj-alfanumerico-2l\wpf\src\CNPJAnalyzer.Domain\obj\Debug\net8.0\CNPJAnalyzer.Domain.AssemblyInfo.cs
+C:\Projeto\cnpj-alfanumerico-2l\wpf\src\CNPJAnalyzer.Domain\obj\Debug\net8.0\CNPJAnalyzer.Domain.csproj.CoreCompileInputs.cache
+C:\Projeto\cnpj-alfanumerico-2l\wpf\src\CNPJAnalyzer.Domain\obj\Debug\net8.0\CNPJAnalyzer.Domain.sourcelink.json
+C:\Projeto\cnpj-alfanumerico-2l\wpf\src\CNPJAnalyzer.Domain\obj\Debug\net8.0\CNPJAnalyzer.Domain.dll
+C:\Projeto\cnpj-alfanumerico-2l\wpf\src\CNPJAnalyzer.Domain\obj\Debug\net8.0\refint\CNPJAnalyzer.Domain.dll
+C:\Projeto\cnpj-alfanumerico-2l\wpf\src\CNPJAnalyzer.Domain\obj\Debug\net8.0\CNPJAnalyzer.Domain.pdb
+C:\Projeto\cnpj-alfanumerico-2l\wpf\src\CNPJAnalyzer.Domain\obj\Debug\net8.0\ref\CNPJAnalyzer.Domain.dll

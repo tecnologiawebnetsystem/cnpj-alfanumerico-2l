@@ -190,7 +190,7 @@ const filtered = allRepositories.filter((repo) =>
 ```ts
 // SUBSTITUIR LINHAS 30-45 POR:
 const fieldNames = ["cnpj", "cpf_cnpj", "documento", "inscricao", "nr_cnpj"]
-console.log("[v0] Using default patterns:", fieldNames)
+console.log(" Using default patterns:", fieldNames)
 ```
 
 #### 1.3 Corrigir campo azure_repo_id
@@ -224,7 +224,7 @@ const { data: batch, error: batchError } = await supabase
   .single()
 
 if (batchError) {
-  console.error("[v0] Failed to create batch:", batchError)
+  console.error(" Failed to create batch:", batchError)
   return NextResponse.json({ error: "Failed to create batch" }, { status: 500 })
 }
 ```
@@ -242,7 +242,7 @@ async function fetchAzureRepositories(
   accessToken: string,
   supabase: any,
 ) {
-  console.log("[v0] Repository IDs (Supabase):", repositoryIds)
+  console.log(" Repository IDs (Supabase):", repositoryIds)
   
   // 1. Buscar nomes dos repositórios selecionados no Supabase
   let selectedRepoNames: string[] = []
@@ -253,19 +253,19 @@ async function fetchAzureRepositories(
       .in("id", repositoryIds)
     
     selectedRepoNames = repos?.map(r => r.name) || []
-    console.log("[v0] Selected repo names:", selectedRepoNames)
+    console.log(" Selected repo names:", selectedRepoNames)
   }
   
   // 2. Buscar TODOS os repos da Azure
   const azureRepos = await fetchAllAzureRepos(token, accessToken)
-  console.log("[v0] Azure repos fetched:", azureRepos.length)
+  console.log(" Azure repos fetched:", azureRepos.length)
   
   // 3. Filtrar por nome se não for analyze_all
   if (!analyzeAll && selectedRepoNames.length > 0) {
     const filtered = azureRepos.filter(repo => 
       selectedRepoNames.includes(repo.name)
     )
-    console.log("[v0] Filtered to", filtered.length, "repos")
+    console.log(" Filtered to", filtered.length, "repos")
     return filtered
   }
   

@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ scheduled_analyses: scheduledAnalyses })
   } catch (error: any) {
-    console.error("[v0] Error fetching scheduled analyses:", error)
+    console.error(" Error fetching scheduled analyses:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ scheduled_analysis: scheduledAnalysis })
   } catch (error: any) {
-    console.error("[v0] Error creating scheduled analysis:", error)
+    console.error(" Error creating scheduled analysis:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

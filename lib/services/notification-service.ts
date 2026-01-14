@@ -53,7 +53,7 @@ export async function sendNotification(options: SendNotificationOptions) {
       })
       results.in_app = true
     } catch (error) {
-      console.error("[v0] Error creating in-app notification:", error)
+      console.error(" Error creating in-app notification:", error)
       results.in_app = false
     }
   }
@@ -67,7 +67,7 @@ export async function sendNotification(options: SendNotificationOptions) {
       })
       results.email = true
     } catch (error) {
-      console.error("[v0] Error sending email notification:", error)
+      console.error(" Error sending email notification:", error)
       results.email = false
     }
   }
@@ -81,7 +81,7 @@ export async function sendNotification(options: SendNotificationOptions) {
       })
       results.whatsapp = true
     } catch (error) {
-      console.error("[v0] Error sending WhatsApp notification:", error)
+      console.error(" Error sending WhatsApp notification:", error)
       results.whatsapp = false
     }
   }

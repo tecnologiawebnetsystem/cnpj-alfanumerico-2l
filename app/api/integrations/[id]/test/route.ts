@@ -80,7 +80,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       response_time: responseTime,
     })
   } catch (error) {
-    console.error("[v0] Error in POST /api/integrations/:id/test:", error)
+    console.error(" Error in POST /api/integrations/:id/test:", error)
 
     const responseTime = Date.now() - startTime
 
@@ -123,7 +123,7 @@ async function testGitHubConnection(integration: any): Promise<{ success: boolea
       message: `Conexão bem-sucedida! Autenticado como ${user.login}`,
     }
   } catch (error: any) {
-    console.error("[v0] GitHub connection test failed:", error)
+    console.error(" GitHub connection test failed:", error)
     return {
       success: false,
       message: "Falha ao conectar com GitHub",

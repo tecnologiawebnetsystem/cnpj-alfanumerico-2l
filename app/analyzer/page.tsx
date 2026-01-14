@@ -77,7 +77,7 @@ export default function AnalyzerPage() {
         setAccounts(data.tokens || [])
       }
     } catch (error) {
-      console.error("[v0] Error loading accounts:", error)
+      console.error(" Error loading accounts:", error)
       setError("Erro ao carregar contas conectadas")
     } finally {
       setLoading(false)
@@ -98,10 +98,10 @@ export default function AnalyzerPage() {
       const account = accounts.find((a) => a.id === accountId)
       if (!account) return
 
-      console.log(`[v0] Loading repositories for ${account.provider}`)
+      console.log(` Loading repositories for ${account.provider}`)
 
       if (account.provider === "azure_devops") {
-        console.log("[v0] Syncing Azure DevOps repositories to database...")
+        console.log(" Syncing Azure DevOps repositories to database...")
         const syncResponse = await fetch("/api/azure-devops/sync-repositories", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -113,12 +113,12 @@ export default function AnalyzerPage() {
 
         if (!syncResponse.ok) {
           const syncError = await syncResponse.json()
-          console.error("[v0] Sync failed:", syncError)
+          console.error(" Sync failed:", syncError)
           throw new Error(syncError.error || "Failed to sync repositories")
         }
 
         const syncData = await syncResponse.json()
-        console.log("[v0] Synced", syncData.synced, "repositories")
+        console.log(" Synced", syncData.synced, "repositories")
       }
 
       const response = await fetch(
@@ -131,10 +131,10 @@ export default function AnalyzerPage() {
         throw new Error(data.error || "Erro ao carregar repositórios")
       }
 
-      console.log(`[v0] Loaded ${data.repositories?.length || 0} repositories`)
+      console.log(` Loaded ${data.repositories?.length || 0} repositories`)
       setRepositories(data.repositories || [])
     } catch (error: any) {
-      console.error("[v0] Error loading repositories:", error)
+      console.error(" Error loading repositories:", error)
       setError(error.message || "Erro ao carregar repositórios")
     } finally {
       setLoadingRepos(false)
@@ -184,10 +184,10 @@ export default function AnalyzerPage() {
     setError("")
 
     try {
-      console.log("[v0] Starting analysis...")
-      console.log("[v0] Selected account:", selectedAccountData.account_name)
-      console.log("[v0] Repository IDs:", Array.from(selectedRepos))
-      console.log("[v0] Analysis method:", analysisMethod)
+      console.log(" Starting analysis...")
+      console.log(" Selected account:", selectedAccountData.account_name)
+      console.log(" Repository IDs:", Array.from(selectedRepos))
+      console.log(" Analysis method:", analysisMethod)
 
       const user = await getCurrentUser()
       if (!user) {
@@ -226,11 +226,11 @@ export default function AnalyzerPage() {
       }
 
       const data = await response.json()
-      console.log(`[v0] Analysis started: ${data.batchId}`)
+      console.log(` Analysis started: ${data.batchId}`)
 
       window.location.href = "/dashboard"
     } catch (error: any) {
-      console.error("[v0] Error starting analysis:", error.message)
+      console.error(" Error starting analysis:", error.message)
       setError(error.message || "Erro ao iniciar análise")
     } finally {
       setIsAnalyzing(false)

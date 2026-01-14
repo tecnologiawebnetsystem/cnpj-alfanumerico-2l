@@ -105,7 +105,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       message: `${developer.name} atribuído ao repositório ${repository.name}`,
     })
   } catch (error: any) {
-    console.error("[v0] Error assigning developer to repository:", error)
+    console.error(" Error assigning developer to repository:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
@@ -139,7 +139,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
     return NextResponse.json(assignments || [])
   } catch (error: any) {
-    console.error("[v0] Error fetching repository assignments:", error)
+    console.error(" Error fetching repository assignments:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
@@ -170,7 +170,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     return NextResponse.json({ success: true, message: "Assignment archived successfully" })
   } catch (error: any) {
-    console.error("[v0] Error archiving repository assignment:", error)
+    console.error(" Error archiving repository assignment:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

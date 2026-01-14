@@ -12,11 +12,11 @@ async function hashPassword(password: string): Promise<string> {
 
 export async function GET(request: NextRequest) {
   try {
-    console.log("[v0] === GET /api/client/devs START ===")
+    console.log(" === GET /api/client/devs START ===")
     const { searchParams } = new URL(request.url)
     const client_id = searchParams.get("client_id")
 
-    console.log("[v0] client_id:", client_id)
+    console.log(" client_id:", client_id)
 
     if (!client_id) {
       return NextResponse.json({ error: "client_id is required" }, { status: 400 })
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = createSupabaseServiceClient()
 
-    console.log("[v0] Querying users table for devs...")
+    console.log(" Querying users table for devs...")
     const { data: devs, error } = await supabase
       .from("users")
       .select("id, name, email, status, created_at")
@@ -33,11 +33,11 @@ export async function GET(request: NextRequest) {
       .order("created_at", { ascending: false })
 
     if (error) {
-      console.error("[v0] Error fetching devs:", error)
+      console.error(" Error fetching devs:", error)
       throw error
     }
 
-    console.log("[v0] Found", devs?.length || 0, "developers")
+    console.log(" Found", devs?.length || 0, "developers")
 
     const devsWithCounts = await Promise.all(
       (devs || []).map(async (dev) => {
@@ -60,24 +60,24 @@ export async function GET(request: NextRequest) {
       }),
     )
 
-    console.log("[v0] Developers with task counts:", devsWithCounts.length)
-    console.log("[v0] === GET /api/client/devs END ===")
+    console.log(" Developers with task counts:", devsWithCounts.length)
+    console.log(" === GET /api/client/devs END ===")
 
     return NextResponse.json(devsWithCounts)
   } catch (error) {
-    console.error("[v0] CRITICAL Error fetching devs:", error)
+    console.error(" CRITICAL Error fetching devs:", error)
     return NextResponse.json({ error: "Failed to fetch devs" }, { status: 500 })
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    console.log("[v0] === POST /api/client/devs START ===")
+    console.log(" === POST /api/client/devs START ===")
 
     const supabase = createSupabaseServiceClient()
     const body = await request.json()
 
-    console.log("[v0] Creating new dev:", body.email)
+    console.log(" Creating new dev:", body.email)
 
     const passwordHash = await hashPassword(body.password)
 
@@ -95,16 +95,16 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error("[v0] Error creating dev:", error)
+      console.error(" Error creating dev:", error)
       throw error
     }
 
-    console.log("[v0] Dev created successfully:", data.id)
-    console.log("[v0] === POST /api/client/devs END ===")
+    console.log(" Dev created successfully:", data.id)
+    console.log(" === POST /api/client/devs END ===")
 
     return NextResponse.json(data)
   } catch (error) {
-    console.error("[v0] CRITICAL Error creating dev:", error)
+    console.error(" CRITICAL Error creating dev:", error)
     return NextResponse.json({ error: "Failed to create dev" }, { status: 500 })
   }
 }

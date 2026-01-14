@@ -58,13 +58,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       .single()
 
     if (error) {
-      console.error("[v0] Error updating user:", error)
+      console.error(" Error updating user:", error)
       return NextResponse.json({ error: "Erro ao atualizar usuário" }, { status: 500 })
     }
 
     return NextResponse.json({ user })
   } catch (error) {
-    console.error("[v0] Error in PUT /api/users/[id]:", error)
+    console.error(" Error in PUT /api/users/[id]:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }
@@ -107,13 +107,13 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     const { error } = await supabase.from("users").delete().eq("id", params.id)
 
     if (error) {
-      console.error("[v0] Error deleting user:", error)
+      console.error(" Error deleting user:", error)
       return NextResponse.json({ error: "Erro ao deletar usuário" }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("[v0] Error in DELETE /api/users/[id]:", error)
+    console.error(" Error in DELETE /api/users/[id]:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

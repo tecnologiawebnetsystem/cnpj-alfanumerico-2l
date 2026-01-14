@@ -3,14 +3,14 @@ import { createServerClient } from "@/lib/supabase/server"
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    console.log("[v0] === PUT /api/admin/clients/[id] START ===")
+    console.log(" === PUT /api/admin/clients/[id] START ===")
     const { id } = await params
-    console.log("[v0] Client ID:", id)
+    console.log(" Client ID:", id)
 
     const supabase = await createServerClient()
     const body = await request.json()
 
-    console.log("[v0] Updating client...")
+    console.log(" Updating client...")
 
     const { data, error } = await supabase
       .from("clients")
@@ -28,42 +28,42 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       .single()
 
     if (error) {
-      console.error("[v0] Error updating client:", error)
+      console.error(" Error updating client:", error)
       throw error
     }
 
-    console.log("[v0] Client updated successfully")
-    console.log("[v0] === PUT /api/admin/clients/[id] END ===")
+    console.log(" Client updated successfully")
+    console.log(" === PUT /api/admin/clients/[id] END ===")
 
     return NextResponse.json(data)
   } catch (error) {
-    console.error("[v0] CRITICAL Error updating client:", error)
+    console.error(" CRITICAL Error updating client:", error)
     return NextResponse.json({ error: "Failed to update client" }, { status: 500 })
   }
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    console.log("[v0] === DELETE /api/admin/clients/[id] START ===")
+    console.log(" === DELETE /api/admin/clients/[id] START ===")
     const { id } = await params
-    console.log("[v0] Client ID to delete:", id)
+    console.log(" Client ID to delete:", id)
 
     const supabase = await createServerClient()
 
-    console.log("[v0] Deleting client...")
+    console.log(" Deleting client...")
     const { error } = await supabase.from("clients").delete().eq("id", id)
 
     if (error) {
-      console.error("[v0] Error deleting client:", error)
+      console.error(" Error deleting client:", error)
       throw error
     }
 
-    console.log("[v0] Client deleted successfully")
-    console.log("[v0] === DELETE /api/admin/clients/[id] END ===")
+    console.log(" Client deleted successfully")
+    console.log(" === DELETE /api/admin/clients/[id] END ===")
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("[v0] CRITICAL Error deleting client:", error)
+    console.error(" CRITICAL Error deleting client:", error)
     return NextResponse.json({ error: "Failed to delete client" }, { status: 500 })
   }
 }

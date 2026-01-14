@@ -39,7 +39,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(data)
   } catch (error) {
-    console.error("[v0] Error updating progress:", error)
+    console.error(" Error updating progress:", error)
     return NextResponse.json({ error: "Failed to update progress" }, { status: 500 })
   }
 }

@@ -80,7 +80,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       },
     })
   } catch (error) {
-    console.error("[v0] Error fetching analysis:", error)
+    console.error(" Error fetching analysis:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

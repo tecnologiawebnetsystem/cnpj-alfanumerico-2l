@@ -3,7 +3,7 @@ import { GitHubIssuesClient } from './github-issues-client'
 import { AzureDevOpsClient } from '@/lib/git/azure-client'
 
 export function createTaskManagementClient(config: TaskManagementConfig): TaskManagementClient {
-  console.log('[v0] Creating task management client for provider:', config.provider)
+  console.log(' Creating task management client for provider:', config.provider)
   
   switch (config.provider) {
     case 'github-issues':

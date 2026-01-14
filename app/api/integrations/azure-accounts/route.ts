@@ -32,7 +32,7 @@ export async function GET(request: Request) {
       .order("account_name", { ascending: true })
 
     if (accountsError) {
-      console.error("[v0] Error fetching Azure accounts:", accountsError)
+      console.error(" Error fetching Azure accounts:", accountsError)
       return NextResponse.json({ error: accountsError.message }, { status: 500 })
     }
 
@@ -62,7 +62,7 @@ export async function GET(request: Request) {
     })
 
   } catch (error: any) {
-    console.error("[v0] Error in azure-accounts route:", error)
+    console.error(" Error in azure-accounts route:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
       if (urlMatch) {
         baseUrl = urlMatch[1]
         org = urlMatch[2]
-        console.log(`[v0] Using custom Azure base URL: ${baseUrl}`)
+        console.log(` Using custom Azure base URL: ${baseUrl}`)
       }
     }
 
@@ -139,7 +139,7 @@ export async function POST(request: Request) {
       .single()
 
     if (insertError) {
-      console.error("[v0] Error inserting Azure account:", insertError)
+      console.error(" Error inserting Azure account:", insertError)
       return NextResponse.json({ error: insertError.message }, { status: 500 })
     }
 
@@ -149,7 +149,7 @@ export async function POST(request: Request) {
     })
 
   } catch (error: any) {
-    console.error("[v0] Error in POST azure-accounts:", error)
+    console.error(" Error in POST azure-accounts:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

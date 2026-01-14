@@ -47,7 +47,7 @@ export async function logActivity({
     .single()
 
   if (error) {
-    console.error("[v0] Error logging activity:", error)
+    console.error(" Error logging activity:", error)
     throw error
   }
 
@@ -92,7 +92,7 @@ export async function getActivityLogs({
   const { data, error } = await query
 
   if (error) {
-    console.error("[v0] Error getting activity logs:", error)
+    console.error(" Error getting activity logs:", error)
     throw error
   }
 

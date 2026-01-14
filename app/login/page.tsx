@@ -27,46 +27,46 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("[v0] === FORM SUBMIT START ===")
+    console.log(" === FORM SUBMIT START ===")
     setLoading(true)
     setError("")
 
     try {
-      console.log("[v0] Calling login function...")
+      console.log(" Calling login function...")
       const result = await login(formData.email, formData.password)
-      console.log("[v0] Login function returned:", result)
+      console.log(" Login function returned:", result)
 
       if (result.success && result.user) {
-        console.log("[v0] Login successful, redirecting...")
+        console.log(" Login successful, redirecting...")
         const userRole = result.user.role.toUpperCase()
-        console.log("[v0] User role (uppercase):", userRole)
+        console.log(" User role (uppercase):", userRole)
 
         if (userRole === "SUPER_ADMIN" || userRole === "SUPER ADMIN") {
-          console.log("[v0] Redirecting to /admin")
+          console.log(" Redirecting to /admin")
           router.push("/admin")
         } else if (userRole === "ADMIN_CLIENT" || userRole === "ADMIN") {
-          console.log("[v0] Redirecting to /dashboard")
+          console.log(" Redirecting to /dashboard")
           router.push("/dashboard")
         } else if (userRole === "DEV" || userRole === "DEVELOPER") {
-          console.log("[v0] Redirecting to /tasks")
+          console.log(" Redirecting to /tasks")
           router.push("/tasks")
         } else {
-          console.log("[v0] Unknown role, redirecting to /dashboard")
+          console.log(" Unknown role, redirecting to /dashboard")
           router.push("/dashboard")
         }
       } else {
-        console.error("[v0] Login failed:", result.error)
+        console.error(" Login failed:", result.error)
         setError(result.error || "Erro ao fazer login")
         setLoading(false)
       }
     } catch (error) {
-      console.error("[v0] === FORM SUBMIT EXCEPTION ===")
-      console.error("[v0] Error:", error)
+      console.error(" === FORM SUBMIT EXCEPTION ===")
+      console.error(" Error:", error)
       setError(error instanceof Error ? error.message : "Erro inesperado")
       setLoading(false)
     }
     
-    console.log("[v0] === FORM SUBMIT END ===")
+    console.log(" === FORM SUBMIT END ===")
   }
 
   if (isAdminRoute) {

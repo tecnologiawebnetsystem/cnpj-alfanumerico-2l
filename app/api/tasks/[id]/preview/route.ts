@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  console.log(`[v0] ========== PREVIEW TASK FIX ==========`)
-  console.log(`[v0] Task ID: ${params.id}`)
+  console.log(` ========== PREVIEW TASK FIX ==========`)
+  console.log(` Task ID: ${params.id}`)
 
   try {
     const supabase = createServerClient(
@@ -29,17 +29,17 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       .single()
 
     if (taskError || !task) {
-      console.error("[v0] Task not found:", taskError)
+      console.error(" Task not found:", taskError)
       return NextResponse.json({ error: "Task not found" }, { status: 404 })
     }
 
-    console.log("[v0] Task found:", task.title)
-    console.log("[v0] File:", task.file_path)
-    console.log("[v0] Line:", task.line_number)
-    console.log("[v0] Repository:", task.repository?.full_name)
+    console.log(" Task found:", task.title)
+    console.log(" File:", task.file_path)
+    console.log(" Line:", task.line_number)
+    console.log(" Repository:", task.repository?.full_name)
 
     if (!task.code_current || !task.code_suggested) {
-      console.error("[v0] Task does not have code context")
+      console.error(" Task does not have code context")
       return NextResponse.json(
         { error: "This task does not have auto-fix available. Code context is missing." },
         { status: 400 }
@@ -65,10 +65,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       },
     }
 
-    console.log("[v0] Preview generated successfully")
+    console.log(" Preview generated successfully")
     return NextResponse.json(preview)
   } catch (error: any) {
-    console.error("[v0] Error generating preview:", error)
+    console.error(" Error generating preview:", error)
     return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 })
   }
 }

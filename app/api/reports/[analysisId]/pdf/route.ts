@@ -54,7 +54,7 @@ Fim do relatório.
       },
     })
   } catch (error) {
-    console.error("[v0] Error generating PDF:", error)
+    console.error(" Error generating PDF:", error)
     return NextResponse.json({ error: "Failed to generate report" }, { status: 500 })
   }
 }

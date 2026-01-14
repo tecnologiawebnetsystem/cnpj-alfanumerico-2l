@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
       projects,
     })
   } catch (error) {
-    console.error("[v0] Error generating analytics:", error)
+    console.error(" Error generating analytics:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

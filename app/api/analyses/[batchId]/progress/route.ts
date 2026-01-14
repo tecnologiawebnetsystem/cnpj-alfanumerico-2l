@@ -7,7 +7,7 @@ export async function GET(request: Request, { params }: { params: { batchId: str
 
     const { batchId } = params
 
-    console.log("[v0] Progress API - batchId:", batchId)
+    console.log(" Progress API - batchId:", batchId)
 
     const { data: taskProgress, error: tasksError } = await supabase.from("task_progress").select(`
         status,
@@ -23,18 +23,18 @@ export async function GET(request: Request, { params }: { params: { batchId: str
       `)
 
     if (tasksError) {
-      console.error("[v0] Error fetching task progress:", tasksError)
+      console.error(" Error fetching task progress:", tasksError)
       return NextResponse.json({ error: tasksError.message }, { status: 500 })
     }
 
-    console.log("[v0] Raw task progress data:", taskProgress?.length)
+    console.log(" Raw task progress data:", taskProgress?.length)
 
     const batchTasks =
       taskProgress?.filter((tp: any) => {
         return tp.tasks?.analyses?.batch_id === batchId
       }) || []
 
-    console.log("[v0] Filtered batch tasks:", batchTasks.length)
+    console.log(" Filtered batch tasks:", batchTasks.length)
 
     const distribution = {
       pending: 0,
@@ -49,11 +49,11 @@ export async function GET(request: Request, { params }: { params: { batchId: str
       else if (task.status === "completed") distribution.completed++
     })
 
-    console.log("[v0] Distribution calculated:", distribution)
+    console.log(" Distribution calculated:", distribution)
 
     return NextResponse.json({ distribution })
   } catch (error) {
-    console.error("[v0] Internal error:", error)
+    console.error(" Internal error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

@@ -50,7 +50,7 @@ export function AnalyticsDashboard({ clientId }: AnalyticsDashboardProps) {
         setMetrics(data)
       }
     } catch (error) {
-      console.error("[v0] Error loading metrics:", error)
+      console.error(" Error loading metrics:", error)
     } finally {
       setLoading(false)
     }

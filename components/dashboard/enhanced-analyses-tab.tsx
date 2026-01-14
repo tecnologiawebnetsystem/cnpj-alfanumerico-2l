@@ -82,7 +82,7 @@ export function EnhancedAnalysesTab({ clientId }: { clientId: string }) {
 
       setAnalyses(enrichedAnalyses)
     } catch (error) {
-      console.error("[v0] Error loading analyses:", error)
+      console.error(" Error loading analyses:", error)
     } finally {
       setLoading(false)
     }
@@ -110,7 +110,7 @@ export function EnhancedAnalysesTab({ clientId }: { clientId: string }) {
         description: `Relatório em ${format.toUpperCase()} foi baixado.`,
       })
     } catch (error) {
-      console.error("[v0] Export error:", error)
+      console.error(" Export error:", error)
       toast({
         title: "Erro ao exportar",
         description: "Não foi possível exportar o relatório.",

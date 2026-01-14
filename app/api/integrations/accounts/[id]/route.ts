@@ -27,13 +27,13 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       .single()
 
     if (error) {
-      console.error("[v0] Error fetching integration:", error)
+      console.error(" Error fetching integration:", error)
       return NextResponse.json({ error: "Conta não encontrada" }, { status: 404 })
     }
 
     return NextResponse.json({ integration })
   } catch (error) {
-    console.error("[v0] Error in GET /api/integrations/accounts/[id]:", error)
+    console.error(" Error in GET /api/integrations/accounts/[id]:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }
@@ -69,13 +69,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       .single()
 
     if (error) {
-      console.error("[v0] Error updating integration:", error)
+      console.error(" Error updating integration:", error)
       return NextResponse.json({ error: "Erro ao atualizar conta" }, { status: 500 })
     }
 
     return NextResponse.json({ integration })
   } catch (error) {
-    console.error("[v0] Error in PUT /api/integrations/accounts/[id]:", error)
+    console.error(" Error in PUT /api/integrations/accounts/[id]:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }
@@ -98,7 +98,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       .limit(1)
 
     if (reposError) {
-      console.error("[v0] Error checking repositories:", reposError)
+      console.error(" Error checking repositories:", reposError)
     }
 
     if (repos && repos.length > 0) {
@@ -108,13 +108,13 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     const { error } = await supabase.from("integrations").delete().eq("id", params.id).eq("client_id", user.client_id)
 
     if (error) {
-      console.error("[v0] Error deleting integration:", error)
+      console.error(" Error deleting integration:", error)
       return NextResponse.json({ error: "Erro ao excluir conta" }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("[v0] Error in DELETE /api/integrations/accounts/[id]:", error)
+    console.error(" Error in DELETE /api/integrations/accounts/[id]:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

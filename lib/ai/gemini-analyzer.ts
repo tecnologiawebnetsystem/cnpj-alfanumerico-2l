@@ -54,7 +54,7 @@ Responda APENAS com JSON válido, sem marcadores de código.`
     const analysis = JSON.parse(jsonMatch[0]) as GeminiAnalysisResult
     return analysis
   } catch (error) {
-    console.error("[v0] Error analyzing with Gemini:", error)
+    console.error(" Error analyzing with Gemini:", error)
     return {
       summary: "Campo CNPJ requer atualização para formato alfanumérico",
       severity: "high",
@@ -99,7 +99,7 @@ Seja conciso e objetivo.`
 
     return text
   } catch (error) {
-    console.error("[v0] Error generating smart report:", error)
+    console.error(" Error generating smart report:", error)
     return "Relatório não disponível no momento"
   }
 }

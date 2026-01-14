@@ -71,25 +71,25 @@ export function DatabaseConnectionsTab() {
 
   const loadConnections = async () => {
     try {
-      console.log("[v0] Loading database connections...")
+      console.log(" Loading database connections...")
       const response = await fetch("/api/database-connections")
 
-      console.log("[v0] Response status:", response.status)
-      console.log("[v0] Response content-type:", response.headers.get("content-type"))
+      console.log(" Response status:", response.status)
+      console.log(" Response content-type:", response.headers.get("content-type"))
 
       const contentType = response.headers.get("content-type")
       if (!contentType || !contentType.includes("application/json")) {
         const text = await response.text()
-        console.error("[v0] Response is not JSON:", text)
+        console.error(" Response is not JSON:", text)
         throw new Error("Resposta inválida do servidor")
       }
 
       const data = await response.json()
-      console.log("[v0] Connections loaded:", data.connections?.length || 0)
+      console.log(" Connections loaded:", data.connections?.length || 0)
 
       setConnections(data.connections || [])
     } catch (error) {
-      console.error("[v0] Error loading database connections:", error)
+      console.error(" Error loading database connections:", error)
       setConnections([])
     } finally {
       setLoading(false)
@@ -114,7 +114,7 @@ export function DatabaseConnectionsTab() {
         alert(`Erro: ${data.error}`)
       }
     } catch (error) {
-      console.error("[v0] Error creating connection:", error)
+      console.error(" Error creating connection:", error)
       alert("Erro ao criar conexão")
     }
   }
@@ -135,7 +135,7 @@ export function DatabaseConnectionsTab() {
 
       await loadConnections()
     } catch (error) {
-      console.error("[v0] Error testing connection:", error)
+      console.error(" Error testing connection:", error)
       alert("Erro ao testar conexão")
     } finally {
       setTestingId(null)
@@ -157,7 +157,7 @@ export function DatabaseConnectionsTab() {
         alert("Erro ao deletar conexão")
       }
     } catch (error) {
-      console.error("[v0] Error deleting connection:", error)
+      console.error(" Error deleting connection:", error)
       alert("Erro ao deletar conexão")
     }
   }

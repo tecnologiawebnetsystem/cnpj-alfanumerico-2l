@@ -91,12 +91,12 @@ export async function POST(request: NextRequest) {
 
     const { message, sessionId } = await request.json()
     
-    console.log("[v0] Chatbot - User message:", message)
-    console.log("[v0] Chatbot - User:", userData.name, "Client ID:", userData.client_id)
+    console.log(" Chatbot - User message:", message)
+    console.log(" Chatbot - User:", userData.name, "Client ID:", userData.client_id)
     
     // Detect user intent
     const intent = detectIntent(message)
-    console.log("[v0] Chatbot - Detected intent:", intent)
+    console.log(" Chatbot - Detected intent:", intent)
     
     // Save user message to history
     await supabase.from("ai_chat_history").insert({
@@ -260,7 +260,7 @@ export async function POST(request: NextRequest) {
         response = "Desculpe, não entendi sua solicitação. Digite 'ajuda' para ver o que posso fazer."
     }
     
-    console.log("[v0] Chatbot - Response:", response.substring(0, 100) + "...")
+    console.log(" Chatbot - Response:", response.substring(0, 100) + "...")
     
     // Save bot response to history
     await supabase.from("ai_chat_history").insert({
@@ -280,7 +280,7 @@ export async function POST(request: NextRequest) {
     })
     
   } catch (error: any) {
-    console.error("[v0] Chatbot error:", error)
+    console.error(" Chatbot error:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
@@ -311,7 +311,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ history: history || [] })
     
   } catch (error: any) {
-    console.error("[v0] Chatbot history error:", error)
+    console.error(" Chatbot history error:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

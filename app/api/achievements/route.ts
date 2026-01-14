@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ achievements: achievementsWithProgress })
   } catch (error: any) {
-    console.error("[v0] Error fetching achievements:", error)
+    console.error(" Error fetching achievements:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

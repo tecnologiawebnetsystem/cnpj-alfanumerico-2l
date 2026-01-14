@@ -6,7 +6,7 @@ import type { TaskManagementConfig } from '@/lib/task-management/types'
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('[v0] ========== EXTERNAL TASK SYNC START ==========')
+    console.log(' ========== EXTERNAL TASK SYNC START ==========')
     
     const currentUser = getCurrentUser()
     if (!currentUser) {
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { task_id, provider } = await request.json()
-    console.log('[v0] Syncing task:', task_id, 'to provider:', provider)
+    console.log(' Syncing task:', task_id, 'to provider:', provider)
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       } : undefined
     })
 
-    console.log('[v0] External task created:', result.key, result.url)
+    console.log(' External task created:', result.key, result.url)
 
     // Update task with external references
     const { error: updateError } = await supabase
@@ -93,10 +93,10 @@ export async function POST(request: NextRequest) {
       .eq('id', task_id)
 
     if (updateError) {
-      console.error('[v0] Error updating task:', updateError)
+      console.error(' Error updating task:', updateError)
     }
 
-    console.log('[v0] ========== EXTERNAL TASK SYNC SUCCESS ==========')
+    console.log(' ========== EXTERNAL TASK SYNC SUCCESS ==========')
 
     return NextResponse.json({
       success: true,
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
       provider: result.provider
     })
   } catch (error) {
-    console.error('[v0] External task sync error:', error)
+    console.error(' External task sync error:', error)
     return NextResponse.json(
       { error: 'Erro ao sincronizar com sistema externo' },
       { status: 500 }

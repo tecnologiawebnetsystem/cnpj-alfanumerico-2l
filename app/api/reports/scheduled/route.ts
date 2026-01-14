@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ schedules: schedules || [] })
   } catch (error) {
-    console.error("[v0] Error loading schedules:", error)
+    console.error(" Error loading schedules:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ schedule: data })
   } catch (error) {
-    console.error("[v0] Error creating schedule:", error)
+    console.error(" Error creating schedule:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

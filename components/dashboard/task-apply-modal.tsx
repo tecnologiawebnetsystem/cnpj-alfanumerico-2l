@@ -25,7 +25,7 @@ export function TaskApplyModal({ open, onOpenChange, taskId, userId, userRole, o
   const loadPreview = async () => {
     if (!open || preview) return
 
-    console.log("[v0] Loading preview for task:", taskId)
+    console.log(" Loading preview for task:", taskId)
     setLoading(true)
     setError(null)
 
@@ -37,10 +37,10 @@ export function TaskApplyModal({ open, onOpenChange, taskId, userId, userRole, o
         throw new Error(data.error || "Failed to load preview")
       }
 
-      console.log("[v0] Preview loaded:", data)
+      console.log(" Preview loaded:", data)
       setPreview(data)
     } catch (err: any) {
-      console.error("[v0] Error loading preview:", err)
+      console.error(" Error loading preview:", err)
       setError(err.message)
     } finally {
       setLoading(false)
@@ -48,7 +48,7 @@ export function TaskApplyModal({ open, onOpenChange, taskId, userId, userRole, o
   }
 
   const applyFix = async (method: "pull_request" | "direct_commit" | "copy") => {
-    console.log("[v0] Applying fix with method:", method)
+    console.log(" Applying fix with method:", method)
     setLoading(true)
     setError(null)
 
@@ -65,7 +65,7 @@ export function TaskApplyModal({ open, onOpenChange, taskId, userId, userRole, o
         throw new Error(data.error || "Failed to apply fix")
       }
 
-      console.log("[v0] Fix applied successfully:", data)
+      console.log(" Fix applied successfully:", data)
       setResult(data)
 
       if (method === "copy") {
@@ -76,7 +76,7 @@ export function TaskApplyModal({ open, onOpenChange, taskId, userId, userRole, o
 
       if (onSuccess) onSuccess()
     } catch (err: any) {
-      console.error("[v0] Error applying fix:", err)
+      console.error(" Error applying fix:", err)
       setError(err.message)
     } finally {
       setLoading(false)

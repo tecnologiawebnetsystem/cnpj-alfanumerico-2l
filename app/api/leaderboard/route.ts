@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
       metric,
     })
   } catch (error: any) {
-    console.error("[v0] Error fetching leaderboard:", error)
+    console.error(" Error fetching leaderboard:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

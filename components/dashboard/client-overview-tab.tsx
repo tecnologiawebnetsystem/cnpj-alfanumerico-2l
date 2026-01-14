@@ -43,37 +43,37 @@ export function ClientOverview({ onChangeTab, userRole }: ClientOverviewTabProps
 
   const loadStats = async () => {
     try {
-      console.log("[v0] === ClientOverview loadStats START ===")
+      console.log(" === ClientOverview loadStats START ===")
       const currentUser = getCurrentUser()
-      console.log("[v0] CurrentUser from localStorage:", currentUser)
+      console.log(" CurrentUser from localStorage:", currentUser)
 
       if (!currentUser) {
-        console.log("[v0] No user found in loadStats")
+        console.log(" No user found in loadStats")
         return
       }
 
-      console.log("[v0] Fetching stats for user:", currentUser.id)
+      console.log(" Fetching stats for user:", currentUser.id)
       const statsUrl = `/api/client/stats?user_id=${currentUser.id}`
-      console.log("[v0] Stats URL:", statsUrl)
+      console.log(" Stats URL:", statsUrl)
 
       const response = await fetch(statsUrl, {
         credentials: "include",
       })
 
-      console.log("[v0] Stats API response status:", response.status)
-      console.log("[v0] Stats API response ok:", response.ok)
+      console.log(" Stats API response status:", response.status)
+      console.log(" Stats API response ok:", response.ok)
 
       if (response.ok) {
         const data = await response.json()
-        console.log("[v0] Stats data received:", data)
+        console.log(" Stats data received:", data)
         setStats(data)
       } else {
         const errorText = await response.text()
-        console.error("[v0] Stats API error:", errorText)
+        console.error(" Stats API error:", errorText)
       }
-      console.log("[v0] === ClientOverview loadStats END ===")
+      console.log(" === ClientOverview loadStats END ===")
     } catch (error) {
-      console.error("[v0] Error loading stats:", error)
+      console.error(" Error loading stats:", error)
     } finally {
       setLoading(false)
     }

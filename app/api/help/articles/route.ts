@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ articles })
   } catch (error: any) {
-    console.error("[v0] Error fetching help articles:", error)
+    console.error(" Error fetching help articles:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

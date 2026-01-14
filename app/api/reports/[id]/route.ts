@@ -11,30 +11,30 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     const { searchParams } = new URL(request.url)
     const format = searchParams.get("format") || "json"
 
-    console.log("[v0] ============ REPORT REQUEST START ============")
-    console.log("[v0] Analysis ID:", id)
-    console.log("[v0] Format:", format)
+    console.log(" ============ REPORT REQUEST START ============")
+    console.log(" Analysis ID:", id)
+    console.log(" Format:", format)
 
     const authHeader = request.headers.get("Authorization")
     const token = authHeader?.replace("Bearer ", "")
 
     if (!token) {
-      console.error("[v0] No authorization token provided")
+      console.error(" No authorization token provided")
       return NextResponse.json({ error: "Unauthorized - No token provided" }, { status: 401 })
     }
 
     let userInfo
     try {
       userInfo = JSON.parse(atob(token))
-      console.log("[v0] User authenticated:", userInfo.email, "Client ID:", userInfo.client_id)
+      console.log(" User authenticated:", userInfo.email, "Client ID:", userInfo.client_id)
     } catch (e) {
-      console.error("[v0] Invalid token format")
+      console.error(" Invalid token format")
       return NextResponse.json({ error: "Unauthorized - Invalid token" }, { status: 401 })
     }
 
     const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
-    console.log("[v0] Step 1: Checking batch_analyses table...")
+    console.log(" Step 1: Checking batch_analyses table...")
     const { data: batchAnalysis } = await supabase
       .from("batch_analyses")
       .select("*")
@@ -43,26 +43,26 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       .maybeSingle()
 
     if (batchAnalysis) {
-      console.log("[v0] Found batch analysis:", batchAnalysis.name)
+      console.log(" Found batch analysis:", batchAnalysis.name)
 
       const { data: analyses } = await supabase.from("analyses").select("*").eq("batch_id", id)
 
-      console.log("[v0] Associated analyses:", analyses?.length || 0)
+      console.log(" Associated analyses:", analyses?.length || 0)
 
       if (!analyses || analyses.length === 0) {
-        console.error("[v0] No analyses found in batch")
+        console.error(" No analyses found in batch")
         return NextResponse.json({ error: "No analyses found in batch" }, { status: 404 })
       }
 
       const analysisIds = analyses.map((a) => a.id)
 
-      console.log("[v0] Fetching findings for", analysisIds.length, "analyses")
+      console.log(" Fetching findings for", analysisIds.length, "analyses")
       let { data: findings } = await supabase.from("findings").select("*").in("analysis_id", analysisIds)
 
-      console.log("[v0] Regular findings found:", findings?.length || 0)
+      console.log(" Regular findings found:", findings?.length || 0)
 
       if (!findings || findings.length === 0) {
-        console.log("[v0] No regular findings, checking compressed...")
+        console.log(" No regular findings, checking compressed...")
         const allCompressed = []
         for (const analysisId of analysisIds) {
           const compressed = await decompressFindings(analysisId)
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
           }
         }
         if (allCompressed.length > 0) {
-          console.log("[v0] Found compressed findings:", allCompressed.length)
+          console.log(" Found compressed findings:", allCompressed.length)
           findings = allCompressed
         }
       }
@@ -81,19 +81,19 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         .select("*")
         .in("analysis_id", analysisIds)
 
-      console.log("[v0] Code findings:", findings?.length || 0)
-      console.log("[v0] Database findings:", databaseFindings?.length || 0)
+      console.log(" Code findings:", findings?.length || 0)
+      console.log(" Database findings:", databaseFindings?.length || 0)
 
       if (findings && findings.length > 0) {
-        console.log("[v0] Sample finding:", {
+        console.log(" Sample finding:", {
           file_path: findings[0].file_path,
           repository: findings[0].repository,
           project: findings[0].project,
           line_number: findings[0].line_number,
         })
       } else {
-        console.error("[v0] ❌ NO FINDINGS FOUND - This is the problem!")
-        console.log("[v0] Analysis IDs searched:", analysisIds)
+        console.error(" ❌ NO FINDINGS FOUND - This is the problem!")
+        console.log(" Analysis IDs searched:", analysisIds)
       }
 
       const reportData = {
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       }
 
       if (format === "zip") {
-        console.log("[v0] Generating ZIP with all formats for batch")
+        console.log(" Generating ZIP with all formats for batch")
         const zip = new JSZip()
 
         const timestamp = new Date().toISOString().split("T")[0].replace(/-/g, "")
@@ -128,8 +128,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
         const zipBuffer = await zip.generateAsync({ type: "nodebuffer" })
 
-        console.log("[v0] ZIP generated successfully")
-        console.log("[v0] ============ REPORT REQUEST END (SUCCESS) ============")
+        console.log(" ZIP generated successfully")
+        console.log(" ============ REPORT REQUEST END (SUCCESS) ============")
 
         return new NextResponse(zipBuffer, {
           headers: {
@@ -162,7 +162,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
           break
       }
 
-      console.log("[v0] ============ REPORT REQUEST END (SUCCESS) ============")
+      console.log(" ============ REPORT REQUEST END (SUCCESS) ============")
 
       if (format === "json") {
         return NextResponse.json(reportContent)
@@ -176,7 +176,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       })
     }
 
-    console.log("[v0] Step 2: Checking analyses table...")
+    console.log(" Step 2: Checking analyses table...")
     const { data: analysis } = await supabase
       .from("analyses")
       .select("*")
@@ -184,14 +184,14 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       .eq("client_id", userInfo.client_id)
       .maybeSingle()
 
-    console.log("[v0] Individual analysis found:", analysis ? "YES" : "NO")
+    console.log(" Individual analysis found:", analysis ? "YES" : "NO")
     if (analysis) {
-      console.log("[v0] Repository:", analysis.repository_name)
-      console.log("[v0] Status:", analysis.status)
+      console.log(" Repository:", analysis.repository_name)
+      console.log(" Status:", analysis.status)
     }
 
     if (!analysis) {
-      console.error("[v0] ❌ Analysis not found in both tables")
+      console.error(" ❌ Analysis not found in both tables")
       return NextResponse.json(
         {
           error: "Analysis not found",
@@ -202,42 +202,42 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 
     if (analysis.status !== "completed") {
-      console.error("[v0] Analysis not completed, status:", analysis.status)
+      console.error(" Analysis not completed, status:", analysis.status)
       return NextResponse.json({ error: "Analysis not completed yet" }, { status: 400 })
     }
 
-    console.log("[v0] Fetching findings for individual analysis...")
+    console.log(" Fetching findings for individual analysis...")
 
     let { data: findings } = await supabase.from("findings").select("*").eq("analysis_id", id)
 
-    console.log("[v0] Regular findings found:", findings?.length || 0)
+    console.log(" Regular findings found:", findings?.length || 0)
 
     if (!findings || findings.length === 0) {
-      console.log("[v0] No regular findings, checking compressed...")
+      console.log(" No regular findings, checking compressed...")
       const compressed = await decompressFindings(id)
       if (compressed && compressed.length > 0) {
-        console.log("[v0] Found compressed findings:", compressed.length)
+        console.log(" Found compressed findings:", compressed.length)
         findings = compressed
       }
     }
 
     const { data: databaseFindings } = await supabase.from("database_findings").select("*").eq("analysis_id", id)
 
-    console.log("[v0] Code findings:", findings?.length || 0)
-    console.log("[v0] Database findings:", databaseFindings?.length || 0)
+    console.log(" Code findings:", findings?.length || 0)
+    console.log(" Database findings:", databaseFindings?.length || 0)
 
     if (findings && findings.length > 0) {
-      console.log("[v0] Sample finding:", {
+      console.log(" Sample finding:", {
         file_path: findings[0].file_path,
         repository: findings[0].repository,
         project: findings[0].project,
         line_number: findings[0].line_number,
       })
     } else {
-      console.error("[v0] ❌ NO FINDINGS FOUND - This is the problem!")
-      console.log("[v0] Analysis ID searched:", id)
-      console.log("[v0] Analysis status:", analysis.status)
-      console.log("[v0] Analysis repository:", analysis.repository_name)
+      console.error(" ❌ NO FINDINGS FOUND - This is the problem!")
+      console.log(" Analysis ID searched:", id)
+      console.log(" Analysis status:", analysis.status)
+      console.log(" Analysis repository:", analysis.repository_name)
     }
 
     const reportData = {
@@ -247,7 +247,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 
     if (format === "zip") {
-      console.log("[v0] Generating ZIP with all formats")
+      console.log(" Generating ZIP with all formats")
       const zip = new JSZip()
 
       const timestamp = new Date().toISOString().split("T")[0].replace(/-/g, "")
@@ -265,8 +265,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
       const zipBuffer = await zip.generateAsync({ type: "nodebuffer" })
 
-      console.log("[v0] ZIP generated successfully")
-      console.log("[v0] ============ REPORT REQUEST END (SUCCESS) ============")
+      console.log(" ZIP generated successfully")
+      console.log(" ============ REPORT REQUEST END (SUCCESS) ============")
 
       return new NextResponse(zipBuffer, {
         headers: {
@@ -299,7 +299,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         break
     }
 
-    console.log("[v0] ============ REPORT REQUEST END (SUCCESS) ============")
+    console.log(" ============ REPORT REQUEST END (SUCCESS) ============")
 
     if (format === "json") {
       return NextResponse.json(reportContent)
@@ -312,9 +312,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       },
     })
   } catch (error) {
-    console.error("[v0] ❌ Error generating report:", error)
-    console.error("[v0] Error stack:", error instanceof Error ? error.stack : "no stack")
-    console.error("[v0] ============ REPORT REQUEST END (ERROR) ============")
+    console.error(" ❌ Error generating report:", error)
+    console.error(" Error stack:", error instanceof Error ? error.stack : "no stack")
+    console.error(" ============ REPORT REQUEST END (ERROR) ============")
     return NextResponse.json(
       {
         error: "Internal server error",

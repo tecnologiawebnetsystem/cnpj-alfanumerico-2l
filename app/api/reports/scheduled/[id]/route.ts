@@ -13,7 +13,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("[v0] Error deleting schedule:", error)
+    console.error(" Error deleting schedule:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

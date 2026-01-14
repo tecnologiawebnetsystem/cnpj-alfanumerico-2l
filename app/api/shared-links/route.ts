@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       url: `${baseUrl}/shared/${token}`,
     })
   } catch (error: any) {
-    console.error("[v0] Error creating shared link:", error)
+    console.error(" Error creating shared link:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

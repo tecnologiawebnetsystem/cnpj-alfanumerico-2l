@@ -16,16 +16,16 @@ export default function DashboardLayout({
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    console.log("[v0] Dashboard layout - checking auth")
+    console.log(" Dashboard layout - checking auth")
     const user = getCurrentUser()
 
     if (!user) {
-      console.log("[v0] No user found, redirecting to login")
+      console.log(" No user found, redirecting to login")
       router.push("/login")
       return
     }
 
-    console.log("[v0] User found:", user.email, "Role:", user.role)
+    console.log(" User found:", user.email, "Role:", user.role)
     setLoading(false)
   }, [router])
 

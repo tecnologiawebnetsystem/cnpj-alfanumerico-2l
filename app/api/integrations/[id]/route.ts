@@ -45,7 +45,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     return NextResponse.json({ integration: sanitizedIntegration })
   } catch (error) {
-    console.error("[v0] Error in GET /api/integrations/:id:", error)
+    console.error(" Error in GET /api/integrations/:id:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }
@@ -117,7 +117,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       .single()
 
     if (error) {
-      console.error("[v0] Error updating integration:", error)
+      console.error(" Error updating integration:", error)
       return NextResponse.json({ error: "Erro ao atualizar integração" }, { status: 500 })
     }
 
@@ -131,7 +131,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     return NextResponse.json({ integration: sanitizedIntegration })
   } catch (error) {
-    console.error("[v0] Error in PUT /api/integrations/:id:", error)
+    console.error(" Error in PUT /api/integrations/:id:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }
@@ -159,13 +159,13 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const { error } = await supabase.from("integrations").delete().eq("id", id).eq("client_id", userData.client_id)
 
     if (error) {
-      console.error("[v0] Error deleting integration:", error)
+      console.error(" Error deleting integration:", error)
       return NextResponse.json({ error: "Erro ao deletar integração" }, { status: 500 })
     }
 
     return NextResponse.json({ message: "Integração deletada com sucesso" })
   } catch (error) {
-    console.error("[v0] Error in DELETE /api/integrations/:id:", error)
+    console.error(" Error in DELETE /api/integrations/:id:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

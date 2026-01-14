@@ -33,7 +33,7 @@ export async function getAnalyzedFile(
 
     return data
   } catch (error: any) {
-    console.error("[v0] Error getting analyzed file:", error)
+    console.error(" Error getting analyzed file:", error)
     return null
   }
 }
@@ -60,7 +60,7 @@ export async function saveAnalyzedFile(params: {
     if (error) throw error
     return true
   } catch (error: any) {
-    console.error("[v0] Error saving analyzed file:", error)
+    console.error(" Error saving analyzed file:", error)
     return false
   }
 }
@@ -85,7 +85,7 @@ export async function getModifiedFiles(
         path: file.path,
         findings: analyzed.findings || [],
       })
-      console.log(`[v0] Using cached result for: ${file.path}`)
+      console.log(` Using cached result for: ${file.path}`)
     } else {
       // Arquivo novo ou modificado
       toAnalyze.push(file)
@@ -93,7 +93,7 @@ export async function getModifiedFiles(
   }
 
   console.log(
-    `[v0] Incremental analysis: ${toAnalyze.length} to analyze, ${fromCache.length} from cache`
+    ` Incremental analysis: ${toAnalyze.length} to analyze, ${fromCache.length} from cache`
   )
 
   return { toAnalyze, fromCache }
@@ -115,10 +115,10 @@ export async function cleanupOldAnalyzedFiles(
 
     if (error) throw error
 
-    console.log(`[v0] Cleaned up old analyzed files`)
+    console.log(` Cleaned up old analyzed files`)
     return 0
   } catch (error: any) {
-    console.error("[v0] Error cleaning analyzed files:", error)
+    console.error(" Error cleaning analyzed files:", error)
     return 0
   }
 }

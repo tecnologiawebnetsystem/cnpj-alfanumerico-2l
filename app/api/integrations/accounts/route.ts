@@ -26,13 +26,13 @@ export async function GET(request: NextRequest) {
       .order("created_at", { ascending: false })
 
     if (error) {
-      console.error("[v0] Error fetching integrations:", error)
+      console.error(" Error fetching integrations:", error)
       return NextResponse.json({ error: "Erro ao buscar contas" }, { status: 500 })
     }
 
     return NextResponse.json({ integrations })
   } catch (error) {
-    console.error("[v0] Error in GET /api/integrations/accounts:", error)
+    console.error(" Error in GET /api/integrations/accounts:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }
@@ -83,13 +83,13 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error("[v0] Error creating integration:", error)
+      console.error(" Error creating integration:", error)
       return NextResponse.json({ error: "Erro ao criar conta" }, { status: 500 })
     }
 
     return NextResponse.json({ integration }, { status: 201 })
   } catch (error) {
-    console.error("[v0] Error in POST /api/integrations/accounts:", error)
+    console.error(" Error in POST /api/integrations/accounts:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

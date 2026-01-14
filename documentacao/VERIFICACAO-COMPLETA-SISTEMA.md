@@ -143,18 +143,18 @@
 
 ### Console do Navegador (F12):
 ```
-[v0] STEP 1: Received analysis request
-[v0] STEP 2: Found user and client
-[v0] STEP 3: Fetching repositories from database
-[v0] STEP 4: Processing repositories...
-[v0] STEP 5: Found X repositories in database
-[v0] STEP 6: Creating batch analysis
-[v0] STEP 7: Batch created successfully
-[v0] STEP 8: Starting repository analysis
-[v0] STEP 9.1: Analyzing repository: repo-name
-[v0] Found X findings in repo-name
-[v0] Progress: 1/X
-[v0] STEP 10: All repositories processed
+ STEP 1: Received analysis request
+ STEP 2: Found user and client
+ STEP 3: Fetching repositories from database
+ STEP 4: Processing repositories...
+ STEP 5: Found X repositories in database
+ STEP 6: Creating batch analysis
+ STEP 7: Batch created successfully
+ STEP 8: Starting repository analysis
+ STEP 9.1: Analyzing repository: repo-name
+ Found X findings in repo-name
+ Progress: 1/X
+ STEP 10: All repositories processed
 ```
 
 ---

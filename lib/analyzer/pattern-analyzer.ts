@@ -110,7 +110,7 @@ function analyzeLineWithPatterns(line: string, filePath: string, lineNumber: num
       suggestion,
     }
   } catch (error) {
-    console.error("[v0] Pattern analysis error:", error)
+    console.error(" Pattern analysis error:", error)
     return null
   }
 }

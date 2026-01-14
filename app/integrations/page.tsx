@@ -67,29 +67,29 @@ export default function IntegrationsPage() {
 
   const loadTokens = async () => {
     try {
-      console.log("[v0] loadTokens - Start")
+      console.log(" loadTokens - Start")
       const user = await getCurrentUser()
       if (!user) {
-        console.log("[v0] No user found, redirecting to login")
+        console.log(" No user found, redirecting to login")
         router.push("/login")
         return
       }
 
-      console.log("[v0] User found:", user.email, "ID:", user.id)
+      console.log(" User found:", user.email, "ID:", user.id)
 
       const role = user.role?.toLowerCase() || ""
       setUserRole(role)
       const canManage = role === "admin" || role === "super_admin" || role === "admin_client"
       setCanManageTokens(canManage)
-      console.log("[v0] User role:", role, "Can manage tokens:", canManage)
+      console.log(" User role:", role, "Can manage tokens:", canManage)
 
-      console.log("[v0] Fetching accounts from /api/accounts?user_id=" + user.id)
+      console.log(" Fetching accounts from /api/accounts?user_id=" + user.id)
       const response = await fetch(`/api/accounts?user_id=${user.id}`)
-      console.log("[v0] Response status:", response.status)
+      console.log(" Response status:", response.status)
 
       if (response.ok) {
         const data = await response.json()
-        console.log("[v0] Received", data.accounts?.length || 0, "accounts")
+        console.log(" Received", data.accounts?.length || 0, "accounts")
         const mappedTokens =
           data.accounts?.map((acc: any) => ({
             id: acc.id,
@@ -102,15 +102,15 @@ export default function IntegrationsPage() {
         setTokens(mappedTokens)
       } else {
         const errorData = await response.json()
-        console.error("[v0] Error response:", errorData)
+        console.error(" Error response:", errorData)
         setError(errorData.error || "Erro ao carregar contas")
       }
     } catch (error) {
-      console.error("[v0] Error loading tokens:", error)
+      console.error(" Error loading tokens:", error)
       setError("Erro ao carregar contas")
     } finally {
       setLoading(false)
-      console.log("[v0] loadTokens - End")
+      console.log(" loadTokens - End")
     }
   }
 
@@ -195,7 +195,7 @@ export default function IntegrationsPage() {
       }
     } catch (error) {
       setError("Erro ao adicionar token. Tente novamente.")
-      console.error("[v0] Error adding token:", error)
+      console.error(" Error adding token:", error)
     } finally {
       setSaving(false)
     }
@@ -213,19 +213,19 @@ export default function IntegrationsPage() {
 
   const handleUpdateToken = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("[v0] handleUpdateToken - Start")
+    console.log(" handleUpdateToken - Start")
 
     if (!editingToken) {
-      console.log("[v0] No editing token found")
+      console.log(" No editing token found")
       return
     }
 
-    console.log("[v0] Editing token:", editingToken.id)
-    console.log("[v0] Account name:", accountName)
-    console.log("[v0] New token provided:", newToken ? "Yes" : "No")
+    console.log(" Editing token:", editingToken.id)
+    console.log(" Account name:", accountName)
+    console.log(" New token provided:", newToken ? "Yes" : "No")
 
     if (!accountName.trim()) {
-      console.log("[v0] Account name is empty")
+      console.log(" Account name is empty")
       setError("Por favor, insira um nome para a conta")
       return
     }
@@ -237,12 +237,12 @@ export default function IntegrationsPage() {
     try {
       const user = await getCurrentUser()
       if (!user) {
-        console.log("[v0] No user found, redirecting to login")
+        console.log(" No user found, redirecting to login")
         router.push("/login")
         return
       }
 
-      console.log("[v0] Current user:", user.email, "ID:", user.id)
+      console.log(" Current user:", user.email, "ID:", user.id)
 
       const updateData: any = {
         user_id: user.id,
@@ -252,13 +252,13 @@ export default function IntegrationsPage() {
 
       if (newToken.trim()) {
         updateData.access_token = newToken
-        console.log("[v0] Including new token in update")
+        console.log(" Including new token in update")
       } else {
-        console.log("[v0] No new token provided, keeping existing")
+        console.log(" No new token provided, keeping existing")
       }
 
-      console.log("[v0] Calling PUT /api/accounts/" + editingToken.id)
-      console.log("[v0] Update data:", {
+      console.log(" Calling PUT /api/accounts/" + editingToken.id)
+      console.log(" Update data:", {
         ...updateData,
         access_token: updateData.access_token ? "[REDACTED]" : undefined,
         user_id: user.id,
@@ -270,11 +270,11 @@ export default function IntegrationsPage() {
         body: JSON.stringify(updateData),
       })
 
-      console.log("[v0] API response status:", response.status)
+      console.log(" API response status:", response.status)
 
       if (response.ok) {
         const result = await response.json()
-        console.log("[v0] Account updated successfully:", result)
+        console.log(" Account updated successfully:", result)
 
         setEditingToken(null)
         setNewToken("")
@@ -291,15 +291,15 @@ export default function IntegrationsPage() {
         }, 3000)
       } else {
         const data = await response.json()
-        console.log("[v0] API error:", data)
+        console.log(" API error:", data)
         setError(data.error || "Erro ao atualizar conta")
       }
     } catch (error) {
-      console.error("[v0] Error updating token:", error)
+      console.error(" Error updating token:", error)
       setError("Erro ao atualizar conta. Tente novamente.")
     } finally {
       setSaving(false)
-      console.log("[v0] handleUpdateToken - End")
+      console.log(" handleUpdateToken - End")
     }
   }
 
@@ -330,7 +330,7 @@ export default function IntegrationsPage() {
       }
     } catch (error) {
       setError("Erro ao remover token")
-      console.error("[v0] Error deleting token:", error)
+      console.error(" Error deleting token:", error)
     }
   }
 
@@ -417,7 +417,7 @@ export default function IntegrationsPage() {
       }
     } catch (error) {
       setError("Erro ao conectar Azure DevOps. Tente novamente.")
-      console.error("[v0] Error connecting Azure DevOps:", error)
+      console.error(" Error connecting Azure DevOps:", error)
     } finally {
       setSaving(false)
     }

@@ -65,7 +65,7 @@ export function IntegrationFormModal({ open, onClose, integration, onSuccess }: 
       const data = await response.json()
       setProviders(data.providers || [])
     } catch (error) {
-      console.error("[v0] Error loading providers:", error)
+      console.error(" Error loading providers:", error)
     }
   }
 
@@ -91,7 +91,7 @@ export function IntegrationFormModal({ open, onClose, integration, onSuccess }: 
         alert(`Erro: ${data.error}`)
       }
     } catch (error) {
-      console.error("[v0] Error saving integration:", error)
+      console.error(" Error saving integration:", error)
       alert("Erro ao salvar integração")
     } finally {
       setLoading(false)

@@ -30,13 +30,13 @@ export async function POST(request: NextRequest) {
     })
 
     if (insertError) {
-      console.error("[v0] Failed to insert error log:", insertError)
+      console.error(" Failed to insert error log:", insertError)
       return NextResponse.json({ error: "Failed to log error" }, { status: 500 })
     }
 
     return NextResponse.json({ success: true }, { status: 200 })
   } catch (error: any) {
-    console.error("[v0] Error in /api/errors:", error)
+    console.error(" Error in /api/errors:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

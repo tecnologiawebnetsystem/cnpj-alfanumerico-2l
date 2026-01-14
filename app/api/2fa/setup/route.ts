@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       backup_codes: backupCodes,
     })
   } catch (error: any) {
-    console.error("[v0] Error setting up 2FA:", error)
+    console.error(" Error setting up 2FA:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

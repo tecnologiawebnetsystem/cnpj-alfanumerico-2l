@@ -24,13 +24,13 @@ export async function GET(request: NextRequest) {
       .order("created_at", { ascending: false })
 
     if (error) {
-      console.error("[v0] Error fetching clients:", error)
+      console.error(" Error fetching clients:", error)
       return NextResponse.json({ error: "Erro ao buscar clientes" }, { status: 500 })
     }
 
     return NextResponse.json({ clients })
   } catch (error) {
-    console.error("[v0] Error in GET /api/clients:", error)
+    console.error(" Error in GET /api/clients:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }
@@ -69,13 +69,13 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error("[v0] Error creating client:", error)
+      console.error(" Error creating client:", error)
       return NextResponse.json({ error: "Erro ao criar cliente" }, { status: 500 })
     }
 
     return NextResponse.json({ client }, { status: 201 })
   } catch (error) {
-    console.error("[v0] Error in POST /api/clients:", error)
+    console.error(" Error in POST /api/clients:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

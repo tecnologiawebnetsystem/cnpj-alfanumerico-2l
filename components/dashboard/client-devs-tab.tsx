@@ -80,21 +80,21 @@ export function ClientDevsTab({ clientId }: ClientDevsTabProps) {
   const userId = getCurrentUser()?.id || ""
 
   useEffect(() => {
-    console.log("[v0] === CLIENT DEVS TAB MOUNTED ===")
-    console.log("[v0] Client ID:", clientId)
-    console.log("[v0] Timestamp:", new Date().toISOString())
+    console.log(" === CLIENT DEVS TAB MOUNTED ===")
+    console.log(" Client ID:", clientId)
+    console.log(" Timestamp:", new Date().toISOString())
     fetchDevs()
   }, [clientId])
 
   const fetchDevs = async () => {
     try {
-      console.log("[v0] === FETCH DEVS START ===")
-      console.log("[v0] Getting current user...")
+      console.log(" === FETCH DEVS START ===")
+      console.log(" Getting current user...")
 
       const currentUser = getCurrentUser()
 
       console.log(
-        "[v0] Current user:",
+        " Current user:",
         currentUser
           ? {
               id: currentUser.id,
@@ -105,44 +105,44 @@ export function ClientDevsTab({ clientId }: ClientDevsTabProps) {
       )
 
       if (!currentUser) {
-        console.error("[v0] ❌ No current user found - ABORTING")
+        console.error(" ❌ No current user found - ABORTING")
         setLoading(false)
         return
       }
 
       const url = `/api/client/devs?client_id=${clientId}&user_id=${currentUser.id}`
-      console.log("[v0] Fetching developers from:", url)
-      console.log("[v0] Request starting at:", new Date().toISOString())
+      console.log(" Fetching developers from:", url)
+      console.log(" Request starting at:", new Date().toISOString())
 
       const response = await fetch(url, {
         credentials: "include",
       })
 
-      console.log("[v0] Response received at:", new Date().toISOString())
-      console.log("[v0] Developers API response status:", response.status)
-      console.log("[v0] Response OK:", response.ok)
+      console.log(" Response received at:", new Date().toISOString())
+      console.log(" Developers API response status:", response.status)
+      console.log(" Response OK:", response.ok)
 
       if (response.ok) {
-        console.log("[v0] Parsing JSON response...")
+        console.log(" Parsing JSON response...")
         const data = await response.json()
-        console.log("[v0] ✅ Developers loaded:", data.length, "records")
+        console.log(" ✅ Developers loaded:", data.length, "records")
         console.log(
-          "[v0] Developer IDs:",
+          " Developer IDs:",
           data.map((d: Dev) => d.id),
         )
         setDevs(data)
       } else {
         const errorText = await response.text()
-        console.error("[v0] ❌ API error response:", errorText)
+        console.error(" ❌ API error response:", errorText)
       }
     } catch (error: any) {
-      console.error("[v0] === FETCH DEVS ERROR ===")
-      console.error("[v0] Error fetching devs:", error)
-      console.error("[v0] Error message:", error.message)
-      console.error("[v0] Error stack:", error.stack)
+      console.error(" === FETCH DEVS ERROR ===")
+      console.error(" Error fetching devs:", error)
+      console.error(" Error message:", error.message)
+      console.error(" Error stack:", error.stack)
     } finally {
-      console.log("[v0] === FETCH DEVS END ===")
-      console.log("[v0] Setting loading to false")
+      console.log(" === FETCH DEVS END ===")
+      console.log(" Setting loading to false")
       setLoading(false)
     }
   }
@@ -150,13 +150,13 @@ export function ClientDevsTab({ clientId }: ClientDevsTabProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    console.log("[v0] === DEV FORM SUBMIT START ===")
-    console.log("[v0] Editing dev:", editingDev)
-    console.log("[v0] Form data:", formData)
+    console.log(" === DEV FORM SUBMIT START ===")
+    console.log(" Editing dev:", editingDev)
+    console.log(" Form data:", formData)
 
     const currentUser = getCurrentUser()
     if (!currentUser) {
-      console.error("[v0] No current user found")
+      console.error(" No current user found")
       showNotification({
         title: "Erro de Autenticação",
         description: "Usuário não encontrado. Faça login novamente.",
@@ -165,18 +165,18 @@ export function ClientDevsTab({ clientId }: ClientDevsTabProps) {
       return
     }
 
-    console.log("[v0] Current user:", currentUser.email, "Role:", currentUser.role)
+    console.log(" Current user:", currentUser.email, "Role:", currentUser.role)
 
     const url = editingDev
       ? `/api/client/devs/${editingDev.id}?user_id=${currentUser.id}`
       : `/api/client/devs?user_id=${currentUser.id}`
     const method = editingDev ? "PUT" : "POST"
 
-    console.log("[v0] Request URL:", url)
-    console.log("[v0] Request method:", method)
+    console.log(" Request URL:", url)
+    console.log(" Request method:", method)
 
     try {
-      console.log("[v0] Sending request...")
+      console.log(" Sending request...")
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -188,12 +188,12 @@ export function ClientDevsTab({ clientId }: ClientDevsTabProps) {
         }),
       })
 
-      console.log("[v0] Response status:", response.status)
-      console.log("[v0] Response OK:", response.ok)
+      console.log(" Response status:", response.status)
+      console.log(" Response OK:", response.ok)
 
       if (response.ok) {
         const data = await response.json()
-        console.log("[v0] Response data:", data)
+        console.log(" Response data:", data)
 
         showNotification({
           title: "Sucesso!",
@@ -206,7 +206,7 @@ export function ClientDevsTab({ clientId }: ClientDevsTabProps) {
         await fetchDevs()
       } else {
         const errorData = await response.json()
-        console.error("[v0] Error response:", errorData)
+        console.error(" Error response:", errorData)
 
         showNotification({
           title: "Erro ao Salvar",
@@ -215,7 +215,7 @@ export function ClientDevsTab({ clientId }: ClientDevsTabProps) {
         })
       }
     } catch (error) {
-      console.error("[v0] Exception in handleSubmit:", error)
+      console.error(" Exception in handleSubmit:", error)
       showNotification({
         title: "Erro de Conexão",
         description: "Erro ao conectar com o servidor. Tente novamente.",
@@ -223,7 +223,7 @@ export function ClientDevsTab({ clientId }: ClientDevsTabProps) {
       })
     }
 
-    console.log("[v0] === DEV FORM SUBMIT END ===")
+    console.log(" === DEV FORM SUBMIT END ===")
   }
 
   const handleEdit = (dev: Dev) => {
@@ -284,7 +284,7 @@ export function ClientDevsTab({ clientId }: ClientDevsTabProps) {
   }
 
   const handleDelete = (id: string) => {
-    console.log("[v0] handleDelete called for dev id:", id)
+    console.log(" handleDelete called for dev id:", id)
     setDeleteDevId(id)
     setIsDeleteDialogOpen(true)
   }
@@ -292,7 +292,7 @@ export function ClientDevsTab({ clientId }: ClientDevsTabProps) {
   const confirmDelete = async () => {
     if (!deleteDevId) return
 
-    console.log("[v0] confirmDelete - Deleting developer:", deleteDevId)
+    console.log(" confirmDelete - Deleting developer:", deleteDevId)
     try {
       const response = await fetch(`/api/client/devs/${deleteDevId}`, {
         method: "DELETE",
@@ -300,11 +300,11 @@ export function ClientDevsTab({ clientId }: ClientDevsTabProps) {
         body: JSON.stringify({ user_id: userId }),
       })
 
-      console.log("[v0] Delete response status:", response.status)
+      console.log(" Delete response status:", response.status)
       const data = await response.json()
 
       if (!response.ok) {
-        console.log("[v0] Error deleting developer:", data)
+        console.log(" Error deleting developer:", data)
         showNotification({
           title: "Erro ao Excluir",
           description: `Erro ao excluir desenvolvedor: ${data.error}`,
@@ -320,7 +320,7 @@ export function ClientDevsTab({ clientId }: ClientDevsTabProps) {
       })
       await fetchDevs()
     } catch (error) {
-      console.error("[v0] Exception deleting developer:", error)
+      console.error(" Exception deleting developer:", error)
       showNotification({
         title: "Erro ao Excluir",
         description: "Erro ao excluir desenvolvedor. Tente novamente.",

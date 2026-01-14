@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
       weeklyMetrics,
     })
   } catch (error) {
-    console.error("[v0] Error fetching dev dashboard:", error)
+    console.error(" Error fetching dev dashboard:", error)
     return NextResponse.json({ error: "Failed to fetch dashboard" }, { status: 500 })
   }
 }

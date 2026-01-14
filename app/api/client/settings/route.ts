@@ -3,30 +3,30 @@ import { createClient } from "@/lib/supabase/server"
 
 export async function GET(request: NextRequest) {
   try {
-    console.log("[v0] === SETTINGS API GET START ===")
+    console.log(" === SETTINGS API GET START ===")
     const { searchParams } = new URL(request.url)
     const client_id = searchParams.get("client_id")
-    console.log("[v0] Requested client_id:", client_id)
+    console.log(" Requested client_id:", client_id)
 
     if (!client_id) {
-      console.log("[v0] No client_id provided")
+      console.log(" No client_id provided")
       return NextResponse.json({ error: "client_id is required" }, { status: 400 })
     }
 
     const supabase = await createClient()
-    console.log("[v0] Supabase client created")
-    console.log("[v0] Target client_id:", client_id)
-    console.log("[v0] Fetching settings from database...")
+    console.log(" Supabase client created")
+    console.log(" Target client_id:", client_id)
+    console.log(" Fetching settings from database...")
 
     const { data: settings, error } = await supabase
       .from("client_settings")
       .select("setting_key, setting_value")
       .eq("client_id", client_id)
 
-    console.log("[v0] Settings query result:", settings, "Error:", error)
+    console.log(" Settings query result:", settings, "Error:", error)
 
     if (error) {
-      console.error("[v0] Database error:", error)
+      console.error(" Database error:", error)
       throw error
     }
 
@@ -40,28 +40,28 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    console.log("[v0] Settings object:", settingsObject)
-    console.log("[v0] === SETTINGS API GET END (SUCCESS) ===")
+    console.log(" Settings object:", settingsObject)
+    console.log(" === SETTINGS API GET END (SUCCESS) ===")
 
     return NextResponse.json(settingsObject)
   } catch (error) {
-    console.error("[v0] === SETTINGS API GET ERROR ===", error)
+    console.error(" === SETTINGS API GET ERROR ===", error)
     return NextResponse.json({ error: "Failed to fetch settings" }, { status: 500 })
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    console.log("[v0] === SETTINGS API POST START ===")
+    console.log(" === SETTINGS API POST START ===")
 
     const { client_id, cnpj_field_names, file_extensions } = await request.json()
 
-    console.log("[v0] POST client_id:", client_id)
-    console.log("[v0] CNPJ fields (raw from client):", cnpj_field_names, typeof cnpj_field_names)
-    console.log("[v0] File extensions (raw from client):", file_extensions, typeof file_extensions)
+    console.log(" POST client_id:", client_id)
+    console.log(" CNPJ fields (raw from client):", cnpj_field_names, typeof cnpj_field_names)
+    console.log(" File extensions (raw from client):", file_extensions, typeof file_extensions)
 
     if (!client_id) {
-      console.log("[v0] No client_id provided")
+      console.log(" No client_id provided")
       return NextResponse.json({ error: "client_id is required" }, { status: 400 })
     }
 
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
 
     // Upsert CNPJ field names
     if (cnpj_field_names !== undefined) {
-      console.log("[v0] Upserting CNPJ field names...")
+      console.log(" Upserting CNPJ field names...")
 
       // Parse if string, use as-is if array
       let cnpjArray: string[]
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
           .filter((f: string) => f)
           .map((f: string) => {
             const cleaned = f.replace(/^\/(.+)\/[gimuy]*$/, "$1")
-            console.log(`[v0]   Cleaned "${f}" -> "${cleaned}"`)
+            console.log(`   Cleaned "${f}" -> "${cleaned}"`)
             return cleaned
           })
       } else if (Array.isArray(cnpj_field_names)) {
@@ -90,15 +90,15 @@ export async function POST(request: NextRequest) {
           .filter((f: string) => f)
           .map((f: string) => {
             const cleaned = f.replace(/^\/(.+)\/[gimuy]*$/, "$1")
-            console.log(`[v0]   Cleaned "${f}" -> "${cleaned}"`)
+            console.log(`   Cleaned "${f}" -> "${cleaned}"`)
             return cleaned
           })
       } else {
         cnpjArray = []
       }
 
-      console.log("[v0] CNPJ array to save:", cnpjArray)
-      console.log("[v0] CNPJ array length:", cnpjArray.length)
+      console.log(" CNPJ array to save:", cnpjArray)
+      console.log(" CNPJ array length:", cnpjArray.length)
 
       const { error: cnpjError } = await supabase.from("client_settings").upsert(
         {
@@ -113,15 +113,15 @@ export async function POST(request: NextRequest) {
       )
 
       if (cnpjError) {
-        console.error("[v0] CNPJ upsert error:", cnpjError)
+        console.error(" CNPJ upsert error:", cnpjError)
         throw cnpjError
       }
-      console.log("[v0] CNPJ field names saved successfully!")
+      console.log(" CNPJ field names saved successfully!")
     }
 
     // Upsert file extensions
     if (file_extensions !== undefined) {
-      console.log("[v0] Upserting file extensions...")
+      console.log(" Upserting file extensions...")
 
       // Parse if string, use as-is if array
       const extArray =
@@ -132,8 +132,8 @@ export async function POST(request: NextRequest) {
               .filter((e: string) => e)
           : file_extensions
 
-      console.log("[v0] Extensions array to save:", extArray)
-      console.log("[v0] Extensions array length:", extArray.length)
+      console.log(" Extensions array to save:", extArray)
+      console.log(" Extensions array length:", extArray.length)
 
       const { error: extError } = await supabase.from("client_settings").upsert(
         {
@@ -148,16 +148,16 @@ export async function POST(request: NextRequest) {
       )
 
       if (extError) {
-        console.error("[v0] Extensions upsert error:", extError)
+        console.error(" Extensions upsert error:", extError)
         throw extError
       }
-      console.log("[v0] File extensions saved successfully!")
+      console.log(" File extensions saved successfully!")
     }
 
-    console.log("[v0] === SETTINGS API POST END (SUCCESS) ===")
+    console.log(" === SETTINGS API POST END (SUCCESS) ===")
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("[v0] === SETTINGS API POST ERROR ===", error)
+    console.error(" === SETTINGS API POST ERROR ===", error)
     return NextResponse.json({ error: "Failed to update settings" }, { status: 500 })
   }
 }

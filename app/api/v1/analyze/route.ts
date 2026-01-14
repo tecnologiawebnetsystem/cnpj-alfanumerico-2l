@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       { status: 202 },
     )
   } catch (error) {
-    console.error("[v0] Error in analyze endpoint:", error)
+    console.error(" Error in analyze endpoint:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
       total: analyses?.length || 0,
     })
   } catch (error) {
-    console.error("[v0] Error fetching analyses:", error)
+    console.error(" Error fetching analyses:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

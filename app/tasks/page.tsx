@@ -39,52 +39,52 @@ export default function TasksPage() {
   const { toast } = useToast()
 
   useEffect(() => {
-    console.log("[v0] TasksPage mounted")
+    console.log(" TasksPage mounted")
     const currentUser = getCurrentUser()
-    console.log("[v0] Current user:", currentUser)
+    console.log(" Current user:", currentUser)
 
     if (!currentUser) {
-      console.log("[v0] No user found, redirecting to login")
+      console.log(" No user found, redirecting to login")
       router.push("/login")
       return
     }
 
     const userRole = currentUser.role.toUpperCase()
     if (userRole !== "DEV" && userRole !== "DEVELOPER") {
-      console.log("[v0] User is not dev, redirecting to dashboard")
+      console.log(" User is not dev, redirecting to dashboard")
       router.push("/dashboard")
       return
     }
 
-    console.log("[v0] User is dev, fetching tasks")
+    console.log(" User is dev, fetching tasks")
     setUser(currentUser)
     fetchTasks()
   }, [router])
 
   const fetchTasks = async () => {
     try {
-      console.log("[v0] Fetching tasks from API")
+      console.log(" Fetching tasks from API")
       const currentUser = getCurrentUser()
       if (!currentUser) {
-        console.log("[v0] No current user found")
+        console.log(" No current user found")
         return
       }
 
       const response = await fetch(`/api/dev/tasks?user_id=${currentUser.id}&include_details=true`, {
         credentials: "include",
       })
-      console.log("[v0] Tasks API response status:", response.status)
+      console.log(" Tasks API response status:", response.status)
 
       if (response.ok) {
         const data = await response.json()
-        console.log("[v0] Tasks fetched:", data)
+        console.log(" Tasks fetched:", data)
         setTasks(data)
       } else {
         const errorText = await response.text()
-        console.log("[v0] Tasks API error:", errorText)
+        console.log(" Tasks API error:", errorText)
       }
     } catch (error) {
-      console.error("[v0] Error fetching tasks:", error)
+      console.error(" Error fetching tasks:", error)
     } finally {
       setLoading(false)
     }

@@ -40,14 +40,14 @@ export class CNPJDetector {
         ? customFieldNames
         : ["cnpj", "cpf_cnpj", "documento", "inscricao", "inscricaofederal", "nr_cnpj", "num_cnpj", "cadastro_nacional"]
 
-    console.log("[v0] CNPJDetector initialized with field names:", fieldNames)
+    console.log(" CNPJDetector initialized with field names:", fieldNames)
 
     this.cnpjPatterns = fieldNames.map((name) => {
       const pattern = new RegExp(name, "gi") // gi = global + case-insensitive
       return pattern
     })
 
-    console.log("[v0] CNPJDetector created", this.cnpjPatterns.length, "patterns")
+    console.log(" CNPJDetector created", this.cnpjPatterns.length, "patterns")
   }
 
   async analyzeFile(filePath: string, content: string, language: string): Promise<CNPJFinding[]> {

@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       .order("created_at", { ascending: false })
 
     if (error) {
-      console.error("[v0] Error fetching tokens:", error.message)
+      console.error(" Error fetching tokens:", error.message)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ tokens: tokensWithProvider })
   } catch (error) {
-    console.error("[v0] Error in GET /api/github/tokens:", error)
+    console.error(" Error in GET /api/github/tokens:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     const canManage = userRole === "admin" || userRole === "super_admin" || userRole === "admin_client"
 
     if (!canManage) {
-      console.log("[v0] User does not have permission to add tokens")
+      console.log(" User does not have permission to add tokens")
       return NextResponse.json({ 
         error: "Forbidden - Only Admin users can add tokens" 
       }, { status: 403 })
@@ -99,11 +99,11 @@ export async function POST(request: NextRequest) {
         .eq("id", existing.id)
 
       if (error) {
-        console.error("[v0] Error updating token:", error.message)
+        console.error(" Error updating token:", error.message)
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
 
-      console.log(`[v0] Token updated successfully for user: ${user_id}, account: ${account_name}`)
+      console.log(` Token updated successfully for user: ${user_id}, account: ${account_name}`)
       return NextResponse.json({ success: true })
     } else {
       const { error } = await supabase.from("github_tokens").insert({
@@ -117,15 +117,15 @@ export async function POST(request: NextRequest) {
       })
 
       if (error) {
-        console.error("[v0] Error inserting token:", error.message)
+        console.error(" Error inserting token:", error.message)
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
 
-      console.log(`[v0] Token inserted successfully for user: ${user_id}, account: ${account_name}`)
+      console.log(` Token inserted successfully for user: ${user_id}, account: ${account_name}`)
       return NextResponse.json({ success: true })
     }
   } catch (error) {
-    console.error("[v0] Error in POST /api/github/tokens:", error)
+    console.error(" Error in POST /api/github/tokens:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
@@ -156,7 +156,7 @@ export async function DELETE(request: NextRequest) {
     const canManage = userRole === "admin" || userRole === "super_admin" || userRole === "admin_client"
 
     if (!canManage) {
-      console.log("[v0] User does not have permission to delete tokens")
+      console.log(" User does not have permission to delete tokens")
       return NextResponse.json({ 
         error: "Forbidden - Only Admin users can delete tokens" 
       }, { status: 403 })
@@ -165,13 +165,13 @@ export async function DELETE(request: NextRequest) {
     const { error } = await supabase.from("github_tokens").delete().eq("id", tokenId).eq("user_id", userId)
 
     if (error) {
-      console.error("[v0] Error deleting token:", error)
+      console.error(" Error deleting token:", error)
       return NextResponse.json({ error: "Failed to delete token" }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("[v0] Error in DELETE /api/github/tokens:", error)
+    console.error(" Error in DELETE /api/github/tokens:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic"
 export const runtime = "nodejs"
 
 export async function GET() {
-  console.log("[v0] === DIAGNOSTIC START ===")
+  console.log(" === DIAGNOSTIC START ===")
 
   const diagnostics = {
     timestamp: new Date().toISOString(),
@@ -26,8 +26,8 @@ export async function GET() {
     },
   }
 
-  console.log("[v0] Diagnostics:", JSON.stringify(diagnostics, null, 2))
-  console.log("[v0] === DIAGNOSTIC END ===")
+  console.log(" Diagnostics:", JSON.stringify(diagnostics, null, 2))
+  console.log(" === DIAGNOSTIC END ===")
 
   return NextResponse.json(diagnostics)
 }

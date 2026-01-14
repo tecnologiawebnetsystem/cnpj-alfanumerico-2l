@@ -52,7 +52,7 @@ export function AzureAccountSelector({
         setAccounts(data.accounts || [])
       }
     } catch (error) {
-      console.error("[v0] Error loading Azure accounts:", error)
+      console.error(" Error loading Azure accounts:", error)
     } finally {
       setLoading(false)
     }

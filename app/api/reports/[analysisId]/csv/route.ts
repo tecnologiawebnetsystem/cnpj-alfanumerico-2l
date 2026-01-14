@@ -55,7 +55,7 @@ export async function GET(request: NextRequest, { params }: { params: { analysis
       },
     })
   } catch (error) {
-    console.error("[v0] Error generating CSV:", error)
+    console.error(" Error generating CSV:", error)
     return NextResponse.json({ error: "Failed to generate report" }, { status: 500 })
   }
 }

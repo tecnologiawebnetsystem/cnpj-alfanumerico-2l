@@ -5,14 +5,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const { id } = await params
 
-    console.log("[v0] Progress endpoint - ID:", id)
+    console.log(" Progress endpoint - ID:", id)
 
     const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
     const { data: batchData } = await supabase.from("batch_analyses").select("*").eq("id", id).maybeSingle()
 
     if (batchData) {
-      console.log("[v0] Found batch analysis:", batchData.id, "progress:", batchData.progress)
+      console.log(" Found batch analysis:", batchData.id, "progress:", batchData.progress)
 
       const { data: analyses } = await supabase
         .from("analyses")
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
         const actualProgress = Math.round((completed / total) * 100)
 
-        console.log("[v0] Batch progress:", { total, completed, processing, failed, actualProgress })
+        console.log(" Batch progress:", { total, completed, processing, failed, actualProgress })
 
         return NextResponse.json({
           id: batchData.id,
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       .maybeSingle()
 
     if (analysis) {
-      console.log("[v0] Found single analysis:", analysis.id, "progress:", analysis.progress)
+      console.log(" Found single analysis:", analysis.id, "progress:", analysis.progress)
 
       return NextResponse.json({
         id: analysis.id,
@@ -65,10 +65,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       })
     }
 
-    console.log("[v0] Analysis not found:", id)
+    console.log(" Analysis not found:", id)
     return NextResponse.json({ error: "Analysis not found" }, { status: 404 })
   } catch (error) {
-    console.error("[v0] Error fetching analysis progress:", error)
+    console.error(" Error fetching analysis progress:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
@@ -77,7 +77,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const { id } = await params
 
-    console.log("[v0] Progress update - ID:", id)
+    console.log(" Progress update - ID:", id)
 
     const body = await request.json()
     const { progress, current_step, status } = body
@@ -92,13 +92,13 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const { error } = await supabase.from("analyses").update(updateData).eq("id", id)
 
     if (error) {
-      console.error("[v0] Error updating progress:", error)
+      console.error(" Error updating progress:", error)
       return NextResponse.json({ error: "Failed to update progress" }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("[v0] Error updating analysis progress:", error)
+    console.error(" Error updating analysis progress:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

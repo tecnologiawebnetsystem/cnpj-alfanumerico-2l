@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       message: `Análise iniciada para ${repository_ids.length} repositório(s)`,
     })
   } catch (error: any) {
-    console.error("[v0] Error starting analysis:", error)
+    console.error(" Error starting analysis:", error)
     return NextResponse.json({ error: error.message || "Erro ao iniciar análise" }, { status: 500 })
   }
 }

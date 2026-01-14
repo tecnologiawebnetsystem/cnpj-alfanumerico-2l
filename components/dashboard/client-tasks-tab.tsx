@@ -143,13 +143,13 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
   const [deleteAllResult, setDeleteAllResult] = useState<any>(null)
 
   useEffect(() => {
-    console.log("[v0] === CLIENT TASKS TAB MOUNTED ===")
-    console.log("[v0] Client ID:", clientId)
-    console.log("[v0] Timestamp:", new Date().toISOString())
+    console.log(" === CLIENT TASKS TAB MOUNTED ===")
+    console.log(" Client ID:", clientId)
+    console.log(" Timestamp:", new Date().toISOString())
     fetchTasks()
     fetchDevs()
     const user = getCurrentUser()
-    console.log("[v0] Setting current user:", user ? { id: user.id, email: user.email, role: user.role } : "NOT FOUND")
+    console.log(" Setting current user:", user ? { id: user.id, email: user.email, role: user.role } : "NOT FOUND")
     setCurrentUser(user)
   }, [clientId])
 
@@ -157,7 +157,7 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
     if (!clientId) return
 
     const interval = setInterval(() => {
-      console.log("[v0] Auto-refreshing tasks...")
+      console.log(" Auto-refreshing tasks...")
       fetchTasks()
     }, 10000) // Refresh every 10 seconds
 
@@ -166,13 +166,13 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
 
   const fetchTasks = async () => {
     try {
-      console.log("[v0] === FETCH TASKS START ===")
-      console.log("[v0] Getting current user...")
+      console.log(" === FETCH TASKS START ===")
+      console.log(" Getting current user...")
 
       const currentUser = getCurrentUser()
 
       console.log(
-        "[v0] Current user:",
+        " Current user:",
         currentUser
           ? {
               id: currentUser.id,
@@ -183,78 +183,78 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
       )
 
       if (!currentUser) {
-        console.error("[v0] ❌ No current user found - ABORTING")
+        console.error(" ❌ No current user found - ABORTING")
         setLoading(false)
         return
       }
 
       const url = `/api/client/tasks?client_id=${clientId}&user_id=${currentUser.id}&include_repo=true`
-      console.log("[v0] Fetching tasks from:", url)
-      console.log("[v0] Request starting at:", new Date().toISOString())
+      console.log(" Fetching tasks from:", url)
+      console.log(" Request starting at:", new Date().toISOString())
 
       const response = await fetch(url)
 
-      console.log("[v0] Response received at:", new Date().toISOString())
-      console.log("[v0] Tasks API response status:", response.status)
-      console.log("[v0] Response OK:", response.ok)
+      console.log(" Response received at:", new Date().toISOString())
+      console.log(" Tasks API response status:", response.status)
+      console.log(" Response OK:", response.ok)
 
       if (response.ok) {
-        console.log("[v0] Parsing JSON response...")
+        console.log(" Parsing JSON response...")
         const data = await response.json()
-        console.log("[v0] ✅ Tasks loaded:", data.length, "records")
+        console.log(" ✅ Tasks loaded:", data.length, "records")
         console.log(
-          "[v0] Task IDs:",
+          " Task IDs:",
           data.map((t: Task) => t.id).slice(0, 5),
           data.length > 5 ? `... and ${data.length - 5} more` : "",
         )
         setTasks(data)
       } else {
         const errorText = await response.text()
-        console.error("[v0] ❌ API error response:", errorText)
+        console.error(" ❌ API error response:", errorText)
       }
     } catch (error: any) {
-      console.error("[v0] === FETCH TASKS ERROR ===")
-      console.error("[v0] Error fetching tasks:", error)
-      console.error("[v0] Error message:", error.message)
-      console.error("[v0] Error stack:", error.stack)
+      console.error(" === FETCH TASKS ERROR ===")
+      console.error(" Error fetching tasks:", error)
+      console.error(" Error message:", error.message)
+      console.error(" Error stack:", error.stack)
     } finally {
-      console.log("[v0] === FETCH TASKS END ===")
-      console.log("[v0] Setting loading to false")
+      console.log(" === FETCH TASKS END ===")
+      console.log(" Setting loading to false")
       setLoading(false)
     }
   }
 
   const fetchDevs = async () => {
     try {
-      console.log("[v0] === FETCH DEVS (for dropdown) START ===")
+      console.log(" === FETCH DEVS (for dropdown) START ===")
 
       const currentUser = getCurrentUser()
 
       if (!currentUser) {
-        console.error("[v0] ❌ No current user found for devs dropdown")
+        console.error(" ❌ No current user found for devs dropdown")
         return
       }
 
       const url = `/api/client/developers?client_id=${clientId}&user_id=${currentUser.id}`
-      console.log("[v0] Fetching developers from:", url)
+      console.log(" Fetching developers from:", url)
 
       const response = await fetch(url)
 
-      console.log("[v0] Developers API response status:", response.status)
+      console.log(" Developers API response status:", response.status)
 
       if (response.ok) {
         const data = await response.json()
         const activeDevs = data.filter((d: Dev & { status: string }) => d.status === "active")
-        console.log("[v0] ✅ Developers loaded for dropdown:", activeDevs.length, "active")
+        console.log(" ✅ Developers loaded for dropdown:", activeDevs.length, "active")
         setDevs(activeDevs)
       } else {
         const errorText = await response.text()
-        console.error("[v0] ❌ Devs dropdown API error:", errorText)
+        console.error(" ❌ Devs dropdown API error:", errorText)
       }
     } catch (error: any) {
-      console.error("[v0] === FETCH DEVS (dropdown) ERROR ===")
-      console.error("[v0] Error fetching devs:", error)
-      console.error("[v0] Error message:", error.message)
+      console.error(" === FETCH DEVS (dropdown) ERROR ===")
+      console.error(" Error fetching devs:", error)
+      console.error(" Error message:", error.message)
     }
   }
 
@@ -263,7 +263,7 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
 
     const currentUser = getCurrentUser()
     if (!currentUser) {
-      console.error("[v0] No current user found")
+      console.error(" No current user found")
       return
     }
 
@@ -274,7 +274,7 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
       : `/api/client/tasks?user_id=${currentUser.id}`
     const method = editingTask ? "PUT" : "POST"
 
-    console.log("[v0] Submitting task:", { url, method, assignedTo, editingTask: !!editingTask })
+    console.log(" Submitting task:", { url, method, assignedTo, editingTask: !!editingTask })
 
     try {
       const response = await fetch(url, {
@@ -290,20 +290,20 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
         }),
       })
 
-      console.log("[v0] Task save response status:", response.status)
+      console.log(" Task save response status:", response.status)
 
       if (response.ok) {
-        console.log("[v0] Task saved successfully")
+        console.log(" Task saved successfully")
         setIsDialogOpen(false)
         resetForm()
         await fetchTasks()
       } else {
         const errorData = await response.json()
-        console.error("[v0] Error saving task:", errorData)
+        console.error(" Error saving task:", errorData)
         alert("Erro ao salvar tarefa. Veja o console para detalhes.")
       }
     } catch (error) {
-      console.error("[v0] Error saving task:", error)
+      console.error(" Error saving task:", error)
       alert("Erro ao salvar tarefa. Tente novamente.")
     }
   }
@@ -394,7 +394,7 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
         fetchTasks()
       }
     } catch (error) {
-      console.error("[v0] Error deleting task:", error)
+      console.error(" Error deleting task:", error)
     }
   }
 
@@ -450,7 +450,7 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
         alert("Erro ao atribuir tarefas em massa")
       }
     } catch (error) {
-      console.error("[v0] Error bulk assigning:", error)
+      console.error(" Error bulk assigning:", error)
       alert("Erro ao atribuir tarefas em massa")
     }
   }
@@ -482,13 +482,13 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
         alert("Erro ao atribuir tarefas filtradas")
       }
     } catch (error) {
-      console.error("[v0] Error filter assigning:", error)
+      console.error(" Error filter assigning:", error)
       alert("Erro ao atribuir tarefas filtradas")
     }
   }
 
   const handleApplyFix = (taskId: string) => {
-    console.log("[v0] Opening apply fix modal for task:", taskId)
+    console.log(" Opening apply fix modal for task:", taskId)
     setSelectedTaskForApply(taskId)
     setApplyModalOpen(true)
   }
@@ -538,7 +538,7 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
       const currentUser = getCurrentUser()
       if (!currentUser) return
 
-      console.log("[v0] Quick assigning task:", { taskId, developerId })
+      console.log(" Quick assigning task:", { taskId, developerId })
 
       const response = await fetch(`/api/client/tasks/${taskId}?user_id=${currentUser.id}`, {
         method: "PUT",
@@ -550,7 +550,7 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
       })
 
       if (response.ok) {
-        console.log("[v0] Task assigned successfully")
+        console.log(" Task assigned successfully")
         const devName = devs.find((d) => d.id === developerId)?.name || "Nenhum"
         toast({
           title: "Tarefa atribuída!",
@@ -565,7 +565,7 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
         })
       }
     } catch (error) {
-      console.error("[v0] Error assigning task:", error)
+      console.error(" Error assigning task:", error)
       toast({
         title: "Erro",
         description: "Erro ao atribuir tarefa",
@@ -600,7 +600,7 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
       const currentUser = getCurrentUser()
       if (!currentUser) return
 
-      console.log("[v0] Changing task status:", { taskId, newStatus })
+      console.log(" Changing task status:", { taskId, newStatus })
 
       const response = await fetch(`/api/client/tasks/${taskId}?user_id=${currentUser.id}`, {
         method: "PUT",
@@ -609,7 +609,7 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
       })
 
       if (response.ok) {
-        console.log("[v0] Task status updated successfully")
+        console.log(" Task status updated successfully")
         toast({
           title: "Status atualizado!",
           description: `Tarefa alterada para: ${newStatus === "in_progress" ? "Em Desenvolvimento" : newStatus === "completed" ? "Concluída" : "Pendente"}`,
@@ -623,7 +623,7 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
         })
       }
     } catch (error) {
-      console.error("[v0] Error changing status:", error)
+      console.error(" Error changing status:", error)
       toast({
         title: "Erro",
         description: "Erro ao alterar status da tarefa",
@@ -644,7 +644,7 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
         return
       }
 
-      console.log("[v0] Assigning task to current user:", { taskId, userId: currentUser.id })
+      console.log(" Assigning task to current user:", { taskId, userId: currentUser.id })
 
       const response = await fetch(`/api/client/tasks/${taskId}?user_id=${currentUser.id}`, {
         method: "PUT",
@@ -656,7 +656,7 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
       })
 
       if (response.ok) {
-        console.log("[v0] Task assigned to current user successfully")
+        console.log(" Task assigned to current user successfully")
         toast({
           title: "Tarefa atribuída!",
           description: "Você pegou esta tarefa e ela foi movida para 'Em Desenvolvimento'",
@@ -670,7 +670,7 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
         })
       }
     } catch (error) {
-      console.error("[v0] Error assigning task:", error)
+      console.error(" Error assigning task:", error)
       toast({
         title: "Erro",
         description: "Erro ao atribuir tarefa",
@@ -691,7 +691,7 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
         return
       }
 
-      console.log("[v0] Deleting all tasks for client:", clientId)
+      console.log(" Deleting all tasks for client:", clientId)
 
       const response = await fetch(`/api/admin/cleanup-client-tasks`, {
         method: "POST",
@@ -702,7 +702,7 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
 
       if (response.ok) {
         const result = await response.json()
-        console.log("[v0] All tasks deleted successfully:", result)
+        console.log(" All tasks deleted successfully:", result)
         setDeleteAllResult(result)
         setIsDeleteAllDialogOpen(false)
         setIsDeleteAllSuccessDialogOpen(true)
@@ -716,7 +716,7 @@ export function ClientTasksTab({ clientId }: ClientTasksTabProps) {
         })
       }
     } catch (error) {
-      console.error("[v0] Error deleting all tasks:", error)
+      console.error(" Error deleting all tasks:", error)
       toast({
         title: "Erro",
         description: "Erro ao excluir todas as tarefas",

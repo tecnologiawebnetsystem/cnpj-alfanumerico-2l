@@ -10,13 +10,13 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
  * NÃO usa await cookies() que trava na Vercel
  */
 export function createSupabaseApiClient(request?: NextRequest) {
-  console.log("[v0] 🔧 Creating API client WITHOUT cookies (Vercel fix)")
+  console.log(" 🔧 Creating API client WITHOUT cookies (Vercel fix)")
 
   // Tenta pegar o token do header Authorization
   const authHeader = request?.headers.get("authorization")
   const token = authHeader?.replace("Bearer ", "")
 
-  console.log("[v0] Token from header:", token ? "✅ Found" : "❌ Not found")
+  console.log(" Token from header:", token ? "✅ Found" : "❌ Not found")
 
   // Cria cliente básico sem cookies
   const client = createClient(supabaseUrl, supabaseAnonKey, {
@@ -40,7 +40,7 @@ export function createSupabaseServiceClient() {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!serviceRoleKey) {
-    console.error("[v0] ❌ SUPABASE_SERVICE_ROLE_KEY not found!")
+    console.error(" ❌ SUPABASE_SERVICE_ROLE_KEY not found!")
     throw new Error("Service role key not configured")
   }
 

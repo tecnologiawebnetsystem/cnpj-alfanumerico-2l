@@ -31,7 +31,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       licenseType: client.license_type,
     })
   } catch (error: any) {
-    console.error("[v0] Error checking license:", error)
+    console.error(" Error checking license:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

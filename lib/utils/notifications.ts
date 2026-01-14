@@ -44,7 +44,7 @@ export async function createNotification({
     .single()
 
   if (error) {
-    console.error("[v0] Error creating notification:", error)
+    console.error(" Error creating notification:", error)
     throw error
   }
 
@@ -63,7 +63,7 @@ export async function markNotificationAsRead(notificationId: string) {
     .eq("id", notificationId)
 
   if (error) {
-    console.error("[v0] Error marking notification as read:", error)
+    console.error(" Error marking notification as read:", error)
     throw error
   }
 }
@@ -81,7 +81,7 @@ export async function markAllNotificationsAsRead(userId: string) {
     .eq("read", false)
 
   if (error) {
-    console.error("[v0] Error marking all notifications as read:", error)
+    console.error(" Error marking all notifications as read:", error)
     throw error
   }
 }
@@ -96,7 +96,7 @@ export async function getUnreadNotificationsCount(userId: string): Promise<numbe
     .eq("read", false)
 
   if (error) {
-    console.error("[v0] Error getting unread notifications count:", error)
+    console.error(" Error getting unread notifications count:", error)
     return 0
   }
 

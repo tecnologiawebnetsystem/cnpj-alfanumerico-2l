@@ -97,7 +97,7 @@ Relatório gerado em: ${new Date().toLocaleString("pt-BR")}
 
     return NextResponse.json({ error: "Invalid format" }, { status: 400 })
   } catch (error: any) {
-    console.error("[v0] Export analytics error:", error)
+    console.error(" Export analytics error:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

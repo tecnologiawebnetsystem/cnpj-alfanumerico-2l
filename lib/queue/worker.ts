@@ -20,7 +20,7 @@ async function processAnalysisJob(job: any): Promise<void> {
   const { analysis_id, repository_id, account_id } = job.job_data
 
   console.log(
-    `[v0] Processing analysis job: ${job.id} for repository: ${repository_id}`
+    ` Processing analysis job: ${job.id} for repository: ${repository_id}`
   )
 
   await logJob(job.id, "info", `Started analysis for repository ${repository_id}`)
@@ -57,7 +57,7 @@ async function processAnalysisJob(job: any): Promise<void> {
 
     await logJob(job.id, "info", "Analysis completed successfully")
   } catch (error: any) {
-    console.error(`[v0] Error processing analysis job ${job.id}:`, error)
+    console.error(` Error processing analysis job ${job.id}:`, error)
     await logJob(job.id, "error", `Analysis failed: ${error.message}`, {
       error: error.stack,
     })
@@ -100,12 +100,12 @@ async function processJob(job: any): Promise<void> {
 
 export async function startWorker(): Promise<void> {
   if (isRunning) {
-    console.log("[v0] Worker already running")
+    console.log(" Worker already running")
     return
   }
 
   isRunning = true
-  console.log(`[v0] Worker ${WORKER_ID} started`)
+  console.log(` Worker ${WORKER_ID} started`)
 
   while (isRunning) {
     try {
@@ -119,13 +119,13 @@ export async function startWorker(): Promise<void> {
         await new Promise((resolve) => setTimeout(resolve, 5000))
       }
     } catch (error: any) {
-      console.error("[v0] Worker error:", error)
+      console.error(" Worker error:", error)
       // Aguardar antes de tentar novamente
       await new Promise((resolve) => setTimeout(resolve, 10000))
     }
   }
 
-  console.log(`[v0] Worker ${WORKER_ID} stopped`)
+  console.log(` Worker ${WORKER_ID} stopped`)
 }
 
 export function stopWorker(): void {

@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ user })
   } catch (error: any) {
-    console.error("[v0] Error fetching current user:", error)
+    console.error(" Error fetching current user:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

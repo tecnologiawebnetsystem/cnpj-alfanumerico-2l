@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ suggestions })
   } catch (error: any) {
-    console.error("[v0] Error fetching AI suggestions:", error)
+    console.error(" Error fetching AI suggestions:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
@@ -103,7 +103,7 @@ Respond in JSON format:
 
     return NextResponse.json(savedSuggestion)
   } catch (error: any) {
-    console.error("[v0] Error creating AI suggestion:", error)
+    console.error(" Error creating AI suggestion:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

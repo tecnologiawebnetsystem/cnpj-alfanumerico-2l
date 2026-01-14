@@ -53,7 +53,7 @@ export function IntegrationsTab() {
       const data = await response.json()
       setIntegrations(data.integrations || [])
     } catch (error) {
-      console.error("[v0] Error loading integrations:", error)
+      console.error(" Error loading integrations:", error)
     } finally {
       setLoading(false)
     }
@@ -75,7 +75,7 @@ export function IntegrationsTab() {
 
       await loadIntegrations()
     } catch (error) {
-      console.error("[v0] Error testing integration:", error)
+      console.error(" Error testing integration:", error)
       alert("Erro ao testar integração")
     } finally {
       setTestingId(null)
@@ -97,7 +97,7 @@ export function IntegrationsTab() {
         alert("Erro ao deletar integração")
       }
     } catch (error) {
-      console.error("[v0] Error deleting integration:", error)
+      console.error(" Error deleting integration:", error)
       alert("Erro ao deletar integração")
     }
   }

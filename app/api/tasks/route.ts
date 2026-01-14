@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ tasks: formattedTasks })
   } catch (error: any) {
-    console.error("[v0] Error fetching tasks:", error)
+    console.error(" Error fetching tasks:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
@@ -113,13 +113,13 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error("[v0] Error creating task:", error)
+      console.error(" Error creating task:", error)
       return NextResponse.json({ error: "Erro ao criar tarefa" }, { status: 500 })
     }
 
     return NextResponse.json({ task }, { status: 201 })
   } catch (error: any) {
-    console.error("[v0] Error in POST /api/tasks:", error)
+    console.error(" Error in POST /api/tasks:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

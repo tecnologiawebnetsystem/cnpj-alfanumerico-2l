@@ -53,7 +53,7 @@ export async function createAlert(
 
     if (error) throw error
 
-    console.log(`[v0] Alert created: ${title} (${severity})`)
+    console.log(` Alert created: ${title} (${severity})`)
     return data.id
   } catch (error) {
     console.error("Failed to create alert:", error)

@@ -51,7 +51,7 @@ export function TasksTab() {
       const data = await response.json()
       setTasks(data.tasks || [])
     } catch (error) {
-      console.error("[v0] Error loading tasks:", error)
+      console.error(" Error loading tasks:", error)
     } finally {
       setLoading(false)
     }
@@ -63,7 +63,7 @@ export function TasksTab() {
       const data = await response.json()
       setStats(data.stats)
     } catch (error) {
-      console.error("[v0] Error loading stats:", error)
+      console.error(" Error loading stats:", error)
     }
   }
 
@@ -73,7 +73,7 @@ export function TasksTab() {
       const data = await response.json()
       setUserRole(data.user?.role || "dev")
     } catch (error) {
-      console.error("[v0] Error loading user role:", error)
+      console.error(" Error loading user role:", error)
     }
   }
 
@@ -90,7 +90,7 @@ export function TasksTab() {
         await loadStats()
       }
     } catch (error) {
-      console.error("[v0] Error updating task:", error)
+      console.error(" Error updating task:", error)
     }
   }
 

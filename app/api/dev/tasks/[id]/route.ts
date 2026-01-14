@@ -72,13 +72,13 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         comment: `Status alterado de ${currentTask.status} para ${body.status} via drag-and-drop`,
       })
 
-      console.log("[v0] Task history logged for status change:", currentTask.status, "->", body.status)
+      console.log(" Task history logged for status change:", currentTask.status, "->", body.status)
     }
 
-    console.log("[v0] Task updated successfully:", id, "New status:", body.status)
+    console.log(" Task updated successfully:", id, "New status:", body.status)
     return NextResponse.json(data)
   } catch (error) {
-    console.error("[v0] Error updating task:", error)
+    console.error(" Error updating task:", error)
     return NextResponse.json({ error: "Failed to update task" }, { status: 500 })
   }
 }

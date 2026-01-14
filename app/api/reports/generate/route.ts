@@ -131,7 +131,7 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error("[v0] Error generating report:", error)
+    console.error(" Error generating report:", error)
     return Response.json({ error: "Internal server error" }, { status: 500 })
   }
 }

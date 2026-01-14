@@ -12,30 +12,30 @@ async function hashPassword(password: string): Promise<string> {
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    console.log("[v0] === PUT /api/client/devs/[id] START ===")
+    console.log(" === PUT /api/client/devs/[id] START ===")
     const { id } = await params
-    console.log("[v0] Dev ID:", id)
+    console.log(" Dev ID:", id)
 
     const supabase = await createServerClient()
     const body = await request.json()
 
-    console.log("[v0] Request body fields:", Object.keys(body))
+    console.log(" Request body fields:", Object.keys(body))
 
     if (body.password) {
-      console.log("[v0] Hashing password with Web Crypto API...")
+      console.log(" Hashing password with Web Crypto API...")
       const hashedPassword = await hashPassword(body.password)
 
-      console.log("[v0] Updating password in database...")
+      console.log(" Updating password in database...")
       const { error: pwdError } = await supabase.from("users").update({ password_hash: hashedPassword }).eq("id", id)
 
       if (pwdError) {
-        console.error("[v0] Password update error:", pwdError)
+        console.error(" Password update error:", pwdError)
         return NextResponse.json({ error: pwdError.message }, { status: 500 })
       }
-      console.log("[v0] Password updated successfully")
+      console.log(" Password updated successfully")
     }
 
-    console.log("[v0] Updating user fields...")
+    console.log(" Updating user fields...")
     const { data, error } = await supabase
       .from("users")
       .update({
@@ -49,16 +49,16 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       .single()
 
     if (error) {
-      console.error("[v0] Update error:", error)
+      console.error(" Update error:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    console.log("[v0] User updated successfully")
-    console.log("[v0] === PUT /api/client/devs/[id] END ===")
+    console.log(" User updated successfully")
+    console.log(" === PUT /api/client/devs/[id] END ===")
 
     return NextResponse.json(data)
   } catch (error) {
-    console.error("[v0] CRITICAL Error updating dev:", error)
+    console.error(" CRITICAL Error updating dev:", error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to update dev" },
       { status: 500 },
@@ -68,26 +68,26 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    console.log("[v0] === DELETE /api/client/devs/[id] START ===")
+    console.log(" === DELETE /api/client/devs/[id] START ===")
     const { id } = await params
-    console.log("[v0] Dev ID to delete:", id)
+    console.log(" Dev ID to delete:", id)
 
     const supabase = await createServerClient()
 
-    console.log("[v0] Deleting user...")
+    console.log(" Deleting user...")
     const { error } = await supabase.from("users").delete().eq("id", id)
 
     if (error) {
-      console.error("[v0] Delete error:", error)
+      console.error(" Delete error:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    console.log("[v0] User deleted successfully")
-    console.log("[v0] === DELETE /api/client/devs/[id] END ===")
+    console.log(" User deleted successfully")
+    console.log(" === DELETE /api/client/devs/[id] END ===")
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("[v0] CRITICAL Error deleting dev:", error)
+    console.error(" CRITICAL Error deleting dev:", error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to delete dev" },
       { status: 500 },

@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    console.log('[v0] Validating Git token availability...')
+    console.log(' Validating Git token availability...')
     
     const supabase = await createClient()
     
@@ -19,7 +19,7 @@ export async function GET() {
       .single()
 
     if (!userData?.client_id) {
-      console.log('[v0] User has no client_id')
+      console.log(' User has no client_id')
       return NextResponse.json({ hasToken: false })
     }
 
@@ -30,18 +30,18 @@ export async function GET() {
       .eq('client_id', userData.client_id)
       .in('provider', ['github', 'azure_devops'])
 
-    console.log('[v0] Found accounts:', accounts?.length || 0)
+    console.log(' Found accounts:', accounts?.length || 0)
 
     const hasToken = accounts && accounts.length > 0 && accounts.some(acc => acc.pat_token && acc.pat_token.length > 0)
 
-    console.log('[v0] Has valid Git token:', hasToken)
+    console.log(' Has valid Git token:', hasToken)
 
     return NextResponse.json({ 
       hasToken: !!hasToken,
       provider: hasToken ? accounts[0].provider : null
     })
   } catch (error) {
-    console.error('[v0] Error validating Git token:', error)
+    console.error(' Error validating Git token:', error)
     return NextResponse.json({ hasToken: false, error: 'Internal error' }, { status: 500 })
   }
 }

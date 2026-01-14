@@ -44,26 +44,26 @@ export function DashboardOverview({ onChangeTab, userRole = "admin" }: Dashboard
   })
 
   useEffect(() => {
-    console.log("[v0] DashboardOverview mounted for role:", userRole)
+    console.log(" DashboardOverview mounted for role:", userRole)
     loadStats()
   }, [])
 
   const loadStats = async () => {
     try {
-      console.log("[v0] Loading dashboard stats...")
+      console.log(" Loading dashboard stats...")
       const response = await fetch("/api/dashboard/stats")
       if (response.ok) {
         const data = await response.json()
-        console.log("[v0] Stats loaded successfully:", data)
+        console.log(" Stats loaded successfully:", data)
         // Simplified state update to prevent blank screen
         // setStats(data)
       } else {
-        console.warn("[v0] Failed to load stats:", response.status, "- using defaults")
+        console.warn(" Failed to load stats:", response.status, "- using defaults")
       }
     } catch (error) {
-      console.error("[v0] Error loading dashboard stats:", error)
+      console.error(" Error loading dashboard stats:", error)
     } finally {
-      console.log("[v0] Dashboard stats loading complete")
+      console.log(" Dashboard stats loading complete")
     }
   }
 
@@ -72,7 +72,7 @@ export function DashboardOverview({ onChangeTab, userRole = "admin" }: Dashboard
   const completionPercentage =
     stats.tasks && stats.tasks.total > 0 ? Math.round((stats.tasks.completed / stats.tasks.total) * 100) : 0
 
-  console.log("[v0] Rendering overview - isDev:", isDev, "isSuperAdmin:", isSuperAdmin)
+  console.log(" Rendering overview - isDev:", isDev, "isSuperAdmin:", isSuperAdmin)
 
   return (
     <div className="space-y-8">

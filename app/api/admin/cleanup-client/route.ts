@@ -30,14 +30,14 @@ export async function POST(request: Request) {
     // Get client name for logging
     const { data: client } = await supabase.from("clients").select("name").eq("id", client_id).single()
 
-    console.log(`[v0] Starting cleanup for client: ${client?.name} (${client_id})`)
+    console.log(` Starting cleanup for client: ${client?.name} (${client_id})`)
 
     const { data: cleanupResult, error: cleanupError } = await supabase.rpc("cleanup_client_data", {
       p_client_id: client_id,
     })
 
     if (cleanupError) {
-      console.error("[v0] Cleanup error:", cleanupError)
+      console.error(" Cleanup error:", cleanupError)
       return NextResponse.json({ error: "Erro ao limpar dados do cliente", details: cleanupError }, { status: 500 })
     }
 
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
       },
     })
 
-    console.log(`[v0] Cleanup completed successfully:`, cleanupResult)
+    console.log(` Cleanup completed successfully:`, cleanupResult)
 
     return NextResponse.json({
       success: true,
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
       details: cleanupResult,
     })
   } catch (error) {
-    console.error("[v0] Unexpected error during cleanup:", error)
+    console.error(" Unexpected error during cleanup:", error)
     return NextResponse.json({ error: "Erro inesperado ao limpar dados" }, { status: 500 })
   }
 }
@@ -112,7 +112,7 @@ export async function GET(request: Request) {
       },
     })
   } catch (error) {
-    console.error("[v0] Error getting cleanup preview:", error)
+    console.error(" Error getting cleanup preview:", error)
     return NextResponse.json({ error: "Erro ao buscar preview" }, { status: 500 })
   }
 }

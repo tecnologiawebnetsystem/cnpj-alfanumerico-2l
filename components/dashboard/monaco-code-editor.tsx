@@ -96,7 +96,7 @@ export function MonacoCodeEditor({
 
         setIsLoading(false)
       } catch (error) {
-        console.error('[v0] Failed to load Monaco Editor:', error)
+        console.error(' Failed to load Monaco Editor:', error)
         setIsLoading(false)
       }
     }

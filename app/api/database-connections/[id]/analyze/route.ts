@@ -83,7 +83,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       findings_count: mockFindings.length,
     })
   } catch (error: any) {
-    console.error("[v0] Error analyzing database:", error)
+    console.error(" Error analyzing database:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

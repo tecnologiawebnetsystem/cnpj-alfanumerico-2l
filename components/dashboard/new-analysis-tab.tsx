@@ -178,7 +178,7 @@ export function NewAnalysisTab() {
                 path: relativePath,
               })
             } catch (error) {
-              console.error(`[v0] Error reading file ${relativePath}:`, error)
+              console.error(` Error reading file ${relativePath}:`, error)
             }
           }
 
@@ -223,7 +223,7 @@ export function NewAnalysisTab() {
         setIsAnalyzing(false)
       }
     } catch (error) {
-      console.error("[v0] Analysis error:", error)
+      console.error(" Analysis error:", error)
       setShowProgressModal(false)
       setErrorMessage("Ocorreu um erro inesperado ao processar sua solicitação. Por favor, tente novamente mais tarde.")
       setShowErrorModal(true)
@@ -232,7 +232,7 @@ export function NewAnalysisTab() {
   }
 
   const handleGitHubSelection = (repositories: any[]) => {
-    console.log("[v0] Selected repositories:", repositories)
+    console.log(" Selected repositories:", repositories)
     setSelectedRepositories(repositories)
     setShowGitHubSelector(false)
 

@@ -42,7 +42,7 @@ async function extractFromZip(file: File): Promise<ExtractedFile[]> {
         size: content.length,
       })
     } catch (error) {
-      console.error(`[v0] Error reading file ${path}:`, error)
+      console.error(` Error reading file ${path}:`, error)
     }
   }
 
@@ -52,7 +52,7 @@ async function extractFromZip(file: File): Promise<ExtractedFile[]> {
 async function extractFromGithub(githubUrl: string): Promise<ExtractedFile[]> {
   // TODO: Implement GitHub repository cloning
   // For now, return empty array
-  console.log("[v0] GitHub extraction not yet implemented:", githubUrl)
+  console.log(" GitHub extraction not yet implemented:", githubUrl)
   return []
 }
 

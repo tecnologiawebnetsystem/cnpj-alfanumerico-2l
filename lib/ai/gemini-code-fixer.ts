@@ -46,7 +46,7 @@ Responda em JSON com: original_code, fixed_code, explanation, confidence (0-100)
       line_number: finding.line_number,
     }
   } catch (error) {
-    console.error("[v0] Error generating code fix:", error)
+    console.error(" Error generating code fix:", error)
     return {
       original_code: finding.context,
       fixed_code: finding.context.replace(/VARCHAR$$14$$/gi, "VARCHAR(18)"),

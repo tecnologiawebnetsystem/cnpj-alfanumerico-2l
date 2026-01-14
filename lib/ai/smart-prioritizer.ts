@@ -56,7 +56,7 @@ Responda APENAS com JSON array válido.`
     const priorities = JSON.parse(jsonMatch[0]) as PriorityScore[]
     return priorities
   } catch (error) {
-    console.error("[v0] Error prioritizing findings:", error)
+    console.error(" Error prioritizing findings:", error)
     return findings.map((f, idx) => ({
       finding_id: String(idx),
       priority_score: 50,

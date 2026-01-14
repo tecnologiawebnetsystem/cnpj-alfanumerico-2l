@@ -75,7 +75,7 @@ export function GitHubRepositorySelector({ onSelect, onClose }: GitHubRepository
       setFilteredRepositories(data.repositories)
       setUsername(data.username)
     } catch (err: any) {
-      console.error("[v0] Error fetching repositories:", err)
+      console.error(" Error fetching repositories:", err)
       setError("Erro ao buscar repositórios do GitHub")
     } finally {
       setLoading(false)

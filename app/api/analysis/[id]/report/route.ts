@@ -99,7 +99,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       repositoryStats,
     })
   } catch (error: any) {
-    console.error("[v0] Error fetching report:", error)
+    console.error(" Error fetching report:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

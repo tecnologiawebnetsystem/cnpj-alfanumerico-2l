@@ -64,12 +64,12 @@ export function AnalysesSection() {
 
   const downloadReport = (analysisId: string, format: string) => {
     // In production, this would call the API
-    console.log(`[v0] Downloading ${format} report for analysis ${analysisId}`)
+    console.log(` Downloading ${format} report for analysis ${analysisId}`)
     // window.open(`/api/v1/reports/${analysisId}?format=${format}`, '_blank')
   }
 
   const handleDeleteAnalysis = async (analysisId: string) => {
-    console.log("[v0] Delete button clicked for analysis:", analysisId)
+    console.log(" Delete button clicked for analysis:", analysisId)
     setAnalysisToDelete(analysisId)
     setDeleteDialogOpen(true)
   }
@@ -78,7 +78,7 @@ export function AnalysesSection() {
     if (!analysisToDelete) return
 
     try {
-      console.log("[v0] Deleting analysis:", analysisToDelete)
+      console.log(" Deleting analysis:", analysisToDelete)
       setDeleting(true)
 
       const response = await fetch(`/api/analyses/${analysisToDelete}`, {
@@ -89,14 +89,14 @@ export function AnalysesSection() {
         throw new Error("Erro ao excluir análise")
       }
 
-      console.log("[v0] Analysis deleted successfully")
+      console.log(" Analysis deleted successfully")
       setDeleteDialogOpen(false)
       setAnalysisToDelete(null)
 
       // Refresh the page to reload analyses
       window.location.reload()
     } catch (error) {
-      console.error("[v0] Error deleting analysis:", error)
+      console.error(" Error deleting analysis:", error)
       alert("Erro ao excluir análise. Tente novamente.")
     } finally {
       setDeleting(false)

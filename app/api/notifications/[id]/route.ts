@@ -16,7 +16,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error("[v0] Error marking notification as read:", error)
+    console.error(" Error marking notification as read:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
@@ -36,7 +36,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error("[v0] Error deleting notification:", error)
+    console.error(" Error deleting notification:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

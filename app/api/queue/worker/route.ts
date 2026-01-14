@@ -5,7 +5,7 @@ export async function POST() {
   try {
     // Iniciar worker em background
     startWorker().catch((error) => {
-      console.error("[v0] Worker crashed:", error)
+      console.error(" Worker crashed:", error)
     })
 
     return NextResponse.json({ message: "Worker started" })

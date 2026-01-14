@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ priorities })
   } catch (error: any) {
-    console.error("[v0] Prioritize error:", error)
+    console.error(" Prioritize error:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const user_id = searchParams.get("user_id")
 
-    console.log("[v0] Admin analyses API - user_id:", user_id)
+    console.log(" Admin analyses API - user_id:", user_id)
 
     if (!user_id) {
       return NextResponse.json({ error: "user_id é obrigatório" }, { status: 400 })
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const { data: user, error: userError } = await supabase.from("users").select("role").eq("id", user_id).single()
 
     if (userError || !user) {
-      console.error("[v0] User not found:", userError)
+      console.error(" User not found:", userError)
       return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 })
     }
 
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
       .order("started_at", { ascending: false })
 
     if (error) {
-      console.error("[v0] Error fetching analyses:", error)
+      console.error(" Error fetching analyses:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -79,10 +79,10 @@ export async function GET(request: NextRequest) {
       }),
     )
 
-    console.log("[v0] Analyses loaded:", analysesWithCounts.length)
+    console.log(" Analyses loaded:", analysesWithCounts.length)
     return NextResponse.json(analysesWithCounts)
   } catch (error: any) {
-    console.error("[v0] Error in admin analyses API:", error)
+    console.error(" Error in admin analyses API:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

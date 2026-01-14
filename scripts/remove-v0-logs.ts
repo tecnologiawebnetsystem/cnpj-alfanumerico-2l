@@ -1,20 +1,20 @@
-// Script to remove all [v0] logs from the codebase
+// Script to remove all  logs from the codebase
 // This will be executed to clean up debug logs
 
 import { readFileSync, writeFileSync, readdirSync, statSync } from "fs"
 import { join } from "path"
 
 function removeV0Logs(content: string): string {
-  // Remove console.log with [v0]
+  // Remove console.log with 
   content = content.replace(/console\.log$$[^)]*\[v0\][^)]*$$;?\n?/g, "")
 
-  // Remove console.error with [v0]
+  // Remove console.error with 
   content = content.replace(/console\.error$$[^)]*\[v0\][^)]*$$;?\n?/g, "")
 
-  // Remove multi-line console statements with [v0]
+  // Remove multi-line console statements with 
   content = content.replace(/console\.(log|error)$$\s*['"]\[v0\][\s\S]*?$$;?\n?/g, "")
 
-  // Remove comments with vercel or [v0]
+  // Remove comments with vercel or 
   content = content.replace(/\/\/.*(\[v0\]|vercel).*\n/gi, "")
 
   // Remove empty lines that were left behind (more than 2 consecutive)

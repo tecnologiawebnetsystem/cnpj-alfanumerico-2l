@@ -30,7 +30,7 @@ export async function checkLicenseExpirations() {
       .eq("license_end", targetDateStr)
 
     if (error) {
-      console.error("[v0] Error fetching expiring licenses:", error)
+      console.error(" Error fetching expiring licenses:", error)
       continue
     }
 
@@ -77,7 +77,7 @@ export async function checkOverdueTasks() {
     .is("notified_overdue", null)
 
   if (error) {
-    console.error("[v0] Error fetching overdue tasks:", error)
+    console.error(" Error fetching overdue tasks:", error)
     return
   }
 

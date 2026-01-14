@@ -55,14 +55,14 @@ export async function PUT(request: NextRequest, { params }: { params: { taskId: 
       .single()
 
     if (updateError) {
-      console.error("[v0] Error updating task:", updateError)
+      console.error(" Error updating task:", updateError)
       return NextResponse.json({ error: "Failed to update task" }, { status: 500 })
     }
 
-    console.log("[v0] Task updated successfully:", params.taskId)
+    console.log(" Task updated successfully:", params.taskId)
     return NextResponse.json(task)
   } catch (error) {
-    console.error("[v0] Error in update task API:", error)
+    console.error(" Error in update task API:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

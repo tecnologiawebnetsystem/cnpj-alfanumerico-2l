@@ -139,7 +139,7 @@ export async function getCurrentUserForAPI() {
 
     return user
   } catch (error) {
-    console.error("[v0] Error getting current user for API:", error)
+    console.error(" Error getting current user for API:", error)
     return null
   }
 }

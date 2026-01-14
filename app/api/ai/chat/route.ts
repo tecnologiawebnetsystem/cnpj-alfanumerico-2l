@@ -54,7 +54,7 @@ Seja conciso, técnico e em PORTUGUÊS.`
       },
     })
   } catch (error: any) {
-    console.error("[v0] Chat error:", error)
+    console.error(" Chat error:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

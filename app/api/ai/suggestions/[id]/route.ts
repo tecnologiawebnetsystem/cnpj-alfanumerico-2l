@@ -37,7 +37,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     return NextResponse.json({ suggestion })
   } catch (error: any) {
-    console.error("[v0] Error updating AI suggestion:", error)
+    console.error(" Error updating AI suggestion:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

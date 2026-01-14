@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
       notifications,
     })
   } catch (error) {
-    console.error("[v0] Error fetching dev monitoring:", error)
+    console.error(" Error fetching dev monitoring:", error)
     return NextResponse.json({ error: "Failed to fetch monitoring data" }, { status: 500 })
   }
 }

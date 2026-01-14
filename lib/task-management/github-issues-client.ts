@@ -9,7 +9,7 @@ export class GitHubIssuesClient implements TaskManagementClient {
   }
 
   async createTask(task: TaskData): Promise<TaskResult> {
-    console.log('[v0] GitHub Issues: Creating issue...')
+    console.log(' GitHub Issues: Creating issue...')
     
     const [owner, repo] = this.config.project!.split('/')
     
@@ -33,12 +33,12 @@ export class GitHubIssuesClient implements TaskManagementClient {
 
     if (!response.ok) {
       const error = await response.text()
-      console.error('[v0] GitHub: Error creating issue:', error)
+      console.error(' GitHub: Error creating issue:', error)
       throw new Error(`Failed to create GitHub issue: ${error}`)
     }
 
     const result = await response.json()
-    console.log('[v0] GitHub Issues: Issue created #', result.number)
+    console.log(' GitHub Issues: Issue created #', result.number)
 
     return {
       id: result.id.toString(),

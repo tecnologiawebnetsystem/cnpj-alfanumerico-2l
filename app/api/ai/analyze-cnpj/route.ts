@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Finding data required" }, { status: 400 })
     }
 
-    console.log("[v0] Analyzing finding with Gemini:", finding.fieldName)
+    console.log(" Analyzing finding with Gemini:", finding.fieldName)
 
     const analysis = await analyzeWithGemini(finding)
 
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       analysis,
     })
   } catch (error) {
-    console.error("[v0] Error in analyze-cnpj endpoint:", error)
+    console.error(" Error in analyze-cnpj endpoint:", error)
     return NextResponse.json({ error: "Failed to analyze with Gemini" }, { status: 500 })
   }
 }

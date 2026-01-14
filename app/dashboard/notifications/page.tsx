@@ -26,7 +26,7 @@ export default function NotificationsPage() {
       const data = await response.json()
       setNotifications(data.notifications || [])
     } catch (error) {
-      console.error("[v0] Error fetching notifications:", error)
+      console.error(" Error fetching notifications:", error)
     } finally {
       setLoading(false)
     }
@@ -41,7 +41,7 @@ export default function NotificationsPage() {
         prev.map((n) => (n.id === notificationId ? { ...n, read: true, read_at: new Date().toISOString() } : n)),
       )
     } catch (error) {
-      console.error("[v0] Error marking notification as read:", error)
+      console.error(" Error marking notification as read:", error)
     }
   }
 
@@ -52,7 +52,7 @@ export default function NotificationsPage() {
       })
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true, read_at: new Date().toISOString() })))
     } catch (error) {
-      console.error("[v0] Error marking all as read:", error)
+      console.error(" Error marking all as read:", error)
     }
   }
 
@@ -63,7 +63,7 @@ export default function NotificationsPage() {
       })
       setNotifications((prev) => prev.filter((n) => n.id !== notificationId))
     } catch (error) {
-      console.error("[v0] Error deleting notification:", error)
+      console.error(" Error deleting notification:", error)
     }
   }
 

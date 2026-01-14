@@ -32,14 +32,14 @@ export function GamificationWidget() {
     try {
       const response = await fetch("/api/stats?include=gamification")
       if (!response.ok) {
-        console.error("[v0] Gamification API error:", response.status, response.statusText)
+        console.error(" Gamification API error:", response.status, response.statusText)
         setError(true)
         return
       }
 
       const contentType = response.headers.get("content-type")
       if (!contentType || !contentType.includes("application/json")) {
-        console.error("[v0] Gamification API returned non-JSON response")
+        console.error(" Gamification API returned non-JSON response")
         setError(true)
         return
       }
@@ -47,7 +47,7 @@ export function GamificationWidget() {
       const data = await response.json()
       setStats(data.gamification)
     } catch (error) {
-      console.error("[v0] Error fetching gamification stats:", error)
+      console.error(" Error fetching gamification stats:", error)
       setError(true)
     } finally {
       setLoading(false)

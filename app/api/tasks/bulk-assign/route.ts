@@ -35,11 +35,11 @@ export async function POST(request: NextRequest) {
       .select()
 
     if (error) {
-      console.error("[v0] Error bulk assigning tasks:", error)
+      console.error(" Error bulk assigning tasks:", error)
       return NextResponse.json({ error: "Erro ao atribuir tarefas" }, { status: 500 })
     }
 
-    console.log("[v0] Bulk assigned", data?.length, "tasks to", assigned_to || "none")
+    console.log(" Bulk assigned", data?.length, "tasks to", assigned_to || "none")
 
     return NextResponse.json({ 
       success: true, 
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       message: `${data?.length || 0} tarefa(s) atribuída(s) com sucesso`
     })
   } catch (error: any) {
-    console.error("[v0] Error in POST /api/tasks/bulk-assign:", error)
+    console.error(" Error in POST /api/tasks/bulk-assign:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

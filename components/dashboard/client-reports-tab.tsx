@@ -63,7 +63,7 @@ export function ClientReportsTab({ clientId }: ClientReportsTabProps) {
         alert("Erro ao gerar relatório")
       }
     } catch (error) {
-      console.error("[v0] Error generating report:", error)
+      console.error(" Error generating report:", error)
       alert("Erro ao gerar relatório")
     } finally {
       setLoading(false)

@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(fix)
   } catch (error) {
-    console.error("[v0] Error generating fix:", error)
+    console.error(" Error generating fix:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

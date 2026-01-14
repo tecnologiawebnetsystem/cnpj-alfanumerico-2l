@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ logs })
   } catch (error: any) {
-    console.error("[v0] Error fetching activity logs:", error)
+    console.error(" Error fetching activity logs:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

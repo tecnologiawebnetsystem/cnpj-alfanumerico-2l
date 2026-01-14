@@ -3,17 +3,17 @@ import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
   try {
-    console.log('[v0] ========== FETCHING DEVELOPER METRICS ==========')
+    console.log(' ========== FETCHING DEVELOPER METRICS ==========')
     
     const supabase = await createClient()
     
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
-      console.error('[v0] Authentication error:', authError)
+      console.error(' Authentication error:', authError)
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    console.log('[v0] Fetching metrics for user:', user.id)
+    console.log(' Fetching metrics for user:', user.id)
 
     const { data: userData, error: userError } = await supabase
       .from('users')
@@ -22,7 +22,7 @@ export async function GET(request: Request) {
       .single()
 
     if (userError) {
-      console.error('[v0] Error fetching user data:', userError)
+      console.error(' Error fetching user data:', userError)
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
@@ -36,11 +36,11 @@ export async function GET(request: Request) {
       .eq('assigned_to', user.id)
 
     if (tasksError) {
-      console.error('[v0] Error fetching tasks:', tasksError)
+      console.error(' Error fetching tasks:', tasksError)
       return NextResponse.json({ error: 'Failed to fetch tasks' }, { status: 500 })
     }
 
-    console.log('[v0] Fetched tasks:', tasks?.length || 0)
+    console.log(' Fetched tasks:', tasks?.length || 0)
 
     const total_tasks = tasks?.length || 0
     const completed_tasks = tasks?.filter(t => t.status === 'concluido').length || 0
@@ -108,13 +108,13 @@ export async function GET(request: Request) {
       prs_merged
     }
 
-    console.log('[v0] Metrics calculated:', metrics)
-    console.log('[v0] ========== DEVELOPER METRICS COMPLETE ==========')
+    console.log(' Metrics calculated:', metrics)
+    console.log(' ========== DEVELOPER METRICS COMPLETE ==========')
 
     return NextResponse.json(metrics)
   } catch (error) {
-    console.error('[v0] ========== ERROR IN DEVELOPER METRICS ==========')
-    console.error('[v0] Error:', error)
+    console.error(' ========== ERROR IN DEVELOPER METRICS ==========')
+    console.error(' Error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

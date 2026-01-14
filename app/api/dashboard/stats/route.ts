@@ -71,7 +71,7 @@ export async function GET(request: Request) {
       tasks: taskStats,
     })
   } catch (error) {
-    console.error("[v0] Error fetching dashboard stats:", error)
+    console.error(" Error fetching dashboard stats:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

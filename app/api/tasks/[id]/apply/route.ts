@@ -4,15 +4,15 @@ import { GitHubClient } from "@/lib/git/github-client"
 import { AzureDevOpsClient } from "@/lib/git/azure-client"
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
-  console.log(`[v0] ========== APPLY TASK FIX ==========`)
-  console.log(`[v0] Task ID: ${params.id}`)
+  console.log(` ========== APPLY TASK FIX ==========`)
+  console.log(` Task ID: ${params.id}`)
 
   try {
     const body = await request.json()
     const { method, user_id } = body // method: 'pull_request' | 'direct_commit' | 'copy'
 
-    console.log(`[v0] Apply method: ${method}`)
-    console.log(`[v0] User ID: ${user_id}`)
+    console.log(` Apply method: ${method}`)
+    console.log(` User ID: ${user_id}`)
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     }
 
     if (method === "direct_commit" && user.role !== "admin" && user.role !== "super_admin") {
-      console.error("[v0] Permission denied: User cannot do direct commits")
+      console.error(" Permission denied: User cannot do direct commits")
       return NextResponse.json({ error: "Only administrators can perform direct commits" }, { status: 403 })
     }
 
@@ -51,9 +51,9 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       return NextResponse.json({ error: "Task not found" }, { status: 404 })
     }
 
-    console.log("[v0] Task:", task.title)
-    console.log("[v0] Repository:", task.repository.full_name)
-    console.log("[v0] Provider:", task.repository.provider)
+    console.log(" Task:", task.title)
+    console.log(" Repository:", task.repository.full_name)
+    console.log(" Provider:", task.repository.provider)
 
     const { data: token } = await supabase
       .from("github_tokens")
@@ -69,10 +69,10 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       )
     }
 
-    console.log("[v0] Git token found for provider:", token.provider)
+    console.log(" Git token found for provider:", token.provider)
 
     if (method === "copy") {
-      console.log("[v0] Copy method - returning code")
+      console.log(" Copy method - returning code")
       return NextResponse.json({
         success: true,
         method: "copy",
@@ -91,10 +91,10 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     const repoFullName = task.repository.full_name || task.repository.name
     const [owner, repo] = repoFullName.split("/")
 
-    console.log("[v0] Repository owner:", owner)
-    console.log("[v0] Repository name:", repo)
+    console.log(" Repository owner:", owner)
+    console.log(" Repository name:", repo)
 
-    console.log("[v0] Reading file content...")
+    console.log(" Reading file content...")
     let fileContent: string
 
     if (task.repository.provider === "github") {
@@ -107,7 +107,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       const { content } = await github.getFileContent(task.file_path)
       fileContent = content
 
-      console.log("[v0] Applying code change...")
+      console.log(" Applying code change...")
       const lines = fileContent.split("\n")
       const lineIndex = task.line_number - 1
 
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
       fileContent = await azure.getFileContent(task.file_path)
 
-      console.log("[v0] Applying code change...")
+      console.log(" Applying code change...")
       const lines = fileContent.split("\n")
       const lineIndex = task.line_number - 1
 
@@ -202,8 +202,8 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       })
       .eq("id", task.id)
 
-    console.log("[v0] Task updated with PR info")
-    console.log("[v0] Fix applied successfully!")
+    console.log(" Task updated with PR info")
+    console.log(" Fix applied successfully!")
 
     return NextResponse.json({
       success: true,
@@ -214,7 +214,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       commit_sha: commitSha,
     })
   } catch (error: any) {
-    console.error("[v0] Error applying fix:", error)
+    console.error(" Error applying fix:", error)
     return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 })
   }
 }

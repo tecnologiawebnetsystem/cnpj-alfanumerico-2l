@@ -25,15 +25,15 @@ export async function comparePassword(password: string, hash: string): Promise<b
  */
 export async function getCurrentUser() {
   try {
-    console.log("[v0] getCurrentUser - Start")
+    console.log(" getCurrentUser - Start")
 
     const cookieStore = await cookies()
     const userEmail = cookieStore.get("user_email")?.value
 
-    console.log("[v0] User email from cookie:", userEmail)
+    console.log(" User email from cookie:", userEmail)
 
     if (!userEmail) {
-      console.log("[v0] No user email in cookie")
+      console.log(" No user email in cookie")
       return null
     }
 
@@ -54,11 +54,11 @@ export async function getCurrentUser() {
       .single()
 
     if (userError || !user) {
-      console.error("[v0] Error fetching user:", userError)
+      console.error(" Error fetching user:", userError)
       return null
     }
 
-    console.log("[v0] User found:", { email: user.email, role: user.role })
+    console.log(" User found:", { email: user.email, role: user.role })
 
     return {
       id: user.id,
@@ -69,7 +69,7 @@ export async function getCurrentUser() {
       client_name: user.clients?.name || null,
     }
   } catch (error) {
-    console.error("[v0] Error in getCurrentUser:", error)
+    console.error(" Error in getCurrentUser:", error)
     return null
   }
 }

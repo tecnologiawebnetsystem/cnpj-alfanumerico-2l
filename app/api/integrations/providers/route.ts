@@ -13,13 +13,13 @@ export async function GET(request: NextRequest) {
       .order("name")
 
     if (error) {
-      console.error("[v0] Error fetching providers:", error)
+      console.error(" Error fetching providers:", error)
       return NextResponse.json({ error: "Erro ao buscar provedores" }, { status: 500 })
     }
 
     return NextResponse.json({ providers })
   } catch (error) {
-    console.error("[v0] Error in GET /api/integrations/providers:", error)
+    console.error(" Error in GET /api/integrations/providers:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

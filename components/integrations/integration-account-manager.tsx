@@ -65,7 +65,7 @@ export function IntegrationAccountManager() {
         setIntegrations(data.integrations || [])
       }
     } catch (error) {
-      console.error("[v0] Error loading integrations:", error)
+      console.error(" Error loading integrations:", error)
       toast({
         title: "Erro",
         description: "Não foi possível carregar as contas",
@@ -109,7 +109,7 @@ export function IntegrationAccountManager() {
         })
       }
     } catch (error) {
-      console.error("[v0] Error saving integration:", error)
+      console.error(" Error saving integration:", error)
       toast({
         title: "Erro",
         description: "Erro ao salvar conta",
@@ -154,7 +154,7 @@ export function IntegrationAccountManager() {
         })
       }
     } catch (error) {
-      console.error("[v0] Error deleting integration:", error)
+      console.error(" Error deleting integration:", error)
       toast({
         title: "Erro",
         description: "Erro ao excluir conta",

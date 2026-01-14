@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   const clientId = searchParams.get("clientId")
   const devId = searchParams.get("devId")
 
-  console.log(`[v0] Generating ${type} report in ${format} format, clientId: ${clientId}, devId: ${devId}`)
+  console.log(` Generating ${type} report in ${format} format, clientId: ${clientId}, devId: ${devId}`)
 
   try {
     const supabase = await createServerClient()
@@ -205,7 +205,7 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error("[v0] Error generating report:", error)
+    console.error(" Error generating report:", error)
     return NextResponse.json({ error: "Failed to generate report" }, { status: 500 })
   }
 }

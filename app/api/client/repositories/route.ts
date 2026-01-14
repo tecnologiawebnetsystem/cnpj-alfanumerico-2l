@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const clientId = searchParams.get("client_id")
     const includeProvider = searchParams.get("include_provider") === "true"
 
-    console.log("[v0] Repositories API - user_id:", userId, "client_id:", clientId)
+    console.log(" Repositories API - user_id:", userId, "client_id:", clientId)
 
     if (!userId) {
       return NextResponse.json({ error: "Missing user_id" }, { status: 401 })
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    console.log("[v0] User verified:", user.role, "client_id:", user.client_id)
+    console.log(" User verified:", user.role, "client_id:", user.client_id)
 
     // Use client_id from URL or user's client_id
     const targetClientId = clientId || user.client_id
@@ -39,11 +39,11 @@ export async function GET(request: NextRequest) {
       .order("created_at", { ascending: false })
 
     if (error) {
-      console.error("[v0] Error fetching repositories:", error)
+      console.error(" Error fetching repositories:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    console.log("[v0] Repositories fetched:", repositories?.length || 0)
+    console.log(" Repositories fetched:", repositories?.length || 0)
 
     if (includeProvider && repositories && repositories.length > 0) {
       // Get unique user_ids from repositories
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(repositories || [])
   } catch (error) {
-    console.error("[v0] Error in repositories API:", error)
+    console.error(" Error in repositories API:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

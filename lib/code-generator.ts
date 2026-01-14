@@ -13,10 +13,10 @@ export class CodeGenerator {
     type: "field" | "validation" | "mask" | "database",
   ): Promise<CodeFix> {
     try {
-      console.log("[v0] Using pattern-based code generation (AI disabled to avoid rate limits)")
+      console.log(" Using pattern-based code generation (AI disabled to avoid rate limits)")
       return this.fallbackGeneration(code, language, type, fieldName)
     } catch (error) {
-      console.error("[v0] Code generation error:", error)
+      console.error(" Code generation error:", error)
       return this.fallbackGeneration(code, language, type, fieldName)
     }
   }

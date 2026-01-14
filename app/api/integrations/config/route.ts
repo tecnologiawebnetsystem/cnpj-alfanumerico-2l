@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ configs })
   } catch (error: any) {
-    console.error("[v0] Error fetching integration configs:", error)
+    console.error(" Error fetching integration configs:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ config: integrationConfig })
   } catch (error: any) {
-    console.error("[v0] Error creating integration config:", error)
+    console.error(" Error creating integration config:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
