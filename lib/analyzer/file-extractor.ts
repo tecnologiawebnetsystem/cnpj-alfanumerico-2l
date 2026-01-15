@@ -1,4 +1,5 @@
 import JSZip from "jszip"
+import { extractFromGitHub } from "./github-extractor"
 
 export interface ExtractedFile {
   path: string
@@ -50,10 +51,24 @@ async function extractFromZip(file: File): Promise<ExtractedFile[]> {
 }
 
 async function extractFromGithub(githubUrl: string): Promise<ExtractedFile[]> {
-  // TODO: Implement GitHub repository cloning
-  // For now, return empty array
-  console.log(" GitHub extraction not yet implemented:", githubUrl)
-  return []
+  console.log(" Extracting from GitHub:", githubUrl)
+
+  const filesMap = await extractFromGitHub(githubUrl)
+  const files: ExtractedFile[] = []
+
+  for (const [path, content] of filesMap.entries()) {
+    const extension = path.split(".").pop() || ""
+
+    files.push({
+      path,
+      content,
+      extension,
+      size: content.length,
+    })
+  }
+
+  console.log(` Extracted ${files.length} files from GitHub`)
+  return files
 }
 
 function shouldIgnorePath(path: string): boolean {

@@ -23,16 +23,16 @@ O instalador vai fazer TUDO sozinho:
 Quando o instalador pedir, você precisa fornecer 2 informações:
 
 **SUPABASE_URL:**
-```
+\`\`\`
 Encontre em: Dashboard → Configurações → Vars
 Exemplo: https://xxxxx.supabase.co
-```
+\`\`\`
 
 **SUPABASE_SERVICE_ROLE_KEY:**
-```
+\`\`\`
 Encontre em: Dashboard → Configurações → Vars
 Exemplo: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
+\`\`\`
 
 ### 5. Pronto!
 Quando ver a mensagem "INSTALAÇÃO CONCLUÍDA COM SUCESSO!", o worker está pronto.

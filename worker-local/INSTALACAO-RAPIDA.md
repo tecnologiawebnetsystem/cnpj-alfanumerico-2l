@@ -5,9 +5,9 @@
 1. Abra o PowerShell como Administrador
 2. Navegue até onde baixou os arquivos
 3. Execute:
-```powershell
+\`\`\`powershell
 .\install-worker.ps1
-```
+\`\`\`
 
 ## Método 2: Download do v0
 
@@ -21,7 +21,7 @@
 
 Depois de instalar por qualquer método:
 
-```powershell
+\`\`\`powershell
 # 1. Entre na pasta
 cd C:\Users\klebe\worker-local
 
@@ -38,7 +38,7 @@ npm install
 
 # 5. Inicie o worker
 npm start
-```
+\`\`\`
 
 ## Onde encontrar as credenciais?
 
@@ -54,9 +54,9 @@ npm start
 ## Verificando se está funcionando
 
 Você verá no console:
-```
+\`\`\`
 [SUCCESS] Worker registrado com sucesso
 [SUCCESS] Worker rodando! Aguardando jobs...
-```
+\`\`\`
 
 E no dashboard web o indicador ficará verde: **Worker Online**

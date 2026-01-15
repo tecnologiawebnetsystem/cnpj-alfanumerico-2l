@@ -34,26 +34,26 @@
 
 Navegue até a pasta `wpf/` e execute:
 
-```bash
+\`\`\`bash
 dotnet restore CNPJAnalyzer.sln
-```
+\`\`\`
 
 ### Opção 3: Build Automático
 
 Ao fazer o primeiro build, os pacotes serão restaurados automaticamente:
 
-```bash
+\`\`\`bash
 cd wpf
 dotnet build
-```
+\`\`\`
 
 ## Verificar Instalação
 
 Para verificar se todos os pacotes foram instalados corretamente:
 
-```bash
+\`\`\`bash
 dotnet list package
-```
+\`\`\`
 
 Ou no Visual Studio:
 - **Tools** → **NuGet Package Manager** → **Manage NuGet Packages for Solution**
@@ -63,10 +63,10 @@ Ou no Visual Studio:
 ### Erro: "Package restore failed"
 
 **Solução:**
-```bash
+\`\`\`bash
 dotnet nuget locals all --clear
 dotnet restore --force
-```
+\`\`\`
 
 ### Erro: "The type or namespace could not be found"
 
@@ -77,18 +77,18 @@ dotnet restore --force
 
 **Causa:** Pacote específico de WPF não instalado
 **Solução:**
-```bash
+\`\`\`bash
 dotnet add package MaterialDesignThemes --version 5.0.0
-```
+\`\`\`
 
 ### Erro: LibGit2Sharp não encontra DLLs nativas
 
 **Causa:** DLLs nativas do Git não copiadas
 **Solução:** Faça rebuild completo
-```bash
+\`\`\`bash
 dotnet clean
 dotnet build
-```
+\`\`\`
 
 ## Configuração Adicional
 
@@ -96,7 +96,7 @@ dotnet build
 
 Crie o arquivo `wpf/src/CNPJAnalyzer.WPF/appsettings.json`:
 
-```json
+\`\`\`json
 {
   "Supabase": {
     "Url": "https://seu-projeto.supabase.co",
@@ -109,16 +109,16 @@ Crie o arquivo `wpf/src/CNPJAnalyzer.WPF/appsettings.json`:
     }
   }
 }
-```
+\`\`\`
 
 ### Variáveis de Ambiente (Alternativa)
 
 Ou configure variáveis de ambiente:
 
-```bash
+\`\`\`bash
 SUPABASE_URL=https://seu-projeto.supabase.co
 SUPABASE_KEY=sua-chave-anon-key
-```
+\`\`\`
 
 ## Executar o Projeto
 
@@ -128,31 +128,31 @@ Após restaurar os pacotes:
 - Pressione **F5** ou clique em **Start**
 
 ### Linha de Comando:
-```bash
+\`\`\`bash
 cd wpf/src/CNPJAnalyzer.WPF
 dotnet run
-```
+\`\`\`
 
 ## Executar Testes
 
-```bash
+\`\`\`bash
 cd wpf/tests/CNPJAnalyzer.Tests
 dotnet test
-```
+\`\`\`
 
 Com cobertura de código:
-```bash
+\`\`\`bash
 dotnet test --collect:"XPlat Code Coverage"
-```
+\`\`\`
 
 ## Atualizar Pacotes
 
 Para atualizar todos os pacotes para versões mais recentes:
 
-```bash
+\`\`\`bash
 dotnet list package --outdated
 dotnet add package NomeDoPacote --version NovaVersao
-```
+\`\`\`
 
 Ou no Visual Studio:
 - **Tools** → **NuGet Package Manager** → **Manage NuGet Packages for Solution**

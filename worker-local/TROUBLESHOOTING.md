@@ -5,9 +5,9 @@
 ### 1. Erro: "Node.js não encontrado"
 
 **Sintoma:**
-```
+\`\`\`
 'node' não é reconhecido como um comando interno ou externo
-```
+\`\`\`
 
 **Causa:** Node.js não está instalado
 
@@ -30,15 +30,15 @@
 #### Causa A: Credenciais incorretas no .env
 
 **Verificar:**
-```bat
+\`\`\`bat
 notepad C:\WorkerLocal\.env
-```
+\`\`\`
 
 **Deve conter:**
-```
+\`\`\`
 SUPABASE_URL=https://xxxxx.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGc...
-```
+\`\`\`
 
 **Solução:**
 - Copie as credenciais corretas do dashboard web
@@ -56,18 +56,18 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGc...
 #### Causa C: Problema de rede
 
 **Testar conexão:**
-```bat
+\`\`\`bat
 ping supabase.co
-```
+\`\`\`
 
 ---
 
 ### 3. Erro ao clonar repositório
 
 **Sintoma:**
-```
+\`\`\`
 Error: Authentication failed
-```
+\`\`\`
 
 **Solução:**
 
@@ -76,9 +76,9 @@ Error: Authentication failed
 2. Acesse Azure DevOps → User Settings → Personal Access Tokens
 3. Gere um novo token com permissões de leitura
 4. Atualize no arquivo `.env`:
-```
+\`\`\`
 AZURE_DEVOPS_PAT=seu_novo_token_aqui
-```
+\`\`\`
 5. Reinicie o Worker
 
 ---
@@ -86,22 +86,22 @@ AZURE_DEVOPS_PAT=seu_novo_token_aqui
 ### 4. Disco cheio / Sem espaço
 
 **Sintoma:**
-```
+\`\`\`
 ENOSPC: no space left on device
-```
+\`\`\`
 
 **Solução:**
 
 #### Opção 1: Limpar repositórios antigos
-```bat
+\`\`\`bat
 del /s /q C:\Projetos\*
-```
+\`\`\`
 
 #### Opção 2: Mudar local dos projetos
 1. Edite `.env`:
-```
+\`\`\`
 PROJECTS_DIR=D:\Projetos
-```
+\`\`\`
 2. Crie a pasta: `mkdir D:\Projetos`
 3. Reinicie o Worker
 
@@ -115,17 +115,17 @@ PROJECTS_DIR=D:\Projetos
 
 #### 1. Verificar banco de dados
 Acesse o Supabase e execute:
-```sql
+\`\`\`sql
 SELECT * FROM worker_jobs WHERE status = 'pending' LIMIT 5;
-```
+\`\`\`
 
 Se vazio → Problema no dashboard (análise não está sendo criada)
 Se cheio → Problema no Worker
 
 #### 2. Verificar logs
-```bat
+\`\`\`bat
 notepad C:\WorkerLocal\logs\worker.log
-```
+\`\`\`
 
 Procure por erros e mensagens
 
@@ -138,9 +138,9 @@ Procure por erros e mensagens
 ### 6. Erro: "Permission denied"
 
 **Sintoma:**
-```
+\`\`\`
 EACCES: permission denied
-```
+\`\`\`
 
 **Solução:**
 
@@ -168,35 +168,35 @@ EACCES: permission denied
 
 #### 3. Aumente concorrência
 Edite `src/index.js`:
-```javascript
+\`\`\`javascript
 const MAX_CONCURRENT = 5; // Padrão: 3
-```
+\`\`\`
 
 ---
 
 ### 8. Erro: "Module not found"
 
 **Sintoma:**
-```
+\`\`\`
 Error: Cannot find module 'simple-git'
-```
+\`\`\`
 
 **Causa:** Dependências não instaladas
 
 **Solução:**
-```bat
+\`\`\`bat
 cd C:\WorkerLocal
 npm install
-```
+\`\`\`
 
 ---
 
 ### 9. Git não instalado
 
 **Sintoma:**
-```
+\`\`\`
 Error: git command not found
-```
+\`\`\`
 
 **Solução:**
 1. Baixe Git: https://git-scm.com/download/win
@@ -224,11 +224,11 @@ Error: git command not found
 5. Reinicie Worker
 
 #### 2. Limpar cache
-```bat
+\`\`\`bat
 cd C:\WorkerLocal
 rmdir /s /q node_modules
 npm install
-```
+\`\`\`
 
 ---
 
@@ -247,16 +247,16 @@ npm install
 ## 🔍 Como Ler os Logs
 
 ### Localização:
-```
+\`\`\`
 C:\WorkerLocal\logs\worker.log
-```
+\`\`\`
 
 ### Formato:
-```
+\`\`\`
 [2025-01-20T10:30:45.123Z] [INFO] Worker Local iniciado
 [2025-01-20T10:30:46.456Z] [SUCCESS] Conectado ao Supabase
 [2025-01-20T10:30:50.789Z] [ERROR] Erro ao clonar: Authentication failed
-```
+\`\`\`
 
 ### Níveis de Log:
 - **INFO** = Informação normal
@@ -273,18 +273,18 @@ Se nenhuma solução acima funcionou, envie:
    - Arquivo `C:\WorkerLocal\logs\worker.log`
 
 2. **Informações do sistema:**
-```bat
+\`\`\`bat
 node --version
 npm --version
 git --version
 systeminfo | findstr /C:"OS"
-```
+\`\`\`
 
 3. **Conteúdo do .env (SEM MOSTRAR AS CHAVES!):**
-```
+\`\`\`
 SUPABASE_URL=[URL presente? Sim/Não]
 SUPABASE_SERVICE_ROLE_KEY=[Chave presente? Sim/Não]
-```
+\`\`\`
 
 4. **Descrição do problema:**
    - O que você estava fazendo?

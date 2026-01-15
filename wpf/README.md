@@ -69,7 +69,7 @@ Utiliza o **mesmo banco Supabase** da aplicação web:
 
 ## 📁 Estrutura do Projeto
 
-```
+\`\`\`
 wpf/
 ├── src/
 │   ├── CNPJAnalyzer.Domain/          # Entidades e Value Objects
@@ -116,21 +116,21 @@ wpf/
 │
 └── tests/
     └── CNPJAnalyzer.Tests/           # Testes unitários
-```
+\`\`\`
 
 ## ⚙️ Configuração
 
 1. Abra a solução no Visual Studio 2022
 2. Configure o `appsettings.json` com suas credenciais Supabase:
 
-```json
+\`\`\`json
 {
   "Supabase": {
     "Url": "https://seu-projeto.supabase.co",
     "Key": "sua-chave-anon"
   }
 }
-```
+\`\`\`
 
 3. Build e execute o projeto CNPJAnalyzer.WPF
 

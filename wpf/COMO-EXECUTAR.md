@@ -20,7 +20,7 @@ Ao instalar o Visual Studio, certifique-se de incluir:
 
 Edite o arquivo `wpf/src/CNPJAnalyzer.WPF/appsettings.json`:
 
-```json
+\`\`\`json
 {
   "Supabase": {
     "Url": "SUA_URL_SUPABASE_AQUI",
@@ -36,7 +36,7 @@ Edite o arquivo `wpf/src/CNPJAnalyzer.WPF/appsettings.json`:
     "Token": "SEU_TOKEN_AZURE_AQUI"
   }
 }
-```
+\`\`\`
 
 **As mesmas credenciais do projeto web funcionam aqui!**
 
@@ -44,15 +44,15 @@ Edite o arquivo `wpf/src/CNPJAnalyzer.WPF/appsettings.json`:
 
 Abra o terminal na pasta `wpf/` e execute:
 
-```bash
+\`\`\`bash
 dotnet restore
-```
+\`\`\`
 
 ### 3. Compilar a Solução
 
-```bash
+\`\`\`bash
 dotnet build
-```
+\`\`\`
 
 ## Executando o Projeto
 
@@ -68,13 +68,13 @@ dotnet build
 
 Na pasta `wpf/`:
 
-```bash
+\`\`\`bash
 dotnet run --project src/CNPJAnalyzer.WPF/CNPJAnalyzer.WPF.csproj
-```
+\`\`\`
 
 ## Estrutura do Projeto
 
-```
+\`\`\`
 wpf/
 ├── CNPJAnalyzer.sln                    # Solução principal
 ├── src/
@@ -97,12 +97,12 @@ wpf/
 │
 └── tests/
     └── CNPJAnalyzer.Tests/            # Testes Unitários (TDD)
-```
+\`\`\`
 
 ## Arquitetura Implementada
 
 ### Clean Architecture (4 Camadas)
-```
+\`\`\`
 ┌─────────────────────────────────────┐
 │      CNPJAnalyzer.WPF (UI)         │  ← Views, ViewModels (MVVM)
 ├─────────────────────────────────────┤
@@ -112,7 +112,7 @@ wpf/
 ├─────────────────────────────────────┤
 │   CNPJAnalyzer.Domain              │  ← Entities, Interfaces (Core)
 └─────────────────────────────────────┘
-```
+\`\`\`
 
 ### Padrões Implementados
 - ✅ **MVVM** (Model-View-ViewModel) - Para separação UI/Lógica
@@ -144,7 +144,7 @@ wpf/
 ### Mesmas Tabelas do Projeto Web
 O sistema WPF usa **exatamente o mesmo banco Supabase** do projeto web:
 
-```sql
+\`\`\`sql
 - users                 # Usuários do sistema
 - clients               # Clientes
 - developers            # Desenvolvedores
@@ -153,7 +153,7 @@ O sistema WPF usa **exatamente o mesmo banco Supabase** do projeto web:
 - findings              # Descobertas nas análises
 - tasks                 # Tarefas dos desenvolvedores
 - cnpj_analysis         # Análise específica de CNPJs
-```
+\`\`\`
 
 **Não é necessário criar novas tabelas!** Use o mesmo banco do web.
 
@@ -200,19 +200,19 @@ O sistema WPF usa **exatamente o mesmo banco Supabase** do projeto web:
 
 ### Erro: "Could not load file or assembly"
 **Solução:** Restaure os pacotes NuGet
-```bash
+\`\`\`bash
 dotnet restore
-```
+\`\`\`
 
 ### Erro: "Supabase connection failed"
 **Solução:** Verifique o `appsettings.json` com as credenciais corretas
 
 ### Erro: "MaterialDesign resources not found"
 **Solução:** Limpe e reconstrua a solução
-```bash
+\`\`\`bash
 dotnet clean
 dotnet build
-```
+\`\`\`
 
 ### Erro: ".NET 8.0 SDK not found"
 **Solução:** Instale o .NET 8.0 SDK:
@@ -221,24 +221,24 @@ https://dotnet.microsoft.com/download/dotnet/8.0
 ## Comandos Úteis
 
 ### Compilar apenas um projeto
-```bash
+\`\`\`bash
 dotnet build src/CNPJAnalyzer.WPF/CNPJAnalyzer.WPF.csproj
-```
+\`\`\`
 
 ### Executar testes
-```bash
+\`\`\`bash
 dotnet test
-```
+\`\`\`
 
 ### Publicar para distribuição
-```bash
+\`\`\`bash
 dotnet publish -c Release -o ./publish
-```
+\`\`\`
 
 ### Limpar artefatos de build
-```bash
+\`\`\`bash
 dotnet clean
-```
+\`\`\`
 
 ## Próximos Passos
 

@@ -6,13 +6,13 @@ O Worker Local é um programa que roda no seu computador e analisa repositórios
 
 ### Como funciona?
 
-```
+\`\`\`
 ┌─────────────────┐      ┌──────────────────┐      ┌─────────────────┐
 │  Você cria      │      │  Worker Local    │      │  Resultados no  │
 │  análise no     │ ───▶ │  clona e analisa │ ───▶ │  Dashboard Web  │
 │  Dashboard Web  │      │  em C:\Projetos  │      │  automaticamente│
 └─────────────────┘      └──────────────────┘      └─────────────────┘
-```
+\`\`\`
 
 ---
 
@@ -42,17 +42,17 @@ O Worker Local é um programa que roda no seu computador e analisa repositórios
 - Procure por "Worker Local"
 
 **Opção 3: Manual**
-```
+\`\`\`
 C:\WorkerLocal\INICIAR-WORKER.bat
-```
+\`\`\`
 
 ### Você verá uma tela assim:
 
-```
+\`\`\`
 Worker Local iniciado
 Monitorando jobs...
 ✅ Worker online e conectado ao sistema
-```
+\`\`\`
 
 **⚠️ IMPORTANTE: Deixe essa janela aberta enquanto usa o sistema!**
 
@@ -68,10 +68,10 @@ Entre no sistema web normalmente
 
 No topo da página, procure:
 
-```
+\`\`\`
 🟢 Worker Online    ← Verde = Pode usar análise local
 🟡 Worker Offline   ← Amarelo = Use análise Cloud
-```
+\`\`\`
 
 ### 3. Crie uma Nova Análise
 
@@ -79,7 +79,7 @@ No topo da página, procure:
 2. Selecione provedor e repositórios normalmente
 3. **IMPORTANTE:** Escolha o método:
 
-```
+\`\`\`
 ┌──────────────────────────────────────────────┐
 │ ⚪ Análise via Cloud (API)                   │
 │    Funciona sempre, mais lento               │
@@ -88,7 +88,7 @@ No topo da página, procure:
 │    Clona em C:\Projetos                     │
 │    Requer Worker rodando                    │
 └──────────────────────────────────────────────┘
-```
+\`\`\`
 
 4. Clique em **"Iniciar Análise"**
 
@@ -103,7 +103,7 @@ No topo da página, procure:
 
 ## 📁 Onde ficam os arquivos?
 
-```
+\`\`\`
 C:\
 ├── WorkerLocal\              ← Instalação do Worker
 │   ├── src\                  ← Código do Worker
@@ -117,7 +117,7 @@ C:\
     │   └── repo2\
     └── Projeto2\
         └── repo3\
-```
+\`\`\`
 
 ---
 
@@ -185,9 +185,9 @@ C:\
 
 ### Logs
 Sempre verifique os logs primeiro:
-```
+\`\`\`
 C:\WorkerLocal\logs\worker.log
-```
+\`\`\`
 
 ### Informações Úteis para Suporte
 

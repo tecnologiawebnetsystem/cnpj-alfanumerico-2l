@@ -7,16 +7,16 @@ Worker local para análise de repositórios com detecção de CNPJ.
 1. Clone ou copie a pasta `worker-local` para sua máquina
 2. Instale as dependências:
 
-```bash
+\`\`\`bash
 cd worker-local
 npm install
-```
+\`\`\`
 
 3. Configure o arquivo `.env`:
 
-```bash
+\`\`\`bash
 cp .env.example .env
-```
+\`\`\`
 
 Edite o `.env` com suas credenciais:
 - SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY (do painel Supabase)
@@ -26,14 +26,14 @@ Edite o `.env` com suas credenciais:
 ## Execução
 
 ### Modo Produção
-```bash
+\`\`\`bash
 npm start
-```
+\`\`\`
 
 ### Modo Desenvolvimento (com hot reload)
-```bash
+\`\`\`bash
 npm run dev
-```
+\`\`\`
 
 ## Como Funciona
 
@@ -45,7 +45,7 @@ npm run dev
 
 ## Estrutura de Pastas
 
-```
+\`\`\`
 C:\Projetos\
   ├── ProjetoA\
   │   ├── RepoA1\
@@ -53,7 +53,7 @@ C:\Projetos\
   └── ProjetoB\
       ├── RepoB1\
       └── RepoB2\
-```
+\`\`\`
 
 ## Vantagens
 

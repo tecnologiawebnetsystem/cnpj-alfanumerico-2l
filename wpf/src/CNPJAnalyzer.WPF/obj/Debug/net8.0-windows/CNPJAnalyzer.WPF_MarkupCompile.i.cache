@@ -1,4 +1,4 @@
-﻿CNPJAnalyzer.WPF
+CNPJAnalyzer.WPF
 1.0.0.0
 
 winexe
@@ -17,4 +17,3 @@ C:\Projeto\cnpj-alfanumerico-2l\wpf\src\CNPJAnalyzer.WPF\App.xaml
 Styles\Buttons.xaml;Styles\Colors.xaml;Views\DashboardWindow.xaml;Views\Dashboard\AdminDashboardView.xaml;Views\LoginWindow.xaml;Views\MainWindow.xaml;
 
 False
-

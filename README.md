@@ -64,6 +64,17 @@ AZURE_DEVOPS_PAT=seu_pat_azure_devops
 AZURE_DEVOPS_ORGANIZATION_URL=seu_url_organizacao_azure_devops
 AZURE_DEVOPS_PROJECT=seu_projeto_azure_devops
 AZURE_DEVOPS_WEBHOOK_SECRET=seu_webhook_secret
+
+# Segurança
+ENCRYPTION_KEY=sua_chave_256_bits_base64
+JWT_SECRET=sua_chave_jwt_secreta
+CSRF_SECRET=sua_chave_csrf_secreta
+
+# Rate Limiting (Redis já configurado)
+# KV_URL, KV_REST_API_TOKEN, etc. (via Upstash)
+
+# IP Whitelisting (opcional - lista separada por vírgula)
+ADMIN_IP_WHITELIST=192.168.1.0/24,10.0.0.0/8
 ```
 
 ### 4. Execute os scripts SQL
@@ -93,6 +104,7 @@ Execute os scripts na pasta `/scripts` no seu banco Supabase, na ordem:
 19. 028-add-azure-sync-to-tasks.sql (novo - Azure DevOps sync)
 20. 028-complete-integration-accounts-crud.sql (novo - CRUD de contas)
 21. 029-add-advanced-analysis-features.sql (novo - features avançadas)
+22. 9000_SECURITY_CONSOLIDATED.sql (novo - script de segurança)
 ```
 
 ### 5. Inicie o servidor de desenvolvimento
@@ -148,6 +160,12 @@ O sistema usa Supabase Auth com bcrypt para hash de senhas. Todas as rotas em `/
 - `job_queue` - Fila de jobs assíncronos
 - `system_metrics` - Métricas de monitoramento
 - `notifications` - Notificações do sistema
+- `security_logs` - Logs de eventos de segurança
+- `api_keys` - API keys hashadas
+- `password_history` - Histórico de senhas
+- `ip_whitelist` - IPs autorizados para admin
+- `account_lockouts` - Controle de bloqueio
+- `active_sessions` - Sessões ativas com timeout
 
 ### Novas Tabelas e Colunas (2025)
 

@@ -11,7 +11,7 @@ Projeto de testes unitários para o sistema CNPJ Analyzer WPF.
 
 ## Estrutura
 
-```
+\`\`\`
 CNPJAnalyzer.Tests/
 ├── Domain/
 │   └── Entities/          # Testes das entidades
@@ -20,7 +20,7 @@ CNPJAnalyzer.Tests/
 ├── Infrastructure/
 │   └── Repositories/      # Testes dos repositórios
 └── ViewModels/            # Testes dos ViewModels
-```
+\`\`\`
 
 ## Como Executar
 
@@ -29,7 +29,7 @@ CNPJAnalyzer.Tests/
 2. Clique em "Run All Tests"
 
 ### Via Linha de Comando
-```bash
+\`\`\`bash
 # Executar todos os testes
 dotnet test
 
@@ -38,7 +38,7 @@ dotnet test /p:CollectCoverage=true
 
 # Executar testes específicos
 dotnet test --filter "FullyQualifiedName~UserTests"
-```
+\`\`\`
 
 ## Padrões
 
@@ -49,7 +49,7 @@ dotnet test --filter "FullyQualifiedName~UserTests"
 ### Estrutura AAA
 Todos os testes seguem o padrão Arrange-Act-Assert:
 
-```csharp
+\`\`\`csharp
 [Fact]
 public async Task Example_Should_DoSomething_When_ConditionMet()
 {
