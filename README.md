@@ -38,22 +38,22 @@ Sistema completo de gestão de CNPJs com análise alfanumérica, gerenciamento �
 
 ### 1. Clone o repositório
 
-```bash
+\`\`\`bash
 git clone https://github.com/seu-usuario/cnpj-alfanumerico.git
 cd cnpj-alfanumerico
-```
+\`\`\`
 
 ### 2. Instale as dependências
 
-```bash
+\`\`\`bash
 npm install
-```
+\`\`\`
 
 ### 3. Configure as variáveis de ambiente
 
 Crie um arquivo `.env.local` na raiz do projeto:
 
-```env
+\`\`\`env
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=sua_url_supabase
 NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_anon_key
@@ -75,13 +75,13 @@ CSRF_SECRET=sua_chave_csrf_secreta
 
 # IP Whitelisting (opcional - lista separada por vírgula)
 ADMIN_IP_WHITELIST=192.168.1.0/24,10.0.0.0/8
-```
+\`\`\`
 
 ### 4. Execute os scripts SQL
 
 Execute os scripts na pasta `/scripts` no seu banco Supabase, na ordem:
 
-```sql
+\`\`\`sql
 -- Ordem de execução:
 1. 001-create-tables.sql
 2. 002-create-api-tables.sql
@@ -105,13 +105,13 @@ Execute os scripts na pasta `/scripts` no seu banco Supabase, na ordem:
 20. 028-complete-integration-accounts-crud.sql (novo - CRUD de contas)
 21. 029-add-advanced-analysis-features.sql (novo - features avançadas)
 22. 9000_SECURITY_CONSOLIDATED.sql (novo - script de segurança)
-```
+\`\`\`
 
 ### 5. Inicie o servidor de desenvolvimento
 
-```bash
+\`\`\`bash
 npm run dev
-```
+\`\`\`
 
 Acesse: `http://localhost:3000`
 
@@ -125,7 +125,7 @@ Após executar os scripts SQL, você pode fazer login com:
 
 ## 🏗️ Estrutura do Projeto
 
-```
+\`\`\`
 ├── app/                    # Páginas Next.js (App Router)
 │   ├── api/               # API Routes
 │   ├── dashboard/         # Área autenticada
@@ -141,7 +141,7 @@ Após executar os scripts SQL, você pode fazer login com:
 │   ├── auth.ts          # Autenticação
 │   └── utils.ts         # Funções auxiliares
 └── scripts/             # Scripts SQL
-```
+\`\`\`
 
 ## 🔐 Autenticação
 
@@ -170,7 +170,7 @@ O sistema usa Supabase Auth com bcrypt para hash de senhas. Todas as rotas em `/
 ### Novas Tabelas e Colunas (2025)
 
 **Tabela `tasks` (atualizada):**
-```sql
+\`\`\`sql
 - code_context_before (ARRAY) - Linhas antes do código
 - code_current (TEXT) - Código atual (errado)
 - code_suggested (TEXT) - Código sugerido (correto)
@@ -187,29 +187,29 @@ O sistema usa Supabase Auth com bcrypt para hash de senhas. Todas as rotas em `/
 - external_task_id (VARCHAR) - ID da tarefa externa (GitHub Issue, Azure Work Item)
 - external_task_url (TEXT) - URL da tarefa externa
 - external_provider (VARCHAR) - Plataforma: github/azure-boards
-```
+\`\`\`
 
 **Tabela `integrations` (atualizada):**
-```sql
+\`\`\`sql
 - project (VARCHAR) - Projeto do Azure DevOps ou GitHub
 - provider (VARCHAR) - github/azure-devops/gitlab
-```
+\`\`\`
 
 **Tabela `repositories` (atualizada):**
-```sql
+\`\`\`sql
 - integration_id (UUID) - Vinculação com conta de integração
-```
+\`\`\`
 
 **Tabela `users` (atualizada):**
-```sql
+\`\`\`sql
 - integration_id (UUID) - Projeto padrão do desenvolvedor
-```
+\`\`\`
 
 **Tabela `ai_chat_history` (nova):**
-```sql
+\`\`\`sql
 - Histórico de conversação do chatbot
 - task_id, repository_id, intent, session_id
-```
+\`\`\`
 
 ## 🎨 Tecnologias
 
@@ -231,34 +231,34 @@ O sistema usa Supabase Auth com bcrypt para hash de senhas. Todas as rotas em `/
 
 ### Build Local
 
-```bash
+\`\`\`bash
 npm run build
 npm start
-```
+\`\`\`
 
 ## 📝 Scripts Disponíveis
 
-```bash
+\`\`\`bash
 npm run dev          # Desenvolvimento
 npm run build        # Build de produção
 npm start            # Servidor de produção
 npm run lint         # Verificar código
-```
+\`\`\`
 
 #### 🗺️ Mapeamento Detalhado de Campos
 
 **Campos Obrigatórios:**
-```
+\`\`\`
 Sistema                    Azure DevOps Work Item          Formato
 --------------------------------------------------------------------------------
 title                   →  Title                          String (255 chars)
 description             →  Description                     HTML/Markdown
 status                  →  State                           New/Active/Closed
 repository_name         →  Tags                            Array de strings
-```
+\`\`\`
 
 **Campos Opcionais:**
-```
+\`\`\`
 Sistema                    Azure DevOps Work Item          Formato
 --------------------------------------------------------------------------------
 priority                →  Priority                        1 (Alta), 2 (Média), 3 (Baixa)
@@ -269,7 +269,7 @@ line_number             →  Repro Steps (incluído)          Número
 analysis_id             →  Custom Field                    UUID
 client_name             →  Area Path                       String hierárquica
 sprint_id               →  Iteration Path                  String hierárquica
-```
+\`\`\`
 
 **Campos Personalizados (Custom Fields):**
 - `CNPJ_Analysis_ID`: UUID da análise no sistema

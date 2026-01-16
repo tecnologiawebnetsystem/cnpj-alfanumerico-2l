@@ -40,7 +40,7 @@
 
 ### 1.2 Arquitetura Multi-Tenant
 
-```
+\`\`\`
 Cliente 1 (UUID: xxx)
 ├── Admin 1.1
 ├── Admin 1.2
@@ -49,7 +49,7 @@ Cliente 1 (UUID: xxx)
 Cliente 2 (UUID: yyy)
 ├── Admin 2.1
 └── Desenvolvedores 2.1, 2.2
-```
+\`\`\`
 
 **Isolamento de Dados:**
 - RLS (Row Level Security) em todas as tabelas
@@ -58,7 +58,7 @@ Cliente 2 (UUID: yyy)
 
 ### 1.3 Fluxo de Análise
 
-```
+\`\`\`
 1. Admin Cliente → Nova Análise
 2. Sistema cria batch no banco
 3. Worker (local ou servidor) processa
@@ -70,7 +70,7 @@ Cliente 2 (UUID: yyy)
 9. Desenvolvedor corrige via UI
 10. Sistema aplica correção (PR automático)
 11. Relatórios gerados (PDF/Excel)
-```
+\`\`\`
 
 ---
 
@@ -122,7 +122,7 @@ Cliente 2 (UUID: yyy)
 
 ### 2.3 Checklist de Auditoria de Segurança
 
-```
+\`\`\`
 [ ] Pentesting realizado nos últimos 6 meses
 [ ] Vulnerability scan executado semanalmente
 [ ] Dependências atualizadas (npm audit clean)
@@ -133,7 +133,7 @@ Cliente 2 (UUID: yyy)
 [ ] Security training realizado para equipe
 [ ] 2FA habilitado para 100% dos admins
 [ ] Logs de segurança sendo monitorados 24/7
-```
+\`\`\`
 
 ---
 
@@ -205,18 +205,18 @@ Cliente 2 (UUID: yyy)
 
 ### 4.1 Vercel (Recomendado)
 
-```bash
+\`\`\`bash
 # 1. Conecte seu repositório GitHub
 # 2. Selecione o projeto no Vercel
 # 3. Configure as variáveis de ambiente
 # 4. Deploy automático em cada push
 
 vercel --prod
-```
+\`\`\`
 
 ### 4.2 Docker (Auto-hospedado)
 
-```dockerfile
+\`\`\`dockerfile
 FROM node:18-alpine
 WORKDIR /app
 COPY package*.json ./
@@ -225,16 +225,16 @@ COPY . .
 RUN npm run build
 EXPOSE 3000
 CMD ["npm", "start"]
-```
+\`\`\`
 
-```bash
+\`\`\`bash
 docker build -t cnpj-system .
 docker run -p 3000:3000 --env-file .env.production cnpj-system
-```
+\`\`\`
 
 ### 4.3 Checklist Pré-Deploy
 
-```
+\`\`\`
 [ ] Tests passando (npm test)
 [ ] Build sem erros (npm run build)
 [ ] Variáveis de ambiente configuradas
@@ -244,7 +244,7 @@ docker run -p 3000:3000 --env-file .env.production cnpj-system
 [ ] SSL/TLS configurado
 [ ] Monitoramento ativo
 [ ] Rollback plan documentado
-```
+\`\`\`
 
 ---
 
@@ -271,25 +271,25 @@ docker run -p 3000:3000 --env-file .env.production cnpj-system
 ### 5.2 Logs de Debug
 
 **Habilitar logs verbose:**
-```env
+\`\`\`env
 LOG_LEVEL=debug
-```
+\`\`\`
 
 **Ver logs de segurança:**
-```sql
+\`\`\`sql
 SELECT * FROM security_logs 
 WHERE event_type = 'failed_login' 
 ORDER BY timestamp DESC 
 LIMIT 50;
-```
+\`\`\`
 
 **Ver sessões ativas:**
-```sql
+\`\`\`sql
 SELECT u.email, s.ip_address, s.last_activity
 FROM active_sessions s
 JOIN users u ON u.id = s.user_id
 WHERE s.expires_at > NOW();
-```
+\`\`\`
 
 ---
 

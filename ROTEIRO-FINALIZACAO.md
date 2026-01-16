@@ -3,7 +3,7 @@
 ## FASE 1: TESTES AUTOMATIZADOS (Dias 1-3)
 
 ### Dia 1: Setup de Testes
-```bash
+\`\`\`bash
 # Instalar dependências
 npm install --save-dev @testing-library/react @testing-library/jest-dom
 npm install --save-dev jest jest-environment-jsdom @testing-library/user-event
@@ -12,7 +12,7 @@ npm install --save-dev @types/jest
 # Criar jest.config.js
 # Criar jest.setup.js
 # Adicionar scripts no package.json
-```
+\`\`\`
 
 ### Dia 2-3: Escrever Testes
 **Prioridade 1 - Segurança:**
@@ -38,12 +38,12 @@ npm install --save-dev @types/jest
 ## FASE 2: BACKUP & DISASTER RECOVERY (Dias 4-5)
 
 ### Dia 4: Configurar Backup
-```bash
+\`\`\`bash
 # Supabase CLI
 npx supabase db dump > backup.sql
 
 # Configurar cron job ou GitHub Action para backup diário
-```
+\`\`\`
 
 **Checklist:**
 - [ ] Script de backup automático
@@ -64,7 +64,7 @@ npx supabase db dump > backup.sql
 ### Dia 6: GitHub Actions
 Criar `.github/workflows/ci.yml`:
 
-```yaml
+\`\`\`yaml
 name: CI/CD Pipeline
 
 on:
@@ -90,7 +90,7 @@ jobs:
       - uses: snyk/actions/node@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-```
+\`\`\`
 
 ### Dia 7: Deploy Automation
 - [ ] Staging environment
@@ -110,9 +110,9 @@ jobs:
 
 ### Dia 10: Monitoring
 **Opção A: Datadog**
-```bash
+\`\`\`bash
 npm install dd-trace
-```
+\`\`\`
 
 **Opção B: ELK Stack**
 - Elasticsearch + Logstash + Kibana
@@ -144,14 +144,14 @@ Ferramentas:
 ## FASE 6: SECRETS MANAGEMENT (Dias 15-17)
 
 ### Opção A: HashiCorp Vault
-```bash
+\`\`\`bash
 docker run -d --name=vault -p 8200:8200 vault
-```
+\`\`\`
 
 ### Opção B: AWS Secrets Manager
-```bash
+\`\`\`bash
 aws secretsmanager create-secret --name prod/database
-```
+\`\`\`
 
 **Migração:**
 - [ ] Mover secrets do .env para Vault
@@ -170,19 +170,19 @@ aws secretsmanager create-secret --name prod/database
 - [ ] Bundle size reduction
 
 ### Benchmarks
-```bash
+\`\`\`bash
 npm install --save-dev lighthouse
 npx lighthouse https://your-app.vercel.app
-```
+\`\`\`
 
 ---
 
 ## FASE 8: DOCUMENTAÇÃO (Dias 20-21)
 
 ### API Documentation
-```bash
+\`\`\`bash
 npm install swagger-jsdoc swagger-ui-express
-```
+\`\`\`
 
 ### Documentos Necessários:
 - [ ] API Reference (Swagger/OpenAPI)

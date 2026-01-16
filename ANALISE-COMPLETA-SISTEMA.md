@@ -136,27 +136,27 @@
 ## 🔧 COMANDOS ÚTEIS
 
 ### Atualizar Dependências
-```bash
+\`\`\`bash
 npm audit fix
 npm update
-```
+\`\`\`
 
 ### Verificar Build
-```bash
+\`\`\`bash
 npm run build
-```
+\`\`\`
 
 ### Rodar Testes
-```bash
+\`\`\`bash
 npm test
-```
+\`\`\`
 
 ### Verificar WPF
-```bash
+\`\`\`bash
 cd wpf
 dotnet restore
 dotnet build
-```
+\`\`\`
 
 ---
 

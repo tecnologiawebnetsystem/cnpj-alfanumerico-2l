@@ -133,9 +133,9 @@
 - Coverage reports
 
 **Ação Necessária:**
-```bash
+\`\`\`bash
 npm install --save-dev @testing-library/react @testing-library/jest-dom jest jest-environment-jsdom
-```
+\`\`\`
 
 ### 2. CI/CD - ALTO
 ❌ **Faltando:**

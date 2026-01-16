@@ -110,7 +110,7 @@
 
 ## Variáveis de Ambiente Necessárias
 
-```env
+\`\`\`env
 # Encryption
 ENCRYPTION_KEY=your-32-character-minimum-key-here
 
@@ -120,32 +120,32 @@ SUPABASE_SERVICE_ROLE_KEY=...
 
 # Optional: Redis for rate limiting (production)
 REDIS_URL=redis://...
-```
+\`\`\`
 
 ## Como Testar
 
 ### 1. Rate Limiting
-```bash
+\`\`\`bash
 # Tentar login 6 vezes rapidamente
 for i in {1..6}; do
   curl -X POST http://localhost:3000/api/auth/login \
     -H "Content-Type: application/json" \
     -d '{"email":"test@test.com","password":"wrong"}'
 done
-```
+\`\`\`
 
 ### 2. Password Policy
-```bash
+\`\`\`bash
 # Tentar senha fraca
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@test.com","password":"123"}'
-```
+\`\`\`
 
 ### 3. Security Headers
-```bash
+\`\`\`bash
 curl -I http://localhost:3000
-```
+\`\`\`
 
 ## Status
 ✅ **PRONTO PARA INSPEÇÃO DE SEGURANÇA**

@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* ACT Digital brand colors: primary blue #0052CC, secondary grays */
+  /* ACT Digital + BS2 brand colors */
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -17,8 +17,10 @@
   --secondary-foreground: oklch(0.351 0.214 276.847);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.351 0.214 276.847); /* Same as primary for consistency */
-  --accent-foreground: oklch(0.985 0 0);
+  --accent: oklch(0.716 0.198 68.25); /* BS2 Orange */
+  --accent-foreground: oklch(0.145 0 0);
+  --bs2-orange: oklch(0.716 0.198 68.25); /* BS2 primary orange */
+  --bs2-yellow: oklch(0.881 0.175 95.86); /* BS2 vibrant yellow */
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
@@ -53,8 +55,10 @@
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.651 0.214 276.847);
+  --accent: oklch(0.816 0.198 68.25); /* Lighter BS2 Orange for dark mode */
   --accent-foreground: oklch(0.145 0 0);
+  --bs2-orange: oklch(0.816 0.198 68.25);
+  --bs2-yellow: oklch(0.931 0.175 95.86);
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: oklch(0.637 0.237 25.331);
   --border: oklch(0.269 0 0);
@@ -136,4 +140,34 @@
 
 .animate-shimmer {
   animation: shimmer 2s infinite;
+}
+
+/* Added gradient animations for BS2 x ACT branding */
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 6s ease infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
