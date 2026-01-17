@@ -1,33 +1,17 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { getClientId, authLimiter } from "@/lib/security/rate-limiter"
 
-export async function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Apply rate limiting to authentication endpoints
-  if (pathname.startsWith("/api/auth/")) {
-    const clientId = getClientId(request)
-    const rateLimitResult = await authLimiter.check(5, `auth_${clientId}`) // 5 attempts per 15 minutes
+  // Public routes - always allow
+  const publicRoutes = ["/", "/login", "/forgot-password", "/license-expired"]
+  const isPublicRoute = publicRoutes.some((route) => pathname === route)
+  const isApiRoute = pathname.startsWith("/api/")
+  const isStaticAsset = pathname.startsWith("/_next/") || pathname.includes(".")
 
-    if (!rateLimitResult.success) {
-      return new NextResponse("Too Many Requests", {
-        status: 429,
-        headers: {
-          "Retry-After": String(Math.ceil((rateLimitResult.reset - Date.now()) / 1000)),
-          "X-RateLimit-Limit": String(rateLimitResult.limit),
-          "X-RateLimit-Remaining": String(rateLimitResult.remaining),
-          "X-RateLimit-Reset": String(rateLimitResult.reset),
-        },
-      })
-    }
-  }
-
-  // Public routes
-  const publicRoutes = ["/", "/login", "/forgot-password", "/license-expired", "/api/auth/login"]
-  const isPublicRoute = publicRoutes.some((route) => pathname === route || pathname.startsWith("/api/v1/"))
-
-  if (isPublicRoute) {
+  // Allow public routes, API routes, and static assets
+  if (isPublicRoute || isApiRoute || isStaticAsset) {
     return NextResponse.next()
   }
 
@@ -36,8 +20,7 @@ export async function proxy(request: NextRequest) {
 
   if (pathname.startsWith("/dashboard") || pathname.startsWith("/admin") || pathname.startsWith("/dev")) {
     if (!sessionToken) {
-      const loginUrl = new URL("/login", request.url)
-      loginUrl.searchParams.set("redirect", pathname)
+      const loginUrl = new URL("/", request.url)
       return NextResponse.redirect(loginUrl)
     }
 
@@ -48,13 +31,11 @@ export async function proxy(request: NextRequest) {
       const maxAge = 7 * 24 * 60 * 60 * 1000 // 7 days
 
       if (tokenAge > maxAge) {
-        const loginUrl = new URL("/login", request.url)
-        loginUrl.searchParams.set("redirect", pathname)
-        loginUrl.searchParams.set("error", "session_expired")
+        const loginUrl = new URL("/", request.url)
         return NextResponse.redirect(loginUrl)
       }
     } catch (error) {
-      const loginUrl = new URL("/login", request.url)
+      const loginUrl = new URL("/", request.url)
       return NextResponse.redirect(loginUrl)
     }
   }

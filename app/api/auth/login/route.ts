@@ -1,11 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@/lib/supabase/server"
 import { loginSchema } from "@/lib/security/validation"
-import { loginRateLimiter } from "@/lib/security/redis-rate-limiter"
-import { enforce2FA } from "@/lib/security/2fa-enforcer"
-import { SessionManager } from "@/lib/security/session-manager"
-import { isIPWhitelisted } from "@/lib/security/ip-whitelist"
-import { safeErrorResponse } from "@/lib/security/error-handler"
+import { cookies } from "next/headers"
+import bcrypt from "bcryptjs"
+import crypto from "crypto"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -19,28 +17,14 @@ export async function POST(request: NextRequest) {
   const clientIP = getClientIP(request)
   const userAgent = request.headers.get("user-agent") || "unknown"
 
-  const rateLimitResult = await loginRateLimiter.check(clientIP)
-
-  if (!rateLimitResult.success) {
-    return NextResponse.json(
-      { success: false, error: "Muitas tentativas de login. Tente novamente em 15 minutos." },
-      {
-        status: 429,
-        headers: {
-          "X-RateLimit-Limit": rateLimitResult.limit.toString(),
-          "X-RateLimit-Remaining": "0",
-          "X-RateLimit-Reset": rateLimitResult.reset.toString(),
-          "Retry-After": String(rateLimitResult.reset - Math.floor(Date.now() / 1000)),
-        },
-      },
-    )
-  }
-
   try {
     const body = await request.json()
+    console.log("[v0] Login attempt for email:", body.email)
 
+    // Validate input
     const validationResult = loginSchema.safeParse(body)
     if (!validationResult.success) {
+      console.log("[v0] Validation failed:", validationResult.error.errors)
       return NextResponse.json({ success: false, error: validationResult.error.errors[0].message }, { status: 400 })
     }
 
@@ -48,121 +32,77 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createServerClient()
 
+    // Query user from database
     const { data: users, error: queryError } = await supabase
       .from("users")
-      .select("id, email, name, role, client_id, status, password_hash, two_factor_enabled")
+      .select("id, email, name, role, client_id, status, password_hash")
       .eq("email", email)
       .limit(1)
 
+    console.log("[v0] User query result:", { found: users?.length || 0, error: queryError?.message })
+
     if (queryError) {
-      return safeErrorResponse(queryError)
+      console.error("[v0] Database query error:", queryError)
+      return NextResponse.json({ success: false, error: "Erro ao consultar banco de dados" }, { status: 500 })
     }
 
     if (!users || users.length === 0) {
-      await supabase.from("security_logs").insert({
-        event_type: "failed_login",
-        user_email: email,
-        ip_address: clientIP,
-        user_agent: userAgent,
-        details: { reason: "user_not_found" },
-      })
+      console.log("[v0] User not found:", email)
       return NextResponse.json({ success: false, error: "Credenciais inválidas" }, { status: 401 })
     }
 
     const userData = users[0]
-
     const storedHash = userData.password_hash?.trim() || ""
+
     let isValid = false
 
-    if (storedHash.startsWith("$2a$") || storedHash.startsWith("$2b$") || storedHash.startsWith("$2y$")) {
-      const { data: verifyResult, error: verifyError } = await supabase.rpc("verify_password", {
-        input_password: password,
-        stored_hash: storedHash,
-      })
-
-      if (verifyError) {
-        const encoder = new TextEncoder()
-        const hashBuffer = await crypto.subtle.digest("SHA-256", encoder.encode(password))
-        const inputHash = Array.from(new Uint8Array(hashBuffer))
-          .map((b) => b.toString(16).padStart(2, "0"))
-          .join("")
-        isValid = inputHash === storedHash.substring(0, 64).toLowerCase()
-      } else {
-        isValid = verifyResult
-      }
-    } else {
+    if (storedHash.length === 60 && storedHash.startsWith("$2")) {
+      // Bcrypt hash - use bcrypt.compare
+      console.log("[v0] Using bcrypt verification")
+      isValid = await bcrypt.compare(password, storedHash)
+    } else if (storedHash.length >= 64) {
+      // SHA-256 hash - use crypto
+      console.log("[v0] Using SHA-256 verification")
       const encoder = new TextEncoder()
       const hashBuffer = await crypto.subtle.digest("SHA-256", encoder.encode(password))
       const inputHash = Array.from(new Uint8Array(hashBuffer))
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("")
-      isValid = inputHash === storedHash.substring(0, 64).toLowerCase()
+      isValid = inputHash.toLowerCase() === storedHash.substring(0, 64).toLowerCase()
+    } else {
+      // Direct comparison for plain text (development only - NOT recommended)
+      console.log("[v0] WARNING: Plain text password detected")
+      isValid = password === storedHash
     }
 
-    if (!isValid) {
-      await supabase.from("security_logs").insert({
-        event_type: "failed_login",
-        user_id: userData.id,
-        user_email: email,
-        ip_address: clientIP,
-        user_agent: userAgent,
-        details: { reason: "invalid_password" },
-      })
+    console.log("[v0] Password verification:", {
+      isValid,
+      hashLength: storedHash.length,
+      hashType: storedHash.startsWith("$2") ? "bcrypt" : "sha256",
+    })
 
+    if (!isValid) {
+      console.log("[v0] Invalid password for user:", email)
       return NextResponse.json({ success: false, error: "Credenciais inválidas" }, { status: 401 })
     }
 
     if (userData.status !== "active") {
-      return NextResponse.json({ success: false, error: "Usuário inativo" }, { status: 401 })
-    }
-
-    const twoFAStatus = await enforce2FA(userData.id)
-    if (twoFAStatus.required && !twoFAStatus.enabled) {
+      console.log("[v0] User is inactive:", email)
       return NextResponse.json(
-        {
-          success: false,
-          error: "Autenticação de dois fatores é obrigatória para sua função. Configure o 2FA antes de continuar.",
-          require2FA: true,
-        },
-        { status: 403 },
+        { success: false, error: "Usuário inativo. Entre em contato com o administrador." },
+        { status: 401 },
       )
     }
 
-    if (["admin", "super_admin"].includes(userData.role) && userData.client_id) {
-      const ipAllowed = await isIPWhitelisted(clientIP, userData.client_id)
-      if (!ipAllowed) {
-        await supabase.from("security_logs").insert({
-          event_type: "blocked_login",
-          user_id: userData.id,
-          user_email: email,
-          ip_address: clientIP,
-          user_agent: userAgent,
-          details: { reason: "ip_not_whitelisted" },
-        })
-
-        return NextResponse.json(
-          { success: false, error: "Acesso negado. Seu IP não está autorizado para login administrativo." },
-          { status: 403 },
-        )
-      }
-    }
-
+    // Update last login
     await supabase.from("users").update({ last_login: new Date().toISOString() }).eq("id", userData.id)
 
+    // Get client name if exists
     let clientName = null
     if (userData.client_id) {
       const { data: clientData } = await supabase.from("clients").select("name").eq("id", userData.client_id).single()
       clientName = clientData?.name
     }
-
-    const sessionId = await SessionManager.createSession(
-      userData.id,
-      userData.email,
-      userData.role,
-      userData.client_id || "",
-      clientIP,
-      userAgent,
-    )
 
     const user = {
       id: userData.id,
@@ -173,23 +113,70 @@ export async function POST(request: NextRequest) {
       client_name: clientName,
     }
 
-    await supabase.from("security_logs").insert({
-      event_type: "successful_login",
-      user_id: userData.id,
-      user_email: email,
-      ip_address: clientIP,
-      user_agent: userAgent,
-      details: { session_id: sessionId },
+    console.log("[v0] Login successful for:", email, "Role:", userData.role)
+
+    const sessionToken = crypto.randomUUID()
+
+    // Set cookies for session
+    const cookieStore = await cookies()
+
+    const sessionData = {
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      timestamp: Date.now(),
+    }
+    const encodedSession = Buffer.from(JSON.stringify(sessionData)).toString("base64")
+
+    cookieStore.set("session_token", encodedSession, {
+      httpOnly: false, // Allow JS access for client-side checks
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: "/",
     })
 
-    const response = NextResponse.json({
+    cookieStore.set("user_email", user.email, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: "/",
+    })
+
+    cookieStore.set("user_role", user.role, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+      path: "/",
+    })
+
+    cookieStore.set("user_id", user.id, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+      path: "/",
+    })
+
+    if (user.client_id) {
+      cookieStore.set("client_id", user.client_id, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 7,
+        path: "/",
+      })
+    }
+
+    return NextResponse.json({
       success: true,
       user,
+      sessionToken,
     })
-
-    // Session is already set by SessionManager
-    return response
   } catch (error: any) {
-    return safeErrorResponse(error)
+    console.error("[v0] Login error:", error)
+    return NextResponse.json({ success: false, error: "Erro interno do servidor" }, { status: 500 })
   }
 }

@@ -5,15 +5,13 @@ import { useRouter } from "next/navigation"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { MobileNav } from "@/components/dashboard/mobile-nav"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Loader2, Users, ListTodo, FileText, BarChart3, Settings, Search, UserPlus } from "lucide-react"
+import { Loader2, Users, FileText, BarChart3, Settings, Search, UserPlus } from "lucide-react"
 import { getCurrentUser } from "@/lib/auth"
 import { ClientOverview } from "@/components/dashboard/client-overview-tab"
 import { ClientDevsTab } from "@/components/dashboard/client-devs-tab"
-import { ClientTasksTab } from "@/components/dashboard/client-tasks-tab"
 import { ClientReportsTab } from "@/components/dashboard/client-reports-tab"
 import { ClientSettingsTab } from "@/components/dashboard/client-settings-tab"
 import { ClientAnalysesTab } from "@/components/dashboard/client-analyses-tab"
-import { RepositoryAnalysisTab } from "@/components/dashboard/repository-analysis-tab"
 import { DeveloperAssignmentTab } from "@/components/dashboard/developer-assignment-tab"
 
 export default function DashboardPage() {
@@ -26,16 +24,21 @@ export default function DashboardPage() {
     const currentUser = getCurrentUser()
 
     if (!currentUser) {
-      router.push("/login")
+      router.push("/")
       return
     }
 
-    if (currentUser.role === "dev") {
-      router.push("/tasks")
+    const normalizedRole = currentUser.role?.toLowerCase() || ""
+
+    if (normalizedRole === "dev" || normalizedRole === "developer") {
+      router.push("/dev/assignments")
       return
     }
 
-    setUser(currentUser)
+    setUser({
+      ...currentUser,
+      role: normalizedRole,
+    })
     setLoading(false)
   }, [router])
 
@@ -48,12 +51,10 @@ export default function DashboardPage() {
   }
 
   if (!user) {
-    router.push("/login")
     return null
   }
 
   const userRole = user?.role || "admin"
-  const isAdmin = userRole === "admin"
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-6 lg:pb-8">
@@ -66,33 +67,25 @@ export default function DashboardPage() {
               <BarChart3 className="h-4 w-4 mr-2" />
               <span className="hidden md:inline">Visão Geral</span>
             </TabsTrigger>
-            <TabsTrigger value="repository-analysis" className="md:flex-1 lg:flex-initial md:min-w-[140px] lg:min-w-0">
+            <TabsTrigger value="analise" className="md:flex-1 lg:flex-initial md:min-w-[140px] lg:min-w-0">
               <Search className="h-4 w-4 mr-2" />
-              <span className="hidden md:inline">Análise de Repositórios</span>
-            </TabsTrigger>
-            <TabsTrigger value="analises" className="md:flex-1 lg:flex-initial md:min-w-[140px] lg:min-w-0">
-              <FileText className="h-4 w-4 mr-2" />
-              <span className="hidden md:inline">Histórico</span>
+              <span className="hidden md:inline">Análise</span>
             </TabsTrigger>
             <TabsTrigger value="atribuicoes" className="md:flex-1 lg:flex-initial md:min-w-[140px] lg:min-w-0">
               <UserPlus className="h-4 w-4 mr-2" />
               <span className="hidden md:inline">Atribuições</span>
             </TabsTrigger>
-            <TabsTrigger value="configuracoes" className="md:flex-1 lg:flex-initial md:min-w-[140px] lg:min-w-0">
-              <Settings className="h-4 w-4 mr-2" />
-              <span className="hidden md:inline">Configurações</span>
-            </TabsTrigger>
             <TabsTrigger value="devs" className="md:flex-1 lg:flex-initial md:min-w-[140px] lg:min-w-0">
               <Users className="h-4 w-4 mr-2" />
               <span className="hidden md:inline">Desenvolvedores</span>
             </TabsTrigger>
-            <TabsTrigger value="tarefas" className="md:flex-1 lg:flex-initial md:min-w-[140px] lg:min-w-0">
-              <ListTodo className="h-4 w-4 mr-2" />
-              <span className="hidden md:inline">Tarefas</span>
-            </TabsTrigger>
             <TabsTrigger value="relatorios" className="md:flex-1 lg:flex-initial md:min-w-[140px] lg:min-w-0">
               <FileText className="h-4 w-4 mr-2" />
               <span className="hidden md:inline">Relatórios</span>
+            </TabsTrigger>
+            <TabsTrigger value="configuracoes" className="md:flex-1 lg:flex-initial md:min-w-[140px] lg:min-w-0">
+              <Settings className="h-4 w-4 mr-2" />
+              <span className="hidden md:inline">Configurações</span>
             </TabsTrigger>
           </TabsList>
 
@@ -100,11 +93,7 @@ export default function DashboardPage() {
             <ClientOverview onChangeTab={setActiveTab} userRole={userRole} />
           </TabsContent>
 
-          <TabsContent value="repository-analysis">
-            <RepositoryAnalysisTab clientId={user.client_id} />
-          </TabsContent>
-
-          <TabsContent value="analises">
+          <TabsContent value="analise">
             <ClientAnalysesTab clientId={user.client_id} />
           </TabsContent>
 
@@ -112,20 +101,16 @@ export default function DashboardPage() {
             <DeveloperAssignmentTab clientId={user.client_id} />
           </TabsContent>
 
-          <TabsContent value="configuracoes">
-            <ClientSettingsTab clientId={user.client_id} />
-          </TabsContent>
-
           <TabsContent value="devs">
             <ClientDevsTab clientId={user.client_id} />
           </TabsContent>
 
-          <TabsContent value="tarefas">
-            <ClientTasksTab clientId={user.client_id} />
-          </TabsContent>
-
           <TabsContent value="relatorios">
             <ClientReportsTab clientId={user.client_id} />
+          </TabsContent>
+
+          <TabsContent value="configuracoes">
+            <ClientSettingsTab clientId={user.client_id} />
           </TabsContent>
         </Tabs>
       </main>

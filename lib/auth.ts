@@ -1,5 +1,4 @@
 import { getSupabaseClient } from "@/lib/supabase"
-import { AbortSignal } from "abort-controller"
 
 // Criar cliente Supabase
 function getSupabaseBrowserClient() {
@@ -32,14 +31,8 @@ export interface AuthResponse {
 // Login com email e senha
 export async function login(email: string, password: string): Promise<AuthResponse & { sessionToken?: string }> {
   try {
-    console.log(" === LOGIN START ===")
-    console.log(" Timestamp:", new Date().toISOString())
-    console.log(" Email:", email)
-    console.log(" Password length:", password?.length || 0)
-    console.log(" Window location:", typeof window !== "undefined" ? window.location.href : "N/A")
-
-    console.log(" Calling fetch to /api/auth/login...")
-    const startTime = Date.now()
+    console.log("[v0] === LOGIN START ===")
+    console.log("[v0] Email:", email)
 
     const response = await fetch("/api/auth/login", {
       method: "POST",
@@ -47,15 +40,10 @@ export async function login(email: string, password: string): Promise<AuthRespon
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, password }),
-      signal: AbortSignal.timeout(30000), // 30 second timeout
+      credentials: "include", // Include cookies in request
     })
 
-    const fetchDuration = Date.now() - startTime
-    console.log(" Fetch completed in", fetchDuration, "ms")
-    console.log(" Response status:", response.status)
-    console.log(" Response headers:", Object.fromEntries(response.headers.entries()))
-
-    console.log(" Response received, status:", response.status)
+    console.log("[v0] Response status:", response.status)
 
     if (!response.ok) {
       const result = await response.json()
@@ -63,38 +51,36 @@ export async function login(email: string, password: string): Promise<AuthRespon
     }
 
     const result = await response.json()
-    console.log(" Response body parsed:", result)
+    console.log("[v0] Response body parsed:", result)
 
     if (result.success && result.user) {
       localStorage.setItem("user", JSON.stringify(result.user))
+
       if (result.sessionToken) {
         localStorage.setItem("sessionToken", result.sessionToken)
-        console.log(" Session token saved to localStorage")
+
+        const cookieValue = btoa(
+          JSON.stringify({
+            userId: result.user.id,
+            email: result.user.email,
+            role: result.user.role,
+            timestamp: Date.now(),
+          }),
+        )
+        document.cookie = `session_token=${cookieValue}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`
+        console.log("[v0] Session token saved to cookie")
       }
 
-      console.log(" === LOGIN END - SUCCESS ===")
+      console.log("[v0] === LOGIN END - SUCCESS ===")
       return { success: true, user: result.user, sessionToken: result.sessionToken }
     }
 
     return { success: false, error: result.error || "Credenciais inválidas" }
   } catch (error) {
-    console.error(" === LOGIN EXCEPTION ===")
-    console.error(" Error name:", error instanceof Error ? error.name : "Unknown")
-    console.error(" Error message:", error instanceof Error ? error.message : String(error))
-    console.error(" Error stack:", error instanceof Error ? error.stack : "N/A")
-
-    let errorMessage = "Erro ao fazer login"
-    if (error instanceof TypeError && error.message.includes("fetch")) {
-      errorMessage = "Erro de conexão com o servidor. Verifique sua internet."
-    } else if (error instanceof Error && error.name === "AbortError") {
-      errorMessage = "Timeout na requisição. Tente novamente."
-    } else if (error instanceof Error) {
-      errorMessage = error.message
-    }
-
+    console.error("[v0] === LOGIN EXCEPTION ===", error)
     return {
       success: false,
-      error: errorMessage,
+      error: error instanceof Error ? error.message : "Erro ao fazer login",
     }
   }
 }
@@ -103,7 +89,8 @@ export async function login(email: string, password: string): Promise<AuthRespon
 export function logout() {
   localStorage.removeItem("user")
   localStorage.removeItem("sessionToken")
-  window.location.href = "/login"
+  document.cookie = "session_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+  window.location.href = "/"
 }
 
 export function getSessionToken(): string | null {

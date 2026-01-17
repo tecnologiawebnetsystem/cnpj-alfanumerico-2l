@@ -1,10 +1,6 @@
 "use client"
-
-import { Button } from "@/components/ui/button"
-import { Menu, BookOpen } from "lucide-react"
+import { Menu } from "lucide-react"
 import { useState } from "react"
-import Link from "next/link"
-import Image from "next/image"
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -17,78 +13,67 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80 shadow-lg">
+      <header className="absolute top-0 left-0 right-0 z-50">
         <div className="container mx-auto px-4">
-          <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center">
-              <Image
-                src="/images/image.png"
-                alt="CNPJ Detector by ACT Digital"
-                width={200}
-                height={60}
-                className="h-auto w-auto max-h-[40px]"
-                priority
-              />
-            </div>
-
-            <nav className="hidden md:flex items-center gap-6">
+          <div className="flex h-16 items-center justify-end">
+            <nav className="hidden md:flex items-center gap-8">
               <button
                 onClick={() => scrollToSection("solucao")}
-                className="text-sm font-medium hover:text-primary transition-colors"
+                className="text-sm font-medium text-gray-700 hover:text-[#0052CC] transition-colors"
               >
                 Solução
               </button>
-              <Link
-                href="/wiki"
-                className="text-sm font-medium hover:text-primary transition-colors inline-flex items-center gap-1"
+              <button
+                onClick={() => scrollToSection("validador")}
+                className="text-sm font-medium text-gray-700 hover:text-[#0052CC] transition-colors"
               >
-                <BookOpen className="h-4 w-4" />
-                Wiki
-              </Link>
-              <Link href="/documentacao" className="text-sm font-medium hover:text-primary transition-colors">
-                Documentação
-              </Link>
-              <Link href="/login">
-                <Button className="bg-primary hover:bg-primary/90 shadow-lg" size="sm">
-                  Login
-                </Button>
-              </Link>
+                Validador
+              </button>
+              <button
+                onClick={() => scrollToSection("exemplos")}
+                className="text-sm font-medium text-gray-700 hover:text-[#0052CC] transition-colors"
+              >
+                Exemplos
+              </button>
+              <button
+                onClick={() => scrollToSection("login")}
+                className="text-sm font-medium text-gray-700 hover:text-[#0052CC] transition-colors"
+              >
+                Login
+              </button>
             </nav>
 
-            <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <button className="md:hidden text-gray-700" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               <Menu className="h-6 w-6" />
             </button>
           </div>
 
           {mobileMenuOpen && (
-            <nav className="md:hidden py-4 space-y-3 border-t border-border">
+            <nav className="md:hidden py-4 space-y-3 bg-white rounded-lg shadow-lg mt-2 p-4">
               <button
                 onClick={() => scrollToSection("solucao")}
-                className="block w-full text-left text-sm font-medium hover:text-primary transition-colors"
+                className="block w-full text-left text-sm font-medium text-gray-700 hover:text-[#0052CC] transition-colors"
               >
                 Solução
               </button>
-              <Link
-                href="/wiki"
-                className="block w-full text-left text-sm font-medium hover:text-primary transition-colors"
+              <button
+                onClick={() => scrollToSection("validador")}
+                className="block w-full text-left text-sm font-medium text-gray-700 hover:text-[#0052CC] transition-colors"
               >
-                <span className="inline-flex items-center gap-2">
-                  <BookOpen className="h-4 w-4" />
-                  Wiki
-                </span>
-              </Link>
-              <Link
-                href="/documentacao"
-                className="block w-full text-left text-sm font-medium hover:text-primary transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
+                Validador
+              </button>
+              <button
+                onClick={() => scrollToSection("exemplos")}
+                className="block w-full text-left text-sm font-medium text-gray-700 hover:text-[#0052CC] transition-colors"
               >
-                Documentação
-              </Link>
-              <Link href="/login" className="block">
-                <Button className="w-full bg-primary hover:bg-primary/90" size="sm">
-                  Login
-                </Button>
-              </Link>
+                Exemplos
+              </button>
+              <button
+                onClick={() => scrollToSection("login")}
+                className="block w-full text-left text-sm font-medium text-gray-700 hover:text-[#0052CC] transition-colors"
+              >
+                Login
+              </button>
             </nav>
           )}
         </div>
