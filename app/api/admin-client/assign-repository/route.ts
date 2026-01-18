@@ -29,31 +29,44 @@ export async function POST(request: NextRequest) {
 
     if (error) throw error
 
-    const { data: findings } = await supabase
-      .from("findings")
-      .select("*")
+    // Buscar findings através das analyses do repositório
+    const { data: analyses } = await supabase
+      .from("analyses")
+      .select("id")
       .eq("repository_id", repository_id)
-      .eq("status", "open")
 
-    if (findings && findings.length > 0) {
-      const tasks = findings.map((finding) => ({
-        title: `Fix: ${finding.issue_type}`,
-        description: finding.description,
-        repository_id: repository_id,
-        developer_id: developer_id,
-        client_id: client_id,
-        finding_id: finding.id,
-        status: "todo",
-        priority: finding.severity === "critical" ? "high" : finding.severity === "high" ? "medium" : "low",
-      }))
+    const analysisIds = analyses?.map((a: any) => a.id) || []
+    let findingsCount = 0
+    let findings: any[] = []
 
-      await supabase.from("kanban_tasks").insert(tasks)
+    if (analysisIds.length > 0) {
+      const { data: findingsData } = await supabase
+        .from("findings")
+        .select("id, file_path, suggestion, action_required")
+        .in("analysis_id", analysisIds)
+
+      if (findingsData && findingsData.length > 0) {
+        findings = findingsData
+        findingsCount = findings.length
+        
+        // Criar tarefas para cada finding
+        const tasks = findings.map((finding: any) => ({
+          title: `Corrigir: ${finding.file_path || "Arquivo"}`,
+          description: finding.suggestion || finding.action_required || "Verificar CNPJ",
+          assigned_to: developer_id,
+          client_id: client_id,
+          status: "pending",
+          priority: "medium",
+        }))
+
+        await supabase.from("tasks").insert(tasks)
+      }
     }
 
     return NextResponse.json({
       success: true,
       message: "Desenvolvedor atribuído com sucesso",
-      tasks_created: findings?.length || 0,
+      tasks_created: findingsCount,
     })
   } catch (error: any) {
     console.error("[API] Assign repository error:", error)

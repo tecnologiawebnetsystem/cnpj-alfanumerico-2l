@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       .from("users")
       .select("id, name, email, status, created_at")
       .eq("client_id", client_id)
-      .eq("role", "dev")
+      .ilike("role", "%dev%")
       .order("created_at", { ascending: false })
 
     if (error) {

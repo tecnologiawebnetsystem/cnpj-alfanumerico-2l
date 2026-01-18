@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { BarChart3, Users, TrendingUp } from "lucide-react"
+import { BarChart3, Users, TrendingUp, Key, FileCode, Database, ArrowRight, CheckCircle2, Clock, AlertCircle } from "lucide-react"
 import { getCurrentUser } from "@/lib/auth"
 
 interface StatsData {
@@ -43,258 +43,227 @@ export function ClientOverview({ onChangeTab, userRole }: ClientOverviewTabProps
 
   const loadStats = async () => {
     try {
-      console.log(" === ClientOverview loadStats START ===")
       const currentUser = getCurrentUser()
-      console.log(" CurrentUser from localStorage:", currentUser)
+      if (!currentUser) return
 
-      if (!currentUser) {
-        console.log(" No user found in loadStats")
-        return
-      }
-
-      console.log(" Fetching stats for user:", currentUser.id)
-      const statsUrl = `/api/client/stats?user_id=${currentUser.id}`
-      console.log(" Stats URL:", statsUrl)
-
-      const response = await fetch(statsUrl, {
+      const response = await fetch(`/api/client/stats?user_id=${currentUser.id}`, {
         credentials: "include",
       })
 
-      console.log(" Stats API response status:", response.status)
-      console.log(" Stats API response ok:", response.ok)
-
       if (response.ok) {
         const data = await response.json()
-        console.log(" Stats data received:", data)
         setStats(data)
-      } else {
-        const errorText = await response.text()
-        console.error(" Stats API error:", errorText)
       }
-      console.log(" === ClientOverview loadStats END ===")
     } catch (error) {
-      console.error(" Error loading stats:", error)
+      console.error("Error loading stats:", error)
     } finally {
       setLoading(false)
     }
   }
 
-  const statCards = [
-    {
-      title: "Total de Desenvolvedores",
-      value: stats.totalDevs,
-      subtitle: `${stats.activeDevs} ativos`,
-      icon: Users,
-      gradient: "from-blue-500 to-purple-600",
-      bgGradient: "from-blue-50 to-purple-50",
-      onClick: () => onChangeTab("devs"),
-    },
-    {
-      title: "Tarefas Concluídas",
-      value: stats.completedTasks,
-      subtitle: `${stats.totalTasks} total`,
-      icon: TrendingUp,
-      gradient: "from-green-500 to-emerald-600",
-      bgGradient: "from-green-50 to-emerald-50",
-      onClick: () => onChangeTab("tarefas"),
-    },
-    {
-      title: "Visão Geral",
-      value: Math.round((stats.completedTasks / (stats.totalTasks || 1)) * 100) + "%",
-      subtitle: "Taxa de conclusão",
-      icon: BarChart3,
-      gradient: "from-purple-500 to-pink-600",
-      bgGradient: "from-purple-50 to-pink-50",
-      onClick: () => {
-        alert(
-          `Visão Geral Detalhada:\n\n` +
-            `Total de Tarefas: ${stats.totalTasks}\n` +
-            `Pendentes: ${stats.pendingTasks}\n` +
-            `Em Progresso: ${stats.inProgressTasks}\n` +
-            `Concluídas: ${stats.completedTasks}\n\n` +
-            `Taxa de Conclusão: ${Math.round((stats.completedTasks / (stats.totalTasks || 1)) * 100)}%`,
-        )
-      },
-    },
-  ]
+  const completionRate = Math.round((stats.completedTasks / (stats.totalTasks || 1)) * 100)
 
   if (loading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {[...Array(3)].map((_, i) => (
-          <Card key={i} className="animate-pulse">
-            <CardHeader className="pb-2">
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-            </CardHeader>
-            <CardContent>
-              <div className="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
-              <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="space-y-6">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-28 bg-muted animate-pulse rounded-lg" />
+          ))}
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-40 bg-muted animate-pulse rounded-lg" />
+          ))}
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-6 md:mb-8">
-        <Card className="cursor-pointer hover:shadow-lg transition-all border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
-          <CardHeader className="pb-2 md:pb-3">
-            <CardTitle className="text-sm md:text-base font-medium text-gray-700 flex items-center gap-2">
-              <div className="p-2 md:p-3 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 md:h-6 md:w-6 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-                  />
-                </svg>
+    <div className="space-y-8">
+      {/* Page Header */}
+      <div>
+        <h1 className="text-2xl font-semibold text-foreground">Visao Geral</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Acompanhe o progresso das analises e tarefas do seu projeto
+        </p>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Card className="border border-border hover:border-primary/20 transition-colors cursor-pointer" onClick={() => onChangeTab("devs")}>
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Desenvolvedores</p>
+                <p className="text-2xl font-semibold mt-1">{stats.totalDevs}</p>
+                <p className="text-xs text-muted-foreground mt-1">{stats.activeDevs} ativos</p>
               </div>
-              <span className="text-sm md:text-base font-semibold">Gerenciar Contas</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs md:text-sm text-gray-600 mb-3 md:mb-4">
-              Cadastre contas do GitHub, GitLab, Bitbucket ou Azure DevOps
-            </p>
-            <Button
-              variant="ghost"
-              className="inline-flex items-center text-xs md:text-sm font-medium text-blue-600 hover:text-blue-700 p-0 h-auto"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                router.push("/integrations")
-              }}
-            >
-              Acessar
-              <svg className="ml-1 h-3 w-3 md:h-4 md:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Button>
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Users className="h-5 w-5 text-primary" />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:shadow-lg transition-all border-0 bg-gradient-to-br from-purple-50 to-pink-50">
-          <CardHeader className="pb-2 md:pb-3">
-            <CardTitle className="text-sm md:text-base font-medium text-gray-700 flex items-center gap-2">
-              <div className="p-2 md:p-3 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 md:h-6 md:w-6 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
+        <Card className="border border-border hover:border-green-500/20 transition-colors">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Concluidas</p>
+                <p className="text-2xl font-semibold mt-1 text-green-600">{stats.completedTasks}</p>
+                <p className="text-xs text-muted-foreground mt-1">de {stats.totalTasks} tarefas</p>
               </div>
-              <span className="text-sm md:text-base font-semibold">Analisar Repositório</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs md:text-sm text-gray-600 mb-3 md:mb-4">
-              Envie um repositório para identificar campos CNPJ
-            </p>
-            <Button
-              variant="ghost"
-              className="inline-flex items-center text-xs md:text-sm font-medium text-purple-600 hover:text-purple-700 p-0 h-auto"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                router.push("/analyzer")
-              }}
-            >
-              Iniciar
-              <svg className="ml-1 h-3 w-3 md:h-4 md:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Button>
+              <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                <CheckCircle2 className="h-5 w-5 text-green-600" />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:shadow-lg transition-all border-0 bg-gradient-to-br from-teal-50 to-green-50 md:col-span-2 lg:col-span-1">
-          <CardHeader className="pb-2 md:pb-3">
-            <CardTitle className="text-sm md:text-base font-medium text-gray-700 flex items-center gap-2">
-              <div className="p-2 md:p-3 rounded-lg bg-gradient-to-br from-teal-500 to-green-600">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 md:h-6 md:w-6 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"
-                  />
-                </svg>
+        <Card className="border border-border hover:border-amber-500/20 transition-colors">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Em Progresso</p>
+                <p className="text-2xl font-semibold mt-1 text-amber-600">{stats.inProgressTasks}</p>
+                <p className="text-xs text-muted-foreground mt-1">{stats.pendingTasks} pendentes</p>
               </div>
-              <span className="text-sm md:text-base font-semibold">Banco de Dados</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs md:text-sm text-gray-600 mb-3 md:mb-4">Analisar tabelas e campos do banco de dados</p>
-            <Button
-              variant="ghost"
-              className="inline-flex items-center text-xs md:text-sm font-medium text-teal-600 hover:text-teal-700 p-0 h-auto"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                router.push("/database-analyzer")
-              }}
-            >
-              Acessar
-              <svg className="ml-1 h-3 w-3 md:h-4 md:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Button>
+              <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                <Clock className="h-5 w-5 text-amber-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-border hover:border-primary/20 transition-colors">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Taxa de Conclusao</p>
+                <p className="text-2xl font-semibold mt-1">{completionRate}%</p>
+                <div className="mt-2 h-1.5 w-24 bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-primary rounded-full transition-all"
+                    style={{ width: `${completionRate}%` }}
+                  />
+                </div>
+              </div>
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <TrendingUp className="h-5 w-5 text-primary" />
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {statCards.map((stat, index) => {
-          const Icon = stat.icon
-          return (
-            <Card
-              key={index}
-              className={`cursor-pointer hover:shadow-lg transition-all border-0 bg-gradient-to-br ${stat.bgGradient}`}
-              onClick={stat.onClick}
-            >
-              <CardHeader className="pb-2 md:pb-3">
-                <CardTitle className="text-sm md:text-base font-medium text-gray-700 flex items-center gap-2">
-                  <div className={`p-2 md:p-2.5 rounded-lg bg-gradient-to-br ${stat.gradient}`}>
-                    <Icon className="h-4 w-4 md:h-5 md:w-5 text-white" />
-                  </div>
-                  <span className="text-sm md:text-base">{stat.title}</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div
-                  className={`text-2xl md:text-3xl font-bold bg-gradient-to-br ${stat.gradient} bg-clip-text text-transparent`}
-                >
-                  {stat.value}
+      {/* Quick Actions */}
+      <div>
+        <h2 className="text-lg font-medium text-foreground mb-4">Acoes Rapidas</h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <Card className="group border border-border hover:border-primary/30 hover:shadow-sm transition-all cursor-pointer" onClick={() => router.push("/integrations")}>
+            <CardContent className="p-5">
+              <div className="flex items-start gap-4">
+                <div className="h-11 w-11 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Key className="h-5 w-5 text-primary" />
                 </div>
-                <p className="text-xs md:text-sm text-gray-600 mt-1">{stat.subtitle}</p>
-              </CardContent>
-            </Card>
-          )
-        })}
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">
+                    Gerenciar Contas
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                    Cadastre contas do GitHub, GitLab, Bitbucket ou Azure DevOps
+                  </p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0 mt-1" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="group border border-border hover:border-primary/30 hover:shadow-sm transition-all cursor-pointer" onClick={() => router.push("/analyzer")}>
+            <CardContent className="p-5">
+              <div className="flex items-start gap-4">
+                <div className="h-11 w-11 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <FileCode className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">
+                    Analisar Repositorio
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                    Envie um repositorio para identificar campos CNPJ
+                  </p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0 mt-1" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="group border border-border hover:border-primary/30 hover:shadow-sm transition-all cursor-pointer sm:col-span-2 lg:col-span-1" onClick={() => router.push("/database-analyzer")}>
+            <CardContent className="p-5">
+              <div className="flex items-start gap-4">
+                <div className="h-11 w-11 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Database className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">
+                    Banco de Dados
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                    Analisar tabelas e campos do banco de dados
+                  </p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0 mt-1" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Summary Section */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card className="border border-border">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-medium text-foreground">Repositorios</h3>
+              <Button variant="ghost" size="sm" className="text-primary h-8" onClick={() => onChangeTab("analise")}>
+                Ver todos
+                <ArrowRight className="h-3 w-3 ml-1" />
+              </Button>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="h-16 w-16 rounded-lg bg-muted flex items-center justify-center">
+                <BarChart3 className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-3xl font-semibold">{stats.totalRepositories}</p>
+                <p className="text-sm text-muted-foreground">repositorios cadastrados</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-border">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-medium text-foreground">Analises</h3>
+              <Button variant="ghost" size="sm" className="text-primary h-8" onClick={() => onChangeTab("relatorios")}>
+                Ver relatorios
+                <ArrowRight className="h-3 w-3 ml-1" />
+              </Button>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="h-16 w-16 rounded-lg bg-muted flex items-center justify-center">
+                <AlertCircle className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-3xl font-semibold">{stats.totalAnalyses}</p>
+                <p className="text-sm text-muted-foreground">analises realizadas</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

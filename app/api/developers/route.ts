@@ -12,28 +12,39 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createClient()
 
+    // Buscar desenvolvedores
     const { data: developers, error } = await supabase
       .from("users")
-      .select(
-        `
-        id,
-        name,
-        email,
-        kanban_tasks!developer_id (
-          id
-        )
-      `,
-      )
+      .select("id, name, email, status")
       .eq("client_id", client_id)
-      .eq("role", "dev")
+      .ilike("role", "%dev%")
 
     if (error) throw error
+
+    // Buscar contagem de tarefas separadamente
+    const devIds = developers?.map((d: any) => d.id) || []
+    let tasksCounts = new Map<string, number>()
+
+    if (devIds.length > 0) {
+      const { data: tasks } = await supabase
+        .from("tasks")
+        .select("assigned_to")
+        .in("assigned_to", devIds)
+
+      if (tasks) {
+        tasks.forEach((task: any) => {
+          const count = tasksCounts.get(task.assigned_to) || 0
+          tasksCounts.set(task.assigned_to, count + 1)
+        })
+      }
+    }
 
     const formattedDevelopers = developers?.map((dev: any) => ({
       id: dev.id,
       name: dev.name,
       email: dev.email,
-      tasks_count: dev.kanban_tasks?.length || 0,
+      status: dev.status,
+      tasks_count: tasksCounts.get(dev.id) || 0,
     }))
 
     return NextResponse.json(formattedDevelopers || [])

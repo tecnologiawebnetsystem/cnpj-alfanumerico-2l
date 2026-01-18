@@ -21,10 +21,10 @@ export async function GET(request: NextRequest) {
         .select(
           `
           *,
-          findings!repository_id (id),
-          repository_assignments!repository_id (
+          analyses (id, findings:findings(id)),
+          repository_assignments (
             developer_id,
-            users!developer_id (name)
+            users:users!developer_id (name)
           )
         `,
         )
@@ -35,12 +35,20 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error
 
-    const formattedRepos = repositories?.map((repo: any) => ({
-      ...repo,
-      findings_count: repo.findings?.length || 0,
-      assigned_developer_id: repo.repository_assignments?.[0]?.developer_id,
-      assigned_developer_name: repo.repository_assignments?.[0]?.users?.name,
-    }))
+    const formattedRepos = repositories?.map((repo: any) => {
+      // Count findings from all analyses
+      const findingsCount = repo.analyses?.reduce((acc: number, analysis: any) => {
+        return acc + (analysis.findings?.length || 0)
+      }, 0) || 0
+
+      return {
+        ...repo,
+        findings_count: findingsCount,
+        assigned_developer_id: repo.repository_assignments?.[0]?.developer_id,
+        assigned_developer_name: repo.repository_assignments?.[0]?.users?.name,
+        analyses: undefined, // Remove analyses from response
+      }
+    })
 
     return NextResponse.json(formattedRepos || [])
   } catch (error: any) {

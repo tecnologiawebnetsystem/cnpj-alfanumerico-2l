@@ -91,13 +91,21 @@ export async function GET(request: NextRequest) {
       // Enrich tasks with repository and user info
       const enrichedTasks = tasks.map((task) => {
         const repositoryId = task.analysis_id ? analysisMap.get(task.analysis_id) : null
-        const repositoryName = repositoryId ? repositoryMap.get(repositoryId) : null
+        const repositoryName = repositoryId ? repositoryMap.get(repositoryId) : task.repository_name
 
         return {
           ...task,
-          repository_name: repositoryName || "Repositório não identificado",
-          file_path: task.description?.match(/Arquivo: (.+)/)?.[1] || task.title?.match(/`(.+)`/)?.[1] || null,
-          assigned_to_name: userMap.get(task.assigned_to) || "Desenvolvedor não identificado",
+          repository_name: repositoryName || "Repositorio nao identificado",
+          // Usar campos diretos se disponiveis, senao extrair da descricao
+          file_path: task.file_path || task.description?.match(/Arquivo: (.+)/)?.[1] || task.title?.match(/`(.+)`/)?.[1] || null,
+          line_number: task.line_number || null,
+          source_code: task.source_code || task.code_original || null,
+          suggested_code: task.suggested_code || null,
+          code_before: task.code_before || null,
+          code_after: task.code_after || null,
+          ai_explanation: task.ai_explanation || null,
+          ai_confidence: task.ai_confidence || null,
+          assigned_to_name: userMap.get(task.assigned_to) || "Desenvolvedor nao identificado",
         }
       })
 

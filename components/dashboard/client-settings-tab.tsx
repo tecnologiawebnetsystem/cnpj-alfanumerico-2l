@@ -7,17 +7,30 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
-import { Plus, X, Save, Loader2, Settings } from "lucide-react"
+import { Switch } from "@/components/ui/switch"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Plus, X, Save, Loader2, Settings, Brain, Eye, EyeOff, CheckCircle2, AlertCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface ClientSettingsTabProps {
   clientId: string
 }
 
+interface AISettings {
+  provider: string
+  model_name: string
+  temperature: number
+  max_tokens: number
+  is_active: boolean
+  has_api_key: boolean
+  api_key_masked: string
+}
+
 export function ClientSettingsTab({ clientId }: ClientSettingsTabProps) {
   const { toast } = useToast()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [savingAI, setSavingAI] = useState(false)
 
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
@@ -29,8 +42,22 @@ export function ClientSettingsTab({ clientId }: ClientSettingsTabProps) {
   const [fileExtensions, setFileExtensions] = useState<string[]>([])
   const [newExtension, setNewExtension] = useState("")
 
+  // AI Settings
+  const [aiSettings, setAISettings] = useState<AISettings>({
+    provider: "gemini",
+    model_name: "gemini-1.5-flash",
+    temperature: 0.3,
+    max_tokens: 4096,
+    is_active: false,
+    has_api_key: false,
+    api_key_masked: "",
+  })
+  const [newApiKey, setNewApiKey] = useState("")
+  const [showApiKey, setShowApiKey] = useState(false)
+
   useEffect(() => {
     loadSettings()
+    loadAISettings()
   }, [clientId])
 
   const loadSettings = async () => {
@@ -82,13 +109,81 @@ export function ClientSettingsTab({ clientId }: ClientSettingsTabProps) {
       console.log(" Final state - CNPJ fields:", parsedCnpjFields, "Extensions:", parsedExtensions)
       setLoading(false)
     } catch (error) {
-      console.error(" Erro ao carregar configurações:", error)
+      console.error("Erro ao carregar configuracoes:", error)
       toast({
         title: "Erro",
-        description: "Não foi possível carregar as configurações",
+        description: "Nao foi possivel carregar as configuracoes",
         variant: "destructive",
       })
       setLoading(false)
+    }
+  }
+
+  const loadAISettings = async () => {
+    try {
+      const response = await fetch(`/api/client/ai-settings?client_id=${clientId}`)
+      if (response.ok) {
+        const data = await response.json()
+        setAISettings({
+          provider: data.provider || "gemini",
+          model_name: data.model_name || "gemini-1.5-flash",
+          temperature: data.temperature ?? 0.3,
+          max_tokens: data.max_tokens || 4096,
+          is_active: data.is_active ?? false,
+          has_api_key: data.has_api_key ?? false,
+          api_key_masked: data.api_key_masked || "",
+        })
+      }
+    } catch (error) {
+      console.error("Erro ao carregar configuracoes de IA:", error)
+    }
+  }
+
+  const saveAISettings = async () => {
+    setSavingAI(true)
+    try {
+      const payload: any = {
+        client_id: clientId,
+        model_name: aiSettings.model_name,
+        temperature: aiSettings.temperature,
+        max_tokens: aiSettings.max_tokens,
+        is_active: aiSettings.is_active,
+      }
+
+      if (newApiKey.trim()) {
+        payload.api_key = newApiKey.trim()
+      }
+
+      const response = await fetch("/api/client/ai-settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) throw new Error("Erro ao salvar configuracoes de IA")
+
+      const result = await response.json()
+      
+      setAISettings({
+        ...aiSettings,
+        has_api_key: result.settings?.has_api_key ?? aiSettings.has_api_key,
+        api_key_masked: result.settings?.api_key_masked ?? aiSettings.api_key_masked,
+      })
+      setNewApiKey("")
+
+      toast({
+        title: "Sucesso",
+        description: "Configuracoes de IA salvas com sucesso",
+      })
+    } catch (error) {
+      console.error("Erro ao salvar configuracoes de IA:", error)
+      toast({
+        title: "Erro",
+        description: "Nao foi possivel salvar as configuracoes de IA",
+        variant: "destructive",
+      })
+    } finally {
+      setSavingAI(false)
     }
   }
 
@@ -217,6 +312,156 @@ export function ClientSettingsTab({ clientId }: ClientSettingsTabProps) {
       </div>
 
       <Separator />
+
+      {/* AI Settings Section */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Brain className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <CardTitle>Configuracoes de IA (Gemini)</CardTitle>
+                <CardDescription>Configure a integracao com IA para analise inteligente de codigo</CardDescription>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              {aiSettings.is_active && aiSettings.has_api_key ? (
+                <Badge className="bg-green-100 text-green-700">
+                  <CheckCircle2 className="h-3 w-3 mr-1" />
+                  Ativa
+                </Badge>
+              ) : (
+                <Badge variant="secondary">
+                  <AlertCircle className="h-3 w-3 mr-1" />
+                  Inativa
+                </Badge>
+              )}
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* API Key */}
+          <div className="space-y-2">
+            <Label htmlFor="apiKey">Chave da API (Google AI Studio)</Label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Input
+                  id="apiKey"
+                  type={showApiKey ? "text" : "password"}
+                  placeholder={aiSettings.has_api_key ? aiSettings.api_key_masked : "Cole sua API Key aqui..."}
+                  value={newApiKey}
+                  onChange={(e) => setNewApiKey(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowApiKey(!showApiKey)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Obtenha sua API Key em{" "}
+              <a
+                href="https://aistudio.google.com/apikey"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                aistudio.google.com/apikey
+              </a>
+            </p>
+          </div>
+
+          {/* Model Selection */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="model">Modelo</Label>
+              <Select
+                value={aiSettings.model_name}
+                onValueChange={(value) => setAISettings({ ...aiSettings, model_name: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o modelo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="gemini-1.5-flash">Gemini 1.5 Flash (Rapido)</SelectItem>
+                  <SelectItem value="gemini-1.5-pro">Gemini 1.5 Pro (Avancado)</SelectItem>
+                  <SelectItem value="gemini-2.0-flash">Gemini 2.0 Flash (Mais Recente)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="temperature">Temperatura: {aiSettings.temperature}</Label>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.1"
+                value={aiSettings.temperature}
+                onChange={(e) => setAISettings({ ...aiSettings, temperature: parseFloat(e.target.value) })}
+                className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
+              />
+              <p className="text-xs text-muted-foreground">
+                Menor = mais preciso, Maior = mais criativo
+              </p>
+            </div>
+          </div>
+
+          {/* Max Tokens */}
+          <div className="space-y-2">
+            <Label htmlFor="maxTokens">Max Tokens</Label>
+            <Select
+              value={aiSettings.max_tokens.toString()}
+              onValueChange={(value) => setAISettings({ ...aiSettings, max_tokens: parseInt(value) })}
+            >
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="2048">2048 (Economico)</SelectItem>
+                <SelectItem value="4096">4096 (Padrao)</SelectItem>
+                <SelectItem value="8192">8192 (Detalhado)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Active Toggle */}
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <Label>Ativar Analise com IA</Label>
+              <p className="text-sm text-muted-foreground">
+                Quando ativa, a IA analisara cada finding e gerara sugestoes detalhadas
+              </p>
+            </div>
+            <Switch
+              checked={aiSettings.is_active}
+              onCheckedChange={(checked) => setAISettings({ ...aiSettings, is_active: checked })}
+            />
+          </div>
+
+          {/* Save Button */}
+          <div className="flex justify-end">
+            <Button onClick={saveAISettings} disabled={savingAI}>
+              {savingAI ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Salvar Configuracoes de IA
+                </>
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* CNPJ Fields Section */}
       <Card>

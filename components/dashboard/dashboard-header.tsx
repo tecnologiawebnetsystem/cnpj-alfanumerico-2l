@@ -2,42 +2,38 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
 import { NotificationsPanel } from "@/components/notifications/notifications-panel"
 import { ProfileDropdown } from "@/components/profile/profile-dropdown"
-import { WorkerStatusIndicator } from "@/components/worker-status-indicator"
 
 interface DashboardHeaderProps {
   user?: any
 }
 
 export function DashboardHeader({ user }: DashboardHeaderProps) {
-  const router = useRouter()
-
-  const handleLogout = async () => {
-    localStorage.removeItem("user")
-    router.push("/login")
-  }
-
   return (
-    <header className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-      <div className="container mx-auto px-4 py-3 md:py-3.5 lg:py-4">
-        <div className="flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-2 md:gap-3">
+    <header className="sticky top-0 z-50 h-16 border-b border-border bg-card">
+      <div className="h-full px-4 lg:px-6">
+        <div className="flex h-full items-center justify-between">
+          {/* Logo */}
+          <Link href="/dashboard" className="flex items-center gap-3">
             <Image
               src="/images/image.png"
-              alt="CNPJ Detector by ACT Digital"
-              width={200}
-              height={60}
-              className="h-auto w-auto max-h-[28px] md:max-h-[32px] lg:max-h-[36px]"
+              alt="CNPJ Detector"
+              width={180}
+              height={50}
+              className="h-8 w-auto"
               priority
             />
-            <span className="hidden sm:inline text-xs md:text-sm font-medium text-muted-foreground">Dashboard</span>
+            <div className="hidden md:flex items-center gap-2">
+              <span className="text-border">/</span>
+              <span className="text-sm font-medium text-foreground">Dashboard</span>
+            </div>
           </Link>
 
-          <div className="flex items-center gap-2 md:gap-3 lg:gap-4">
+          {/* Right Actions */}
+          <div className="flex items-center gap-2">
             <NotificationsPanel />
-            <WorkerStatusIndicator />
+            <div className="w-px h-6 bg-border mx-1 hidden sm:block" />
             <ProfileDropdown user={user} />
           </div>
         </div>
