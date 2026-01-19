@@ -64,6 +64,13 @@ export async function POST(request: NextRequest) {
       // SHA-256 hash - use Node.js crypto
       const inputHash = crypto.createHash("sha256").update(password).digest("hex")
       const storedHashClean = storedHash.replace(/[\r\n\s]/g, "").substring(0, 64)
+      console.log("[v0] SHA-256 comparison:", {
+        inputHash: inputHash.substring(0, 20) + "...",
+        storedHash: storedHashClean.substring(0, 20) + "...",
+        inputFull: inputHash,
+        storedFull: storedHashClean,
+        match: inputHash.toLowerCase() === storedHashClean.toLowerCase()
+      })
       isValid = inputHash.toLowerCase() === storedHashClean.toLowerCase()
     } else {
       // Direct comparison for plain text (development only - NOT recommended)
