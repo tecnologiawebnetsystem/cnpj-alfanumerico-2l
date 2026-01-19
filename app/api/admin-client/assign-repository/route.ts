@@ -60,6 +60,27 @@ export async function POST(request: NextRequest) {
         }))
 
         await supabase.from("tasks").insert(tasks)
+
+        // Create notification for the developer
+        try {
+          // Get repository name
+          const { data: repo } = await supabase
+            .from("repositories")
+            .select("name")
+            .eq("id", repository_id)
+            .single()
+
+          await supabase.from("notifications").insert({
+            user_id: developer_id,
+            type: "task_assigned",
+            title: "Repositorio atribuido",
+            message: `Voce foi atribuido ao repositorio "${repo?.name || "Repositorio"}" com ${findingsCount} tarefa(s) pendente(s).`,
+            data: { repository_id, tasks_count: findingsCount },
+            read: false,
+          })
+        } catch (notifError) {
+          console.error("Error creating notification:", notifError)
+        }
       }
     }
 

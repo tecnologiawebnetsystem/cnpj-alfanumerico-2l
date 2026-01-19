@@ -5,13 +5,25 @@ import { useRouter } from "next/navigation"
 import { getCurrentUser } from "@/lib/auth"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ListTodo, Loader2, Play, CheckCircle2, Clock, Code } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { 
+  ListTodo, 
+  Loader2, 
+  Play, 
+  CheckCircle2, 
+  Clock, 
+  Search, 
+  GitBranch, 
+  FileCode, 
+  ChevronRight,
+  AlertTriangle,
+  Target
+} from "lucide-react"
 import { DevTaskDetail } from "@/components/dev/dev-task-detail"
-import Image from "next/image"
-import Link from "next/link"
+import { DevHeader } from "@/components/dev/dev-header"
+import { useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 
 interface Task {
   id: string
@@ -25,12 +37,16 @@ interface Task {
   completed_at: string | null
 }
 
+const Loading = () => null
+
 export default function DevTasksPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [tasks, setTasks] = useState<Task[]>([])
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
+  const [searchTerm, setSearchTerm] = useState("")
 
   useEffect(() => {
     const currentUser = getCurrentUser()
@@ -52,44 +68,76 @@ export default function DevTasksPage() {
     try {
       const res = await fetch(`/api/dev/tasks?user_id=${userId}&include_details=true`)
       const data = await res.json()
-      setTasks(data)
+      setTasks(data || [])
     } catch (error) {
       console.error("Error fetching tasks:", error)
+      setTasks([])
     } finally {
       setLoading(false)
     }
   }
 
   const filterTasks = (status: string) => {
-    return tasks.filter((t) => t.status === status)
+    let filtered = tasks.filter((t) => t.status === status)
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (t) =>
+          t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          t.repository_name?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    }
+    return filtered
+  }
+
+  const getAllFilteredTasks = () => {
+    if (!searchTerm) return tasks
+    return tasks.filter(
+      (t) =>
+        t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        t.repository_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
   }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
         return (
-          <Badge className="bg-orange-100 text-orange-800">
-            <Clock className="h-3 w-3 mr-1" />
+          <Badge className="bg-orange-100 text-orange-700 border border-orange-200 text-[10px] px-1.5 py-0">
+            <Clock className="h-2.5 w-2.5 mr-1" />
             Pendente
           </Badge>
         )
       case "in_progress":
         return (
-          <Badge className="bg-blue-100 text-blue-800">
-            <Play className="h-3 w-3 mr-1" />
+          <Badge className="bg-blue-100 text-blue-700 border border-blue-200 text-[10px] px-1.5 py-0">
+            <Play className="h-2.5 w-2.5 mr-1" />
             Em Progresso
           </Badge>
         )
       case "completed":
         return (
-          <Badge className="bg-green-100 text-green-800">
-            <CheckCircle2 className="h-3 w-3 mr-1" />
-            Concluída
+          <Badge className="bg-green-100 text-green-700 border border-green-200 text-[10px] px-1.5 py-0">
+            <CheckCircle2 className="h-2.5 w-2.5 mr-1" />
+            Concluida
           </Badge>
         )
       default:
         return null
     }
+  }
+
+  const getPriorityBadge = (priority: string) => {
+    const colors: Record<string, string> = {
+      critical: "bg-red-100 text-red-700 border-red-200",
+      high: "bg-orange-100 text-orange-700 border-orange-200",
+      medium: "bg-yellow-100 text-yellow-700 border-yellow-200",
+      low: "bg-green-100 text-green-700 border-green-200",
+    }
+    return (
+      <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${colors[priority] || "bg-gray-100 text-gray-700"}`}>
+        {priority}
+      </Badge>
+    )
   }
 
   const handleUpdateStatus = async (taskId: string, newStatus: string) => {
@@ -113,134 +161,247 @@ export default function DevTasksPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Carregando suas tarefas...</p>
+        </div>
       </div>
     )
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-primary/5 to-slate-50">
-      <div className="bg-gradient-to-r from-primary to-primary/80 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <Image
-                src="/images/act-logo-square.jfif"
-                alt="ACT Digital"
-                width={48}
-                height={48}
-                className="rounded-xl shadow-lg"
-              />
-              <div>
-                <h1 className="text-2xl font-bold text-white">Minhas Tarefas</h1>
-                <p className="text-primary-foreground/80">{user?.name}</p>
-              </div>
+  if (!user) return null
+
+  const TaskCard = ({ task }: { task: Task }) => (
+    <Card 
+      className={`cursor-pointer transition-all hover:shadow-sm border-l-4 ${
+        selectedTask?.id === task.id 
+          ? "ring-2 ring-primary border-l-primary bg-primary/5" 
+          : "border-l-transparent hover:border-l-primary/50"
+      }`}
+      onClick={() => setSelectedTask(task)}
+    >
+      <CardContent className="p-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 mb-1.5">
+              {getStatusBadge(task.status)}
+              {getPriorityBadge(task.priority)}
             </div>
-            <div className="flex items-center gap-2">
-              <Link href="/documentacao">
-                <Button
-                  variant="outline"
-                  className="gap-2 bg-white/10 border-white/20 text-white hover:bg-white/20"
-                >
-                  <Code className="h-4 w-4" />
-                  Documentacao
-                </Button>
-              </Link>
-              <Button
-                onClick={() => router.push("/dev/board")}
-                variant="outline"
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-              >
-                Ver Board Kanban
-              </Button>
+            <h3 className="font-medium text-sm text-foreground line-clamp-1">
+              {task.title}
+            </h3>
+            <p className="text-xs text-muted-foreground line-clamp-1 mt-1">
+              {task.description}
+            </p>
+            
+            <div className="flex flex-wrap items-center gap-2 mt-2 text-[10px] text-muted-foreground">
+              {task.repository_name && (
+                <div className="flex items-center gap-1">
+                  <GitBranch className="h-2.5 w-2.5 text-blue-500" />
+                  <span className="truncate max-w-[120px]">{task.repository_name}</span>
+                </div>
+              )}
+              {task.file_path && (
+                <div className="flex items-center gap-1">
+                  <FileCode className="h-2.5 w-2.5" />
+                  <span className="font-mono truncate max-w-[120px]">{task.file_path}</span>
+                </div>
+              )}
             </div>
           </div>
+          <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
         </div>
-      </div>
+      </CardContent>
+    </Card>
+  )
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  const criticalTasks = tasks.filter(t => t.priority === "critical" && t.status !== "completed")
+  const completionRate = tasks.length > 0 
+    ? Math.round((filterTasks("completed").length / tasks.length) * 100) 
+    : 0
+
+  return (
+    <div className="min-h-screen bg-muted/30">
+      <DevHeader user={user} activeView="tasks" />
+
+      <main className="container mx-auto px-4 py-6 max-w-7xl">
+        {/* Page Title */}
+        <div className="mb-6">
+          <h1 className="text-xl font-semibold text-foreground">Minhas Tarefas</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Gerencie e acompanhe suas tarefas atribuidas
+          </p>
+        </div>
+
+        {/* Stats Cards - Compact */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+          <Card className="bg-card">
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Total</p>
+                  <p className="text-2xl font-bold">{tasks.length}</p>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                  <ListTodo className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-card border-orange-200">
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] text-orange-600 uppercase tracking-wide">Pendentes</p>
+                  <p className="text-2xl font-bold text-orange-700">{filterTasks("pending").length}</p>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                  <Clock className="h-4 w-4 text-orange-500" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-card border-blue-200">
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] text-blue-600 uppercase tracking-wide">Em Progresso</p>
+                  <p className="text-2xl font-bold text-blue-700">{filterTasks("in_progress").length}</p>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                  <Play className="h-4 w-4 text-blue-500" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-card border-green-200">
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] text-green-600 uppercase tracking-wide">Concluidas</p>
+                  <p className="text-2xl font-bold text-green-700">{filterTasks("completed").length}</p>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                  <CheckCircle2 className="h-4 w-4 text-green-500" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card">
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Progresso</p>
+                  <p className="text-2xl font-bold">{completionRate}%</p>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Target className="h-4 w-4 text-primary" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Alert for critical tasks */}
+        {criticalTasks.length > 0 && (
+          <Card className="mb-6 border-red-200 bg-red-50">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-red-500" />
+                <span className="text-sm font-medium text-red-700">
+                  Voce tem {criticalTasks.length} tarefa(s) critica(s) pendente(s)
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Task List */}
           <div className="lg:col-span-2">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ListTodo className="h-5 w-5" />
-                  Lista de Tarefas ({tasks.length})
-                </CardTitle>
+              <CardHeader className="pb-3 px-4 pt-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <ListTodo className="h-4 w-4" />
+                    Tarefas
+                  </CardTitle>
+                  <div className="relative w-full sm:w-56">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                    <Input
+                      placeholder="Buscar tarefas..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-8 h-8 text-sm"
+                    />
+                  </div>
+                </div>
               </CardHeader>
-              <CardContent>
-                <Tabs defaultValue="all" className="w-full">
-                  <TabsList className="grid w-full grid-cols-4">
-                    <TabsTrigger value="all">Todas ({tasks.length})</TabsTrigger>
-                    <TabsTrigger value="pending">Pendentes ({filterTasks("pending").length})</TabsTrigger>
-                    <TabsTrigger value="in_progress">Em Progresso ({filterTasks("in_progress").length})</TabsTrigger>
-                    <TabsTrigger value="completed">Concluídas ({filterTasks("completed").length})</TabsTrigger>
-                  </TabsList>
+              <CardContent className="px-4 pb-4">
+                <Suspense fallback={<Loading />}>
+                  <Tabs defaultValue="all" className="w-full">
+                    <TabsList className="grid w-full grid-cols-4 h-8">
+                      <TabsTrigger value="all" className="text-xs">
+                        Todas ({getAllFilteredTasks().length})
+                      </TabsTrigger>
+                      <TabsTrigger value="pending" className="text-xs">
+                        Pendentes ({filterTasks("pending").length})
+                      </TabsTrigger>
+                      <TabsTrigger value="in_progress" className="text-xs">
+                        Progresso ({filterTasks("in_progress").length})
+                      </TabsTrigger>
+                      <TabsTrigger value="completed" className="text-xs">
+                        Concluidas ({filterTasks("completed").length})
+                      </TabsTrigger>
+                    </TabsList>
 
-                  {["all", "pending", "in_progress", "completed"].map((tabValue) => (
-                    <TabsContent key={tabValue} value={tabValue} className="mt-4">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Tarefa</TableHead>
-                            <TableHead>Repositório</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Ações</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {(tabValue === "all" ? tasks : filterTasks(tabValue)).map((task) => (
-                            <TableRow key={task.id}>
-                              <TableCell>
-                                <div>
-                                  <div className="font-medium">{task.title}</div>
-                                  <div className="text-sm text-muted-foreground truncate max-w-md">
-                                    {task.description}
-                                  </div>
-                                </div>
-                              </TableCell>
-                              <TableCell>
-                                <code className="text-sm">{task.repository_name}</code>
-                              </TableCell>
-                              <TableCell>{getStatusBadge(task.status)}</TableCell>
-                              <TableCell>
-                                <Button variant="outline" size="sm" onClick={() => setSelectedTask(task)}>
-                                  Ver Detalhes
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                          {(tabValue === "all" ? tasks : filterTasks(tabValue)).length === 0 && (
-                            <TableRow>
-                              <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                                Nenhuma tarefa encontrada
-                              </TableCell>
-                            </TableRow>
-                          )}
-                        </TableBody>
-                      </Table>
-                    </TabsContent>
-                  ))}
-                </Tabs>
+                    {["all", "pending", "in_progress", "completed"].map((tabValue) => (
+                      <TabsContent key={tabValue} value={tabValue} className="mt-3 space-y-2">
+                        {(tabValue === "all" ? getAllFilteredTasks() : filterTasks(tabValue)).length === 0 ? (
+                          <div className="text-center py-10">
+                            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+                              <ListTodo className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <p className="text-sm text-muted-foreground">Nenhuma tarefa encontrada</p>
+                          </div>
+                        ) : (
+                          (tabValue === "all" ? getAllFilteredTasks() : filterTasks(tabValue)).map((task) => (
+                            <TaskCard key={task.id} task={task} />
+                          ))
+                        )}
+                      </TabsContent>
+                    ))}
+                  </Tabs>
+                </Suspense>
               </CardContent>
             </Card>
           </div>
 
-          <div>
+          {/* Task Detail */}
+          <div className="lg:col-span-1">
             {selectedTask ? (
               <DevTaskDetail task={selectedTask} onUpdateStatus={handleUpdateStatus} />
             ) : (
-              <Card className="h-full flex items-center justify-center">
-                <CardContent className="text-center py-12">
-                  <ListTodo className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">Selecione uma tarefa para ver os detalhes</p>
+              <Card className="h-[350px] flex items-center justify-center bg-muted/30 border-dashed">
+                <CardContent className="text-center py-8">
+                  <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                    <ListTodo className="h-7 w-7 text-muted-foreground" />
+                  </div>
+                  <p className="text-sm text-muted-foreground font-medium">Selecione uma tarefa</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Clique em uma tarefa para ver os detalhes
+                  </p>
                 </CardContent>
               </Card>
             )}
           </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

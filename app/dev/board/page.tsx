@@ -4,10 +4,8 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { getCurrentUser } from "@/lib/auth"
 import { DevKanbanBoard } from "@/components/dev/dev-kanban-board"
-import { Button } from "@/components/ui/button"
-import { Loader2, ListTodo, Code } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
+import { DevHeader } from "@/components/dev/dev-header"
+import { Loader2 } from "lucide-react"
 
 export default function DevBoardPage() {
   const router = useRouter()
@@ -35,72 +33,69 @@ export default function DevBoardPage() {
     try {
       const res = await fetch(`/api/dev/tasks?user_id=${userId}&include_details=true`)
       const data = await res.json()
-      setTasks(data)
+      setTasks(data || [])
     } catch (error) {
       console.error("Error fetching tasks:", error)
+      setTasks([])
     } finally {
       setLoading(false)
     }
   }
 
-  const handleTaskUpdate = async () => {
-    if (user) {
-      await fetchTasks(user.id)
+  const handleTaskUpdate = async (taskId: string, updates: any) => {
+    try {
+      const res = await fetch(`/api/dev/tasks/${taskId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      })
+
+      if (!res.ok) {
+        throw new Error("Failed to update task")
+      }
+
+      // Refresh tasks
+      if (user) {
+        await fetchTasks(user.id)
+      }
+    } catch (error) {
+      console.error("Error updating task:", error)
+      throw error
     }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Carregando suas tarefas...</p>
+        </div>
       </div>
     )
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-primary/5 to-slate-50">
-      <div className="bg-gradient-to-r from-primary to-primary/80 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <Image
-                src="/images/act-logo-square.jfif"
-                alt="ACT Digital"
-                width={48}
-                height={48}
-                className="rounded-xl shadow-lg"
-              />
-              <div>
-                <h1 className="text-2xl font-bold text-white">Board Kanban</h1>
-                <p className="text-primary-foreground/80">Arraste e solte para organizar suas tarefas</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Link href="/documentacao">
-                <Button
-                  variant="outline"
-                  className="gap-2 bg-white/10 border-white/20 text-white hover:bg-white/20"
-                >
-                  <Code className="h-4 w-4" />
-                  Documentacao
-                </Button>
-              </Link>
-              <Button
-                onClick={() => router.push("/dev/tasks")}
-                variant="outline"
-                className="gap-2 bg-white/10 border-white/20 text-white hover:bg-white/20"
-              >
-                <ListTodo className="h-4 w-4" />
-                Ver Lista de Tarefas
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+  if (!user) {
+    return null
+  }
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  return (
+    <div className="min-h-screen bg-muted/30">
+      <DevHeader user={user} activeView="board" />
+
+      {/* Page Content */}
+      <main className="container mx-auto px-4 py-6 max-w-7xl">
+        {/* Page Title */}
+        <div className="mb-6">
+          <h1 className="text-xl font-semibold text-foreground">Board Kanban</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Arraste e solte para organizar suas tarefas
+          </p>
+        </div>
+
+        {/* Kanban Board */}
         <DevKanbanBoard tasks={tasks} onTaskUpdate={handleTaskUpdate} />
-      </div>
+      </main>
     </div>
   )
 }

@@ -39,7 +39,10 @@ export default function DevMonitoringPage() {
     return <div className="p-8">Erro ao carregar dados</div>
   }
 
-  const { devsPerformance, devsNoUpdate, delayedTasks, notifications } = data
+  const devsPerformance = data.devsPerformance || []
+  const devsNoUpdate = data.devsNoUpdate || []
+  const delayedTasks = data.delayedTasks || []
+  const notifications = data.notifications || []
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600 bg-green-50"

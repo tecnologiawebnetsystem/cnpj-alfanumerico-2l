@@ -61,14 +61,10 @@ export async function POST(request: NextRequest) {
       console.log("[v0] Using bcrypt verification")
       isValid = await bcrypt.compare(password, storedHash)
     } else if (storedHash.length >= 64) {
-      // SHA-256 hash - use crypto
-      console.log("[v0] Using SHA-256 verification")
-      const encoder = new TextEncoder()
-      const hashBuffer = await crypto.subtle.digest("SHA-256", encoder.encode(password))
-      const inputHash = Array.from(new Uint8Array(hashBuffer))
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("")
-      isValid = inputHash.toLowerCase() === storedHash.substring(0, 64).toLowerCase()
+      // SHA-256 hash - use Node.js crypto
+      const inputHash = crypto.createHash("sha256").update(password).digest("hex")
+      const storedHashClean = storedHash.replace(/[\r\n\s]/g, "").substring(0, 64)
+      isValid = inputHash.toLowerCase() === storedHashClean.toLowerCase()
     } else {
       // Direct comparison for plain text (development only - NOT recommended)
       console.log("[v0] WARNING: Plain text password detected")

@@ -39,6 +39,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Erro ao atribuir tarefas" }, { status: 500 })
     }
 
+    // Create notification for the developer if tasks were assigned
+    if (assigned_to && data && data.length > 0) {
+      try {
+        await supabase.from("notifications").insert({
+          user_id: assigned_to,
+          type: "task_assigned",
+          title: "Novas tarefas atribuidas",
+          message: `Voce recebeu ${data.length} nova(s) tarefa(s) para trabalhar.`,
+          data: { task_ids: task_ids, assigned_by: user.id },
+          read: false,
+        })
+      } catch (notifError) {
+        console.error("Error creating notification:", notifError)
+        // Don't fail the request if notification fails
+      }
+    }
+
     console.log(" Bulk assigned", data?.length, "tasks to", assigned_to || "none")
 
     return NextResponse.json({ 
