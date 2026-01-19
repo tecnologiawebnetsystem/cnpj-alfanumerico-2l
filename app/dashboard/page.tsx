@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { DashboardHeader } from "@/components/dashboard/dashboard-header"
-import { MobileNav } from "@/components/dashboard/mobile-nav"
 import { Loader2, Users, FileText, BarChart3, Settings, Search, UserPlus, BookOpen, Code } from "lucide-react"
 import { getCurrentUser } from "@/lib/auth"
+import { cn } from "@/lib/utils"
+import { DashboardHeader } from "@/components/dashboard/dashboard-header"
+import { MobileNav } from "@/components/dashboard/mobile-nav"
 import { ClientOverview } from "@/components/dashboard/client-overview-tab"
 import { ClientDevsTab } from "@/components/dashboard/client-devs-tab"
 import { ClientReportsTab } from "@/components/dashboard/client-reports-tab"
@@ -14,7 +15,6 @@ import { ClientAnalysesTab } from "@/components/dashboard/client-analyses-tab"
 import { DeveloperAssignmentTab } from "@/components/dashboard/developer-assignment-tab"
 import { WikiTab } from "@/components/dashboard/wiki-tab"
 import { DocumentationTab } from "@/components/dashboard/documentation-tab"
-import { cn } from "@/lib/utils"
 
 const navItems = [
   { id: "overview", label: "Visao Geral", icon: BarChart3 },
@@ -72,36 +72,13 @@ export default function DashboardPage() {
 
   const userRole = user?.role || "admin"
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case "overview":
-        return <ClientOverview onChangeTab={setActiveTab} userRole={userRole} />
-      case "analise":
-        return <ClientAnalysesTab clientId={user.client_id} />
-      case "atribuicoes":
-        return <DeveloperAssignmentTab clientId={user.client_id} />
-      case "devs":
-        return <ClientDevsTab clientId={user.client_id} />
-      case "relatorios":
-        return <ClientReportsTab clientId={user.client_id} />
-      case "configuracoes":
-        return <ClientSettingsTab clientId={user.client_id} />
-      case "wiki":
-        return <WikiTab />
-      case "documentacao":
-        return <DocumentationTab />
-      default:
-        return <ClientOverview onChangeTab={setActiveTab} userRole={userRole} />
-    }
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <DashboardHeader user={user} />
 
       <div className="flex">
         {/* Sidebar - Desktop */}
-        <aside className="hidden lg:flex flex-col w-56 border-r border-border bg-card min-h-[calc(100vh-65px)] sticky top-[65px]">
+        <aside className="hidden lg:flex flex-col w-56 border-r border-border bg-card min-h-[calc(100vh-64px)] sticky top-16">
           <nav className="flex-1 p-4 space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon
@@ -128,7 +105,7 @@ export default function DashboardPage() {
         {/* Main Content */}
         <main className="flex-1 min-w-0 pb-20 lg:pb-0">
           {/* Tab Navigation - Tablet */}
-          <div className="hidden md:flex lg:hidden border-b border-border bg-card sticky top-[65px] z-10 overflow-x-auto">
+          <div className="hidden md:flex lg:hidden border-b border-border bg-card sticky top-16 z-10 overflow-x-auto">
             <div className="flex px-4 py-2 gap-1">
               {navItems.map((item) => {
                 const Icon = item.icon
@@ -154,9 +131,14 @@ export default function DashboardPage() {
 
           {/* Content Area */}
           <div className="p-4 md:p-6 lg:p-8 max-w-[1200px]">
-            <div className="animate-fade-in">
-              {renderContent()}
-            </div>
+            {activeTab === "overview" && <ClientOverview onChangeTab={setActiveTab} userRole={userRole} />}
+            {activeTab === "analise" && <ClientAnalysesTab clientId={user.client_id} />}
+            {activeTab === "atribuicoes" && <DeveloperAssignmentTab clientId={user.client_id} />}
+            {activeTab === "devs" && <ClientDevsTab clientId={user.client_id} />}
+            {activeTab === "relatorios" && <ClientReportsTab clientId={user.client_id} />}
+            {activeTab === "configuracoes" && <ClientSettingsTab clientId={user.client_id} />}
+            {activeTab === "wiki" && <WikiTab />}
+            {activeTab === "documentacao" && <DocumentationTab />}
           </div>
         </main>
       </div>

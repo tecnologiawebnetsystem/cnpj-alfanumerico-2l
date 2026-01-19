@@ -1,8 +1,8 @@
 "use client"
 
+import { useState } from "react"
 import { Home, FileText, Users, Settings, Search, BarChart3, BookOpen, MoreHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useState } from "react"
 
 interface MobileNavProps {
   activeTab: string
