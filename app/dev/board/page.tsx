@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation"
 import { getCurrentUser } from "@/lib/auth"
 import { DevKanbanBoard } from "@/components/dev/dev-kanban-board"
 import { Button } from "@/components/ui/button"
-import { Loader2, ListTodo } from "lucide-react"
+import { Loader2, ListTodo, Code } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 
 export default function DevBoardPage() {
   const router = useRouter()
@@ -74,14 +75,25 @@ export default function DevBoardPage() {
                 <p className="text-primary-foreground/80">Arraste e solte para organizar suas tarefas</p>
               </div>
             </div>
-            <Button
-              onClick={() => router.push("/dev/tasks")}
-              variant="outline"
-              className="gap-2 bg-white/10 border-white/20 text-white hover:bg-white/20"
-            >
-              <ListTodo className="h-4 w-4" />
-              Ver Lista de Tarefas
-            </Button>
+            <div className="flex items-center gap-2">
+              <Link href="/documentacao">
+                <Button
+                  variant="outline"
+                  className="gap-2 bg-white/10 border-white/20 text-white hover:bg-white/20"
+                >
+                  <Code className="h-4 w-4" />
+                  Documentacao
+                </Button>
+              </Link>
+              <Button
+                onClick={() => router.push("/dev/tasks")}
+                variant="outline"
+                className="gap-2 bg-white/10 border-white/20 text-white hover:bg-white/20"
+              >
+                <ListTodo className="h-4 w-4" />
+                Ver Lista de Tarefas
+              </Button>
+            </div>
           </div>
         </div>
       </div>

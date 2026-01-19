@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation"
 import { getCurrentUser, isSuperAdmin, logout } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { LogOut, Building2, Users, FileText, BarChart3 } from "lucide-react"
+import { LogOut, Building2, Users, FileText, BarChart3, Code } from "lucide-react"
 import { AdminClientsTab } from "@/components/admin/admin-clients-tab"
 import { AdminUsersTab } from "@/components/admin/admin-users-tab"
 import { AdminReportsTab } from "@/components/admin/admin-reports-tab"
 import { AdminOverview } from "@/components/admin/admin-overview"
+import { DocumentationTab } from "@/components/dashboard/documentation-tab"
 import Image from "next/image"
 
 export default function AdminPage() {
@@ -104,6 +105,13 @@ export default function AdminPage() {
               <FileText className="h-4 w-4 mr-2" />
               Relatórios
             </TabsTrigger>
+            <TabsTrigger
+              value="documentacao"
+              className="data-[state=active]:bg-primary data-[state=active]:text-white text-slate-700"
+            >
+              <Code className="h-4 w-4 mr-2" />
+              Documentacao
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -120,6 +128,10 @@ export default function AdminPage() {
 
           <TabsContent value="reports">
             <AdminReportsTab />
+          </TabsContent>
+
+          <TabsContent value="documentacao">
+            <DocumentationTab />
           </TabsContent>
         </Tabs>
       </div>

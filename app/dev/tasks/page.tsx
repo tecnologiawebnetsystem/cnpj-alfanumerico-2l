@@ -8,9 +8,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ListTodo, Loader2, Play, CheckCircle2, Clock } from "lucide-react"
+import { ListTodo, Loader2, Play, CheckCircle2, Clock, Code } from "lucide-react"
 import { DevTaskDetail } from "@/components/dev/dev-task-detail"
 import Image from "next/image"
+import Link from "next/link"
 
 interface Task {
   id: string
@@ -136,13 +137,24 @@ export default function DevTasksPage() {
                 <p className="text-primary-foreground/80">{user?.name}</p>
               </div>
             </div>
-            <Button
-              onClick={() => router.push("/dev/board")}
-              variant="outline"
-              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-            >
-              Ver Board Kanban
-            </Button>
+            <div className="flex items-center gap-2">
+              <Link href="/documentacao">
+                <Button
+                  variant="outline"
+                  className="gap-2 bg-white/10 border-white/20 text-white hover:bg-white/20"
+                >
+                  <Code className="h-4 w-4" />
+                  Documentacao
+                </Button>
+              </Link>
+              <Button
+                onClick={() => router.push("/dev/board")}
+                variant="outline"
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              >
+                Ver Board Kanban
+              </Button>
+            </div>
           </div>
         </div>
       </div>

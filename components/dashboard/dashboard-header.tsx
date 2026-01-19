@@ -1,5 +1,7 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
+import { BookOpen } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { NotificationsPanel } from "@/components/notifications/notifications-panel"

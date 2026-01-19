@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
           analyses (id, findings:findings(id)),
           repository_assignments (
             developer_id,
+            status,
             users:users!developer_id (name)
           )
         `,
@@ -46,7 +47,9 @@ export async function GET(request: NextRequest) {
         findings_count: findingsCount,
         assigned_developer_id: repo.repository_assignments?.[0]?.developer_id,
         assigned_developer_name: repo.repository_assignments?.[0]?.users?.name,
+        status: repo.repository_assignments?.[0]?.status || "pendente",
         analyses: undefined, // Remove analyses from response
+        repository_assignments: undefined, // Remove assignments from response
       }
     })
 

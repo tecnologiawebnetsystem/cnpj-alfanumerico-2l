@@ -19,7 +19,9 @@ import {
   Code,
   Database,
   Menu,
+  BookOpen,
 } from "lucide-react"
+import Link from "next/link"
 import Image from "next/image"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -130,7 +132,7 @@ export function HeroSection() {
                 onClick={() => scrollToSection("solucao")}
                 className="text-sm font-medium text-gray-600 hover:text-[#0052CC] transition-colors"
               >
-                Solução
+                Solucao
               </button>
               <button
                 onClick={() => scrollToSection("validador")}
@@ -144,6 +146,13 @@ export function HeroSection() {
               >
                 Exemplos
               </button>
+              <Link
+                href="/wiki"
+                className="text-sm font-medium text-gray-600 hover:text-[#0052CC] transition-colors flex items-center gap-1"
+              >
+                <BookOpen className="h-4 w-4" />
+                Wiki
+              </Link>
               <button
                 onClick={() => scrollToSection("login")}
                 className="px-5 py-2.5 bg-[#0052CC] text-white rounded-lg font-medium text-sm hover:bg-[#0052CC]/90 transition-all shadow-md hover:shadow-lg"

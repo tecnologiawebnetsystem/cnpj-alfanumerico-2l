@@ -12,16 +12,18 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createClient()
 
-    const { data, error } = await supabase
+    const { data: rows, error } = await supabase
       .from("ai_provider_settings")
       .select("*")
       .eq("client_id", client_id)
       .eq("provider", "gemini")
-      .single()
+      .limit(1)
 
-    if (error && error.code !== "PGRST116") {
+    if (error) {
       throw error
     }
+
+    const data = rows && rows.length > 0 ? rows[0] : null
 
     // Retornar configuracao padrao se nao existir
     const settings = data || {
@@ -62,12 +64,14 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient()
 
     // Verificar se ja existe configuracao
-    const { data: existing } = await supabase
+    const { data: existingRows } = await supabase
       .from("ai_provider_settings")
       .select("id")
       .eq("client_id", client_id)
       .eq("provider", "gemini")
-      .single()
+      .limit(1)
+
+    const existing = existingRows && existingRows.length > 0 ? existingRows[0] : null
 
     const settingsData: any = {
       client_id,

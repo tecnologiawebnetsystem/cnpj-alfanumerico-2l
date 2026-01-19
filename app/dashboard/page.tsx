@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, Users, FileText, BarChart3, Settings, Search, UserPlus, BookOpen, Code } from "lucide-react"
+import { Loader2, Users, FileText, BarChart3, Settings, Search, UserPlus, Code } from "lucide-react"
 import { getCurrentUser } from "@/lib/auth"
 import { cn } from "@/lib/utils"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
@@ -13,7 +13,6 @@ import { ClientReportsTab } from "@/components/dashboard/client-reports-tab"
 import { ClientSettingsTab } from "@/components/dashboard/client-settings-tab"
 import { ClientAnalysesTab } from "@/components/dashboard/client-analyses-tab"
 import { DeveloperAssignmentTab } from "@/components/dashboard/developer-assignment-tab"
-import { WikiTab } from "@/components/dashboard/wiki-tab"
 import { DocumentationTab } from "@/components/dashboard/documentation-tab"
 
 const navItems = [
@@ -23,7 +22,6 @@ const navItems = [
   { id: "devs", label: "Desenvolvedores", icon: Users },
   { id: "relatorios", label: "Relatorios", icon: FileText },
   { id: "configuracoes", label: "Configuracoes", icon: Settings },
-  { id: "wiki", label: "Wiki", icon: BookOpen },
   { id: "documentacao", label: "Documentacao", icon: Code },
 ]
 
@@ -137,7 +135,6 @@ export default function DashboardPage() {
             {activeTab === "devs" && <ClientDevsTab clientId={user.client_id} />}
             {activeTab === "relatorios" && <ClientReportsTab clientId={user.client_id} />}
             {activeTab === "configuracoes" && <ClientSettingsTab clientId={user.client_id} />}
-            {activeTab === "wiki" && <WikiTab />}
             {activeTab === "documentacao" && <DocumentationTab />}
           </div>
         </main>
