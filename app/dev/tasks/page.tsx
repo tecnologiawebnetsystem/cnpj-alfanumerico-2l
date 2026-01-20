@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { 
   ListTodo, 
   Loader2, 
@@ -47,6 +48,8 @@ export default function DevTasksPage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [searchTerm, setSearchTerm] = useState("")
+  const [repositoryFilter, setRepositoryFilter] = useState<string>("all")
+  const [statusFilter, setStatusFilter] = useState<string>("all")
 
   useEffect(() => {
     const currentUser = getCurrentUser()
@@ -77,25 +80,44 @@ export default function DevTasksPage() {
     }
   }
 
-  const filterTasks = (status: string) => {
-    let filtered = tasks.filter((t) => t.status === status)
+  // Get unique repositories for filter dropdown
+  const uniqueRepositories = [...new Set(tasks.map(t => t.repository_name).filter(Boolean))]
+
+  const applyFilters = (taskList: Task[]) => {
+    let filtered = taskList
+
+    // Apply repository filter
+    if (repositoryFilter !== "all") {
+      filtered = filtered.filter(t => t.repository_name === repositoryFilter)
+    }
+
+    // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(
         (t) =>
           t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          t.repository_name?.toLowerCase().includes(searchTerm.toLowerCase())
+          t.repository_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          t.file_path?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
+
     return filtered
   }
 
+  const filterTasks = (status: string) => {
+    let filtered = tasks.filter((t) => t.status === status)
+    return applyFilters(filtered)
+  }
+
   const getAllFilteredTasks = () => {
-    if (!searchTerm) return tasks
-    return tasks.filter(
-      (t) =>
-        t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.repository_name?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    let filtered = tasks
+    
+    // Apply status filter if not "all"
+    if (statusFilter !== "all") {
+      filtered = filtered.filter(t => t.status === statusFilter)
+    }
+
+    return applyFilters(filtered)
   }
 
   const getStatusBadge = (status: string) => {
@@ -234,72 +256,72 @@ export default function DevTasksPage() {
           </p>
         </div>
 
-        {/* Stats Cards - Compact */}
+        {/* Stats Cards - Compact and Consistent */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-          <Card className="bg-card">
+          <Card className="bg-card border">
             <CardContent className="p-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Total</p>
-                  <p className="text-2xl font-bold">{tasks.length}</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-medium">Total</p>
+                  <p className="text-xl font-bold mt-1">{tasks.length}</p>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                  <ListTodo className="h-4 w-4 text-muted-foreground" />
+                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                  <ListTodo className="h-4 w-4 text-slate-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-card border-orange-200">
+          <Card className="bg-card border">
             <CardContent className="p-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] text-orange-600 uppercase tracking-wide">Pendentes</p>
-                  <p className="text-2xl font-bold text-orange-700">{filterTasks("pending").length}</p>
+                  <p className="text-[10px] text-orange-600 uppercase tracking-wide font-medium">Pendentes</p>
+                  <p className="text-xl font-bold text-orange-600 mt-1">{filterTasks("pending").length}</p>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
-                  <Clock className="h-4 w-4 text-orange-500" />
+                <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center">
+                  <Clock className="h-4 w-4 text-orange-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-card border-blue-200">
+          <Card className="bg-card border">
             <CardContent className="p-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] text-blue-600 uppercase tracking-wide">Em Progresso</p>
-                  <p className="text-2xl font-bold text-blue-700">{filterTasks("in_progress").length}</p>
+                  <p className="text-[10px] text-blue-600 uppercase tracking-wide font-medium">Em Progresso</p>
+                  <p className="text-xl font-bold text-blue-600 mt-1">{filterTasks("in_progress").length}</p>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                  <Play className="h-4 w-4 text-blue-500" />
+                <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <Play className="h-4 w-4 text-blue-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-card border-green-200">
+          <Card className="bg-card border">
             <CardContent className="p-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] text-green-600 uppercase tracking-wide">Concluidas</p>
-                  <p className="text-2xl font-bold text-green-700">{filterTasks("completed").length}</p>
+                  <p className="text-[10px] text-green-600 uppercase tracking-wide font-medium">Concluidas</p>
+                  <p className="text-xl font-bold text-green-600 mt-1">{filterTasks("completed").length}</p>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                  <CheckCircle2 className="h-4 w-4 text-green-500" />
+                <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-card">
+          <Card className="bg-card border">
             <CardContent className="p-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Progresso</p>
-                  <p className="text-2xl font-bold">{completionRate}%</p>
+                  <p className="text-[10px] text-primary uppercase tracking-wide font-medium">Progresso</p>
+                  <p className="text-xl font-bold text-primary mt-1">{completionRate}%</p>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                   <Target className="h-4 w-4 text-primary" />
                 </div>
               </div>
@@ -326,19 +348,49 @@ export default function DevTasksPage() {
           <div className="lg:col-span-2">
             <Card>
               <CardHeader className="pb-3 px-4 pt-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <ListTodo className="h-4 w-4" />
-                    Tarefas
-                  </CardTitle>
-                  <div className="relative w-full sm:w-56">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                    <Input
-                      placeholder="Buscar tarefas..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-8 h-8 text-sm"
-                    />
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <ListTodo className="h-4 w-4" />
+                      Tarefas
+                    </CardTitle>
+                  </div>
+                  
+                  {/* Search and Filters - Same Row */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <div className="relative flex-1 sm:max-w-[200px]">
+                      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                      <Input
+                        placeholder="Buscar..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-8 h-8 text-sm"
+                      />
+                    </div>
+                    <Select value={repositoryFilter} onValueChange={setRepositoryFilter}>
+                      <SelectTrigger className="h-8 text-sm w-full sm:w-[180px]">
+                        <GitBranch className="h-3.5 w-3.5 mr-2 text-muted-foreground flex-shrink-0" />
+                        <SelectValue placeholder="Repositorio" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos repositorios</SelectItem>
+                        {uniqueRepositories.map((repo) => (
+                          <SelectItem key={repo} value={repo}>{repo}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="h-8 text-sm w-full sm:w-[160px]">
+                        <Clock className="h-3.5 w-3.5 mr-2 text-muted-foreground flex-shrink-0" />
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos status</SelectItem>
+                        <SelectItem value="pending">Pendentes</SelectItem>
+                        <SelectItem value="in_progress">Em Progresso</SelectItem>
+                        <SelectItem value="completed">Concluidas</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </CardHeader>

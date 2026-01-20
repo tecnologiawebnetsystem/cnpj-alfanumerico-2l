@@ -5,20 +5,33 @@ import { Button } from "@/components/ui/button"
 import { Download, FileJson, Code, Shield, Zap } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import { useEffect, useState } from "react"
+import { DevHeader } from "@/components/dev/dev-header"
 
 export default function DocumentacaoPage() {
   const [spec, setSpec] = useState<any>(null)
+  const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
     fetch("/api-spec.json")
       .then((res) => res.json())
       .then((data) => setSpec(data))
       .catch((err) => console.error("Erro ao carregar spec:", err))
+    
+    // Get current user
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user) setUser(data.user)
+      })
+      .catch((err) => console.error("Erro ao carregar usuario:", err))
   }, [])
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-      <div className="container mx-auto px-4 py-16">
+      {/* Header for logged in developers */}
+      {user && <DevHeader user={user} />}
+      
+      <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto space-y-8">
           {/* Header */}
           <div className="text-center space-y-4">

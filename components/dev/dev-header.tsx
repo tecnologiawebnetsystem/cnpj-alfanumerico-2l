@@ -6,6 +6,15 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,8 +35,12 @@ import {
   Clock,
   AlertCircle,
   ChevronDown,
+  Mail,
+  Shield,
+  Save,
 } from "lucide-react"
 import { logout } from "@/lib/auth"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface DevHeaderProps {
   user: {
@@ -35,7 +48,7 @@ interface DevHeaderProps {
     name: string
     email: string
   }
-  activeView?: "board" | "tasks"
+  activeView?: "board" | "tasks" | "docs"
 }
 
 interface Notification {
@@ -52,10 +65,11 @@ export function DevHeader({ user, activeView = "board" }: DevHeaderProps) {
   const router = useRouter()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loadingNotifications, setLoadingNotifications] = useState(true)
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const [showSettingsModal, setShowSettingsModal] = useState(false)
 
   useEffect(() => {
     fetchNotifications()
-    // Poll for new notifications every 30 seconds
     const interval = setInterval(fetchNotifications, 30000)
     return () => clearInterval(interval)
   }, [user.id])
@@ -118,26 +132,22 @@ export function DevHeader({ user, activeView = "board" }: DevHeaderProps) {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-background border-b">
-      <div className="container mx-auto px-4 max-w-7xl">
-        <div className="flex items-center justify-between h-14">
-          {/* Left - Logo and Navigation */}
-          <div className="flex items-center gap-6">
-            <Link href="/dev/board" className="flex items-center gap-2">
-              <Image
-                src="/images/act-logo-square.jfif"
-                alt="ACT Digital"
-                width={32}
-                height={32}
-                className="rounded-md"
-              />
-              <span className="font-semibold text-sm text-foreground hidden sm:block">
-                CNPJ Detector
-              </span>
-            </Link>
+    <>
+      <header className="sticky top-0 z-50 bg-background border-b">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="flex items-center h-14">
+            {/* Left - Logo */}
+            <div className="flex items-center gap-2 min-w-[160px]">
+              <Link href="/dev/board" className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-primary rounded flex items-center justify-center text-primary-foreground font-bold text-xs">
+                  ACT
+                </div>
+                <span className="font-semibold text-sm hidden sm:block">CNPJ Detector</span>
+              </Link>
+            </div>
 
-            {/* Navigation Tabs */}
-            <nav className="hidden md:flex items-center gap-1">
+            {/* Center - Navigation */}
+            <nav className="flex-1 hidden md:flex items-center justify-center gap-1">
               <Link href="/dev/board">
                 <Button
                   variant={activeView === "board" ? "secondary" : "ghost"}
@@ -159,155 +169,269 @@ export function DevHeader({ user, activeView = "board" }: DevHeaderProps) {
                 </Button>
               </Link>
               <Link href="/documentacao">
-                <Button variant="ghost" size="sm" className="gap-1.5 h-8 text-xs">
+                <Button 
+                  variant={activeView === "docs" ? "secondary" : "ghost"} 
+                  size="sm" 
+                  className="gap-1.5 h-8 text-xs"
+                >
                   <Code className="h-3.5 w-3.5" />
                   Documentacao
                 </Button>
               </Link>
             </nav>
-          </div>
 
-          {/* Right - Notifications and Profile */}
-          <div className="flex items-center gap-1">
-            {/* Notifications Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative h-8 w-8">
-                  <Bell className="h-4 w-4" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 h-4 w-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-medium">
-                      {unreadCount > 9 ? "9+" : unreadCount}
-                    </span>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80">
-                <DropdownMenuLabel className="flex items-center justify-between py-2">
-                  <span className="text-sm font-medium">Notificacoes</span>
-                  {unreadCount > 0 && (
-                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                      {unreadCount} novas
-                    </Badge>
-                  )}
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                
-                {notifications.length === 0 ? (
-                  <div className="py-8 text-center text-muted-foreground">
-                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mx-auto mb-2">
-                      <Bell className="h-5 w-5 text-muted-foreground" />
+            {/* Right - Notifications and Profile */}
+            <div className="flex items-center gap-1 min-w-[160px] justify-end">
+              {/* Notifications */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative h-8 w-8">
+                    <Bell className="h-4 w-4" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 h-4 w-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-medium">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-80">
+                  <DropdownMenuLabel className="flex items-center justify-between py-2">
+                    <span className="text-sm font-medium">Notificacoes</span>
+                    {unreadCount > 0 && (
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                        {unreadCount} novas
+                      </Badge>
+                    )}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  
+                  {notifications.length === 0 ? (
+                    <div className="py-8 text-center text-muted-foreground">
+                      <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mx-auto mb-2">
+                        <Bell className="h-5 w-5" />
+                      </div>
+                      <p className="text-xs">Nenhuma notificacao</p>
                     </div>
-                    <p className="text-xs">Nenhuma notificacao</p>
-                  </div>
-                ) : (
-                  <div className="max-h-72 overflow-y-auto">
-                    {notifications.slice(0, 10).map((notification) => (
-                      <DropdownMenuItem
-                        key={notification.id}
-                        className={`flex items-start gap-2.5 p-2.5 cursor-pointer ${
-                          !notification.read ? "bg-blue-50/50" : ""
-                        }`}
-                        onClick={() => {
-                          markAsRead(notification.id)
-                          if (notification.task_id) {
-                            router.push("/dev/tasks")
-                          }
-                        }}
-                      >
-                        {getNotificationIcon(notification.type)}
-                        <div className="flex-1 min-w-0">
-                          {notification.title && (
-                            <p className={`text-xs font-medium ${!notification.read ? "text-foreground" : "text-muted-foreground"}`}>
-                              {notification.title}
+                  ) : (
+                    <div className="max-h-72 overflow-y-auto">
+                      {notifications.slice(0, 10).map((notification) => (
+                        <DropdownMenuItem
+                          key={notification.id}
+                          className={`flex items-start gap-2.5 p-2.5 cursor-pointer ${
+                            !notification.read ? "bg-blue-50/50" : ""
+                          }`}
+                          onClick={() => {
+                            markAsRead(notification.id)
+                            if (notification.task_id) {
+                              router.push("/dev/tasks")
+                            }
+                          }}
+                        >
+                          {getNotificationIcon(notification.type)}
+                          <div className="flex-1 min-w-0">
+                            {notification.title && (
+                              <p className={`text-xs font-medium ${!notification.read ? "text-foreground" : "text-muted-foreground"}`}>
+                                {notification.title}
+                              </p>
+                            )}
+                            <p className={`text-xs ${!notification.read ? "" : "text-muted-foreground"} line-clamp-2`}>
+                              {notification.message}
                             </p>
-                          )}
-                          <p className={`text-xs ${!notification.read ? "" : "text-muted-foreground"} line-clamp-2`}>
-                            {notification.message}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground mt-0.5">
-                            {formatTimeAgo(notification.created_at)}
-                          </p>
-                        </div>
-                        {!notification.read && (
-                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5" />
-                        )}
-                      </DropdownMenuItem>
-                    ))}
-                  </div>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">
+                              {formatTimeAgo(notification.created_at)}
+                            </p>
+                          </div>
+                        </DropdownMenuItem>
+                      ))}
+                    </div>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-            {/* Profile Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="gap-1.5 pl-1.5 pr-2 h-8">
-                  <div className="h-6 w-6 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-white font-medium text-xs">
-                    {user.name?.charAt(0)?.toUpperCase() || "D"}
-                  </div>
-                  <div className="hidden sm:flex flex-col items-start">
-                    <span className="text-xs font-medium leading-none">{user.name}</span>
-                    <span className="text-[10px] text-muted-foreground leading-none mt-0.5">Dev</span>
-                  </div>
-                  <ChevronDown className="h-3 w-3 text-muted-foreground hidden sm:block" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuLabel className="py-2">
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium">{user.name}</span>
-                    <span className="text-[10px] text-muted-foreground font-normal">{user.email}</span>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="gap-2 text-xs py-1.5">
-                  <User className="h-3.5 w-3.5" />
-                  Meu Perfil
-                </DropdownMenuItem>
-                <DropdownMenuItem className="gap-2 text-xs py-1.5">
-                  <Settings className="h-3.5 w-3.5" />
-                  Configuracoes
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="gap-2 text-xs py-1.5 text-red-600" onClick={handleLogout}>
-                  <LogOut className="h-3.5 w-3.5" />
-                  Sair
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              {/* Profile */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="gap-1.5 pl-1.5 pr-2 h-8">
+                    <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-medium text-xs">
+                      {user.name?.charAt(0)?.toUpperCase() || "D"}
+                    </div>
+                    <div className="hidden sm:flex flex-col items-start">
+                      <span className="text-xs font-medium leading-none">{user.name}</span>
+                      <span className="text-[10px] text-muted-foreground leading-none mt-0.5">Dev</span>
+                    </div>
+                    <ChevronDown className="h-3 w-3 text-muted-foreground hidden sm:block" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuLabel className="py-2">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium">{user.name}</span>
+                      <span className="text-[10px] text-muted-foreground font-normal">{user.email}</span>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    className="gap-2 text-xs py-1.5 cursor-pointer"
+                    onClick={() => setShowProfileModal(true)}
+                  >
+                    <User className="h-3.5 w-3.5" />
+                    Meu Perfil
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    className="gap-2 text-xs py-1.5 cursor-pointer"
+                    onClick={() => setShowSettingsModal(true)}
+                  >
+                    <Settings className="h-3.5 w-3.5" />
+                    Configuracoes
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="gap-2 text-xs py-1.5 text-red-600 cursor-pointer" onClick={handleLogout}>
+                    <LogOut className="h-3.5 w-3.5" />
+                    Sair
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+
+          {/* Mobile Navigation */}
+          <div className="md:hidden flex items-center justify-center gap-1 pb-2 -mt-1">
+            <Link href="/dev/board">
+              <Button
+                variant={activeView === "board" ? "secondary" : "ghost"}
+                size="sm"
+                className="gap-1 h-7 text-xs px-2"
+              >
+                <Kanban className="h-3 w-3" />
+                Board
+              </Button>
+            </Link>
+            <Link href="/dev/tasks">
+              <Button
+                variant={activeView === "tasks" ? "secondary" : "ghost"}
+                size="sm"
+                className="gap-1 h-7 text-xs px-2"
+              >
+                <ListTodo className="h-3 w-3" />
+                Tarefas
+              </Button>
+            </Link>
+            <Link href="/documentacao">
+              <Button 
+                variant={activeView === "docs" ? "secondary" : "ghost"} 
+                size="sm" 
+                className="gap-1 h-7 text-xs px-2"
+              >
+                <Code className="h-3 w-3" />
+                Docs
+              </Button>
+            </Link>
           </div>
         </div>
+      </header>
 
-        {/* Mobile Navigation */}
-        <div className="md:hidden flex items-center gap-1 pb-2 -mt-1 overflow-x-auto">
-          <Link href="/dev/board">
-            <Button
-              variant={activeView === "board" ? "secondary" : "ghost"}
-              size="sm"
-              className="gap-1.5 whitespace-nowrap h-7 text-xs"
-            >
-              <Kanban className="h-3.5 w-3.5" />
-              Board
+      {/* Profile Modal */}
+      <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Meu Perfil
+            </DialogTitle>
+            <DialogDescription>
+              Visualize e gerencie suas informacoes pessoais
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="flex items-center gap-4">
+              <div className="h-16 w-16 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-2xl">
+                {user.name?.charAt(0)?.toUpperCase() || "D"}
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">{user.name}</h3>
+                <p className="text-sm text-muted-foreground">Desenvolvedor</p>
+              </div>
+            </div>
+            
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Email</p>
+                  <p className="text-sm font-medium">{user.email}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <Shield className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Funcao</p>
+                  <p className="text-sm font-medium">Desenvolvedor</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Settings Modal */}
+      <Dialog open={showSettingsModal} onOpenChange={setShowSettingsModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5" />
+              Configuracoes
+            </DialogTitle>
+            <DialogDescription>
+              Gerencie suas preferencias do sistema
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Notificacoes</CardTitle>
+                <CardDescription className="text-xs">Configure como deseja receber notificacoes</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Novas tarefas</p>
+                    <p className="text-xs text-muted-foreground">Receber ao ser atribuido</p>
+                  </div>
+                  <input type="checkbox" defaultChecked className="h-4 w-4 rounded" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Lembretes</p>
+                    <p className="text-xs text-muted-foreground">Tarefas proximas do prazo</p>
+                  </div>
+                  <input type="checkbox" defaultChecked className="h-4 w-4 rounded" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Aparencia</CardTitle>
+                <CardDescription className="text-xs">Personalize a interface do sistema</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Tema escuro</p>
+                    <p className="text-xs text-muted-foreground">Usar tema escuro</p>
+                  </div>
+                  <input type="checkbox" className="h-4 w-4 rounded" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Button className="w-full gap-2" size="sm">
+              <Save className="h-4 w-4" />
+              Salvar Configuracoes
             </Button>
-          </Link>
-          <Link href="/dev/tasks">
-            <Button
-              variant={activeView === "tasks" ? "secondary" : "ghost"}
-              size="sm"
-              className="gap-1.5 whitespace-nowrap h-7 text-xs"
-            >
-              <ListTodo className="h-3.5 w-3.5" />
-              Tarefas
-            </Button>
-          </Link>
-          <Link href="/documentacao">
-            <Button variant="ghost" size="sm" className="gap-1.5 whitespace-nowrap h-7 text-xs">
-              <Code className="h-3.5 w-3.5" />
-              Docs
-            </Button>
-          </Link>
-        </div>
-      </div>
-    </header>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
