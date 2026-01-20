@@ -17,6 +17,13 @@ import {
   GripVertical,
   GitBranch,
   FileCode,
+  Brain,
+  Lightbulb,
+  Timer,
+  Play,
+  Copy,
+  AlertCircle,
+  X,
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
@@ -46,6 +53,17 @@ interface Task {
   repository_name?: string
   file_path?: string
   assigned_to_name?: string
+  line_number?: number
+  source_code?: string
+  suggested_code?: string
+  code_before?: string
+  code_after?: string
+  ai_explanation?: string
+  ai_suggestion?: string
+  ai_confidence?: number
+  estimated_hours?: number
+  remaining_hours?: number
+  completed_hours?: number
 }
 
 interface DevKanbanBoardProps {
@@ -102,11 +120,20 @@ export function DevKanbanBoard({ tasks, onTaskUpdate }: DevKanbanBoardProps) {
   const { toast } = useToast()
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [isCompletionDialogOpen, setIsCompletionDialogOpen] = useState(false)
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
   const [completionData, setCompletionData] = useState({
     commit_hash: "",
     pr_number: "",
   })
   const [activeId, setActiveId] = useState<string | null>(null)
+  
+  // Hours editing state
+  const [isEditingHours, setIsEditingHours] = useState(false)
+  const [editedHours, setEditedHours] = useState({
+    estimated_hours: 0,
+    remaining_hours: 0,
+    completed_hours: 0,
+  })
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -161,6 +188,34 @@ export function DevKanbanBoard({ tasks, onTaskUpdate }: DevKanbanBoardProps) {
       toast({
         title: "Erro ao mover tarefa",
         description: "Nao foi possivel atualizar a tarefa",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleCardClick = (task: Task) => {
+    setSelectedTask(task)
+    setEditedHours({
+      estimated_hours: task.estimated_hours || 0,
+      remaining_hours: task.remaining_hours || 0,
+      completed_hours: task.completed_hours || 0,
+    })
+    setIsDetailDialogOpen(true)
+  }
+
+  const handleSaveHours = async () => {
+    if (!selectedTask) return
+    try {
+      await onTaskUpdate(selectedTask.id, editedHours)
+      toast({
+        title: "Horas atualizadas!",
+        description: "O controle de horas foi salvo com sucesso.",
+      })
+      setIsEditingHours(false)
+    } catch (error) {
+      toast({
+        title: "Erro ao salvar horas",
+        description: "Nao foi possivel atualizar o controle de horas",
         variant: "destructive",
       })
     }
@@ -247,10 +302,18 @@ export function DevKanbanBoard({ tasks, onTaskUpdate }: DevKanbanBoardProps) {
 
     return (
       <div ref={setNodeRef} style={style}>
-        <Card className={`hover:shadow-md transition-all cursor-grab active:cursor-grabbing border-l-4 ${getPriorityBorderColor(task.priority)} bg-white`}>
+        <Card 
+          className={`hover:shadow-md transition-all cursor-pointer border-l-4 ${getPriorityBorderColor(task.priority)} bg-white`}
+          onClick={() => handleCardClick(task)}
+        >
           <CardContent className="p-2.5">
             <div className="flex items-start gap-1.5">
-              <div {...attributes} {...listeners} className="mt-0.5 flex-shrink-0 touch-none">
+              <div 
+                {...attributes} 
+                {...listeners} 
+                className="mt-0.5 flex-shrink-0 touch-none cursor-grab active:cursor-grabbing"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <GripVertical className="h-3.5 w-3.5 text-gray-400 hover:text-gray-600" />
               </div>
               <div className="flex-1 min-w-0 space-y-1.5">
@@ -392,6 +455,310 @@ export function DevKanbanBoard({ tasks, onTaskUpdate }: DevKanbanBoardProps) {
           ) : null}
         </DragOverlay>
       </DndContext>
+
+      {/* Task Detail Dialog */}
+      <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-lg">
+              <FileCode className="h-5 w-5" />
+              Detalhes da Tarefa
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedTask && (
+            <div className="space-y-4">
+              {/* Title and badges */}
+              <div className="space-y-2">
+                <h3 className="font-semibold text-base">{selectedTask.title}</h3>
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="outline" className={getPriorityColor(selectedTask.priority)}>
+                    {selectedTask.priority}
+                  </Badge>
+                  <Badge variant="outline" className={
+                    selectedTask.status === "pending" ? "bg-orange-100 text-orange-700" :
+                    selectedTask.status === "in_progress" ? "bg-blue-100 text-blue-700" :
+                    "bg-green-100 text-green-700"
+                  }>
+                    {selectedTask.status === "pending" ? "Pendente" :
+                     selectedTask.status === "in_progress" ? "Em Progresso" : "Concluida"}
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="p-3 bg-muted/50 rounded-lg">
+                <p className="text-sm text-muted-foreground">{selectedTask.description}</p>
+              </div>
+
+              {/* File location */}
+              {(selectedTask.repository_name || selectedTask.file_path) && (
+                <div className="border rounded-lg p-3 space-y-2">
+                  <h4 className="text-sm font-medium flex items-center gap-2">
+                    <GitBranch className="h-4 w-4 text-blue-500" />
+                    Localizacao
+                  </h4>
+                  {selectedTask.repository_name && (
+                    <p className="text-sm text-muted-foreground">
+                      Repositorio: <code className="text-primary">{selectedTask.repository_name}</code>
+                    </p>
+                  )}
+                  {selectedTask.file_path && (
+                    <p className="text-sm text-muted-foreground">
+                      Arquivo: <code className="text-primary font-mono text-xs">{selectedTask.file_path}</code>
+                    </p>
+                  )}
+                  {selectedTask.line_number && (
+                    <p className="text-sm text-muted-foreground">
+                      Linha: <Badge variant="secondary">{selectedTask.line_number}</Badge>
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Current Code (Problem) */}
+              {selectedTask.source_code && (
+                <div className="border rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-medium flex items-center gap-2 text-red-600">
+                      <AlertCircle className="h-4 w-4" />
+                      Codigo Atual (Problema)
+                    </h4>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        navigator.clipboard.writeText(selectedTask.source_code || "")
+                        toast({ title: "Copiado!", description: "Codigo copiado para a area de transferencia" })
+                      }}
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <pre className="bg-red-50 border border-red-200 rounded p-2 text-xs overflow-x-auto">
+                    <code className="text-red-800">
+                      {selectedTask.code_before && <span className="text-muted-foreground">{selectedTask.code_before}{"\n"}</span>}
+                      <span className="bg-red-200 px-1">{selectedTask.source_code}</span>
+                      {selectedTask.code_after && <span className="text-muted-foreground">{"\n"}{selectedTask.code_after}</span>}
+                    </code>
+                  </pre>
+                </div>
+              )}
+
+              {/* Suggested Code (Fix) */}
+              {selectedTask.suggested_code && (
+                <div className="border rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-medium flex items-center gap-2 text-green-600">
+                      <Play className="h-4 w-4" />
+                      Codigo Sugerido (Correcao)
+                    </h4>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        navigator.clipboard.writeText(selectedTask.suggested_code || "")
+                        toast({ title: "Copiado!", description: "Codigo copiado para a area de transferencia" })
+                      }}
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <pre className="bg-green-50 border border-green-200 rounded p-2 text-xs overflow-x-auto">
+                    <code className="text-green-800">
+                      {selectedTask.code_before && <span className="text-muted-foreground">{selectedTask.code_before}{"\n"}</span>}
+                      <span className="bg-green-200 px-1">{selectedTask.suggested_code}</span>
+                      {selectedTask.code_after && <span className="text-muted-foreground">{"\n"}{selectedTask.code_after}</span>}
+                    </code>
+                  </pre>
+                </div>
+              )}
+
+              {/* AI Analysis */}
+              {selectedTask.ai_explanation && (
+                <div className="border rounded-lg p-3 bg-primary/5">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-medium flex items-center gap-2">
+                      <Brain className="h-4 w-4 text-primary" />
+                      Analise da IA
+                    </h4>
+                    {selectedTask.ai_confidence && (
+                      <Badge className={
+                        selectedTask.ai_confidence >= 0.8 ? "bg-green-100 text-green-700" :
+                        selectedTask.ai_confidence >= 0.5 ? "bg-amber-100 text-amber-700" :
+                        "bg-red-100 text-red-700"
+                      }>
+                        {Math.round(selectedTask.ai_confidence * 100)}% confianca
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{selectedTask.ai_explanation}</p>
+                </div>
+              )}
+
+              {/* AI Suggestion */}
+              {selectedTask.ai_suggestion && (
+                <div className="border rounded-lg p-3 bg-yellow-50">
+                  <h4 className="text-sm font-medium flex items-center gap-2 mb-2 text-yellow-700">
+                    <Lightbulb className="h-4 w-4" />
+                    Sugestao da IA
+                  </h4>
+                  <p className="text-sm text-yellow-800 whitespace-pre-wrap">{selectedTask.ai_suggestion}</p>
+                </div>
+              )}
+
+              {/* Hours Tracking */}
+              <div className="border rounded-lg p-3">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-medium flex items-center gap-2">
+                    <Timer className="h-4 w-4" />
+                    Controle de Horas
+                  </h4>
+                  {!isEditingHours ? (
+                    <Button variant="outline" size="sm" onClick={() => setIsEditingHours(true)}>
+                      Editar
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => setIsEditingHours(false)}>
+                        <X className="h-3 w-3" />
+                      </Button>
+                      <Button size="sm" onClick={handleSaveHours}>
+                        Salvar
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="bg-blue-50 border border-blue-200 rounded p-2 text-center">
+                    <div className="flex items-center justify-center gap-1 text-blue-600 mb-1">
+                      <Clock className="h-3 w-3" />
+                      <span className="text-[10px] font-medium">Estimado</span>
+                    </div>
+                    {isEditingHours ? (
+                      <Input
+                        type="number"
+                        step="0.5"
+                        min="0"
+                        value={editedHours.estimated_hours}
+                        onChange={(e) => setEditedHours({...editedHours, estimated_hours: Number(e.target.value)})}
+                        className="h-7 text-center text-sm font-bold"
+                      />
+                    ) : (
+                      <p className="text-lg font-bold text-blue-700">{selectedTask.estimated_hours || 0}h</p>
+                    )}
+                  </div>
+                  
+                  <div className="bg-orange-50 border border-orange-200 rounded p-2 text-center">
+                    <div className="flex items-center justify-center gap-1 text-orange-600 mb-1">
+                      <PlayCircle className="h-3 w-3" />
+                      <span className="text-[10px] font-medium">Restante</span>
+                    </div>
+                    {isEditingHours ? (
+                      <Input
+                        type="number"
+                        step="0.5"
+                        min="0"
+                        value={editedHours.remaining_hours}
+                        onChange={(e) => setEditedHours({...editedHours, remaining_hours: Number(e.target.value)})}
+                        className="h-7 text-center text-sm font-bold"
+                      />
+                    ) : (
+                      <p className="text-lg font-bold text-orange-700">{selectedTask.remaining_hours || 0}h</p>
+                    )}
+                  </div>
+                  
+                  <div className="bg-green-50 border border-green-200 rounded p-2 text-center">
+                    <div className="flex items-center justify-center gap-1 text-green-600 mb-1">
+                      <CheckCircle2 className="h-3 w-3" />
+                      <span className="text-[10px] font-medium">Completado</span>
+                    </div>
+                    {isEditingHours ? (
+                      <Input
+                        type="number"
+                        step="0.5"
+                        min="0"
+                        value={editedHours.completed_hours}
+                        onChange={(e) => setEditedHours({...editedHours, completed_hours: Number(e.target.value)})}
+                        className="h-7 text-center text-sm font-bold"
+                      />
+                    ) : (
+                      <p className="text-lg font-bold text-green-700">{selectedTask.completed_hours || 0}h</p>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Progress Bar */}
+                {(selectedTask.estimated_hours || 0) > 0 && (
+                  <div className="mt-2">
+                    <div className="flex justify-between text-[10px] text-muted-foreground mb-1">
+                      <span>Progresso</span>
+                      <span>{Math.round(((selectedTask.completed_hours || 0) / (selectedTask.estimated_hours || 1)) * 100)}%</span>
+                    </div>
+                    <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-green-500 transition-all duration-300"
+                        style={{ width: `${Math.min(((selectedTask.completed_hours || 0) / (selectedTask.estimated_hours || 1)) * 100, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Completed info */}
+              {selectedTask.status === "completed" && selectedTask.commit_hash && (
+                <div className="border rounded-lg p-3 bg-green-50">
+                  <h4 className="text-sm font-medium mb-2 text-green-700">Informacoes de Conclusao</h4>
+                  <div className="space-y-1 text-sm">
+                    <div className="flex items-center gap-2">
+                      <GitCommit className="h-3 w-3 text-green-600" />
+                      <span>Commit: <code className="font-mono">{selectedTask.commit_hash}</code></span>
+                    </div>
+                    {selectedTask.pr_number && (
+                      <div className="flex items-center gap-2">
+                        <GitPullRequest className="h-3 w-3 text-purple-600" />
+                        <span>PR: #{selectedTask.pr_number}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setIsDetailDialogOpen(false)}>
+              Fechar
+            </Button>
+            {selectedTask?.status === "pending" && (
+              <Button 
+                className="bg-blue-600 hover:bg-blue-700"
+                onClick={async () => {
+                  await onTaskUpdate(selectedTask.id, { status: "in_progress" })
+                  toast({ title: "Tarefa iniciada!", description: "Status atualizado para Em Desenvolvimento" })
+                  setIsDetailDialogOpen(false)
+                }}
+              >
+                <Play className="h-4 w-4 mr-2" />
+                Iniciar Tarefa
+              </Button>
+            )}
+            {selectedTask?.status === "in_progress" && (
+              <Button 
+                className="bg-green-600 hover:bg-green-700"
+                onClick={() => {
+                  setIsDetailDialogOpen(false)
+                  setIsCompletionDialogOpen(true)
+                }}
+              >
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                Finalizar
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Completion Dialog */}
       <Dialog open={isCompletionDialogOpen} onOpenChange={setIsCompletionDialogOpen}>

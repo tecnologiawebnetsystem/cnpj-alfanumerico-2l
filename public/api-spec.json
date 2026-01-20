@@ -1410,17 +1410,40 @@
       },
       "Notification": {
         "type": "object",
+        "description": "Notificacao do sistema - criada automaticamente quando admin atribui tarefas",
         "properties": {
           "id": {"type": "string", "format": "uuid"},
           "user_id": {"type": "string", "format": "uuid"},
-          "title": {"type": "string"},
-          "message": {"type": "string"},
+          "title": {"type": "string", "description": "Titulo da notificacao"},
+          "message": {"type": "string", "description": "Mensagem detalhada"},
           "type": {
             "type": "string",
-            "enum": ["info", "success", "warning", "error"]
+            "enum": ["task_assigned", "info", "success", "warning", "error"],
+            "description": "Tipo da notificacao"
           },
-          "read": {"type": "boolean"},
+          "data": {"type": "object", "description": "Dados adicionais (ex: task_ids, repository_id)"},
+          "read": {"type": "boolean", "description": "Se a notificacao foi lida"},
           "created_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "TaskHours": {
+        "type": "object",
+        "description": "Controle de horas da tarefa (estilo Azure DevOps)",
+        "properties": {
+          "estimated_hours": {"type": "number", "description": "Horas estimadas para completar a tarefa"},
+          "remaining_hours": {"type": "number", "description": "Horas restantes para completar"},
+          "completed_hours": {"type": "number", "description": "Horas ja trabalhadas na tarefa"}
+        }
+      },
+      "TaskAISuggestion": {
+        "type": "object",
+        "description": "Sugestao da IA para correcao do codigo",
+        "properties": {
+          "source_code": {"type": "string", "description": "Codigo original com problema"},
+          "suggested_code": {"type": "string", "description": "Codigo sugerido pela IA"},
+          "ai_explanation": {"type": "string", "description": "Explicacao da IA sobre o problema"},
+          "ai_suggestion": {"type": "string", "description": "Sugestao detalhada da IA"},
+          "ai_confidence": {"type": "number", "description": "Nivel de confianca da IA (0-1)"}
         }
       },
       "TaskAnalytics": {

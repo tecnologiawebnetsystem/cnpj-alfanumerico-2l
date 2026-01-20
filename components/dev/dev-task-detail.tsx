@@ -4,7 +4,8 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Clock, AlertCircle, CheckCircle2, Play, Check, FileCode, Brain, Copy, GitBranch } from "lucide-react"
+import { Clock, AlertCircle, CheckCircle2, Play, Check, FileCode, Brain, Copy, GitBranch, Timer, Lightbulb } from "lucide-react"
+import { Input } from "@/components/ui/input"
 
 interface Task {
   id: string
@@ -22,23 +23,55 @@ interface Task {
   code_before?: string
   code_after?: string
   ai_explanation?: string
+  ai_suggestion?: string
   ai_confidence?: number
   repository_name?: string
+  // Hours tracking (Azure DevOps style)
+  estimated_hours?: number
+  remaining_hours?: number
+  completed_hours?: number
 }
 
 interface DevTaskDetailProps {
   task: Task
   onUpdateStatus: (taskId: string, status: string) => void
+  onUpdateHours?: (taskId: string, hours: { estimated_hours?: number; remaining_hours?: number; completed_hours?: number }) => Promise<void>
 }
 
-export function DevTaskDetail({ task, onUpdateStatus }: DevTaskDetailProps) {
+export function DevTaskDetail({ task, onUpdateStatus, onUpdateHours }: DevTaskDetailProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [isEditingHours, setIsEditingHours] = useState(false)
+  const [estimatedHours, setEstimatedHours] = useState(task.estimated_hours || 0)
+  const [remainingHours, setRemainingHours] = useState(task.remaining_hours || 0)
+  const [completedHours, setCompletedHours] = useState(task.completed_hours || 0)
+  const [isSaving, setIsSaving] = useState(false)
 
   const copyToClipboard = async (text: string, id: string) => {
     await navigator.clipboard.writeText(text)
     setCopiedId(id)
     setTimeout(() => setCopiedId(null), 2000)
   }
+
+  const handleSaveHours = async () => {
+    if (!onUpdateHours) return
+    setIsSaving(true)
+    try {
+      await onUpdateHours(task.id, {
+        estimated_hours: estimatedHours,
+        remaining_hours: remainingHours,
+        completed_hours: completedHours,
+      })
+      setIsEditingHours(false)
+    } catch (error) {
+      console.error("Error saving hours:", error)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const progressPercentage = (task.estimated_hours || 0) > 0 
+    ? Math.round(((task.completed_hours || 0) / (task.estimated_hours || 1)) * 100) 
+    : 0
 
   const getConfidenceBadge = (confidence: number | undefined) => {
     if (!confidence) return null
@@ -220,6 +253,118 @@ export function DevTaskDetail({ task, onUpdateStatus }: DevTaskDetailProps) {
             </div>
           </div>
         )}
+
+        {/* Sugestao da IA */}
+        {task.ai_suggestion && (
+          <div className="border-t pt-4">
+            <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2 mb-2">
+              <Lightbulb className="h-4 w-4 text-yellow-500" />
+              Sugestao da IA
+            </h3>
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm">
+              <p className="whitespace-pre-wrap text-yellow-800">{task.ai_suggestion}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Hours Tracking - Azure DevOps Style */}
+        <div className="border-t pt-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+              <Timer className="h-4 w-4" />
+              Controle de Horas
+            </h3>
+            {!isEditingHours ? (
+              <Button variant="outline" size="sm" onClick={() => setIsEditingHours(true)}>
+                Editar
+              </Button>
+            ) : (
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => setIsEditingHours(false)}>
+                  Cancelar
+                </Button>
+                <Button size="sm" onClick={handleSaveHours} disabled={isSaving}>
+                  {isSaving ? "Salvando..." : "Salvar"}
+                </Button>
+              </div>
+            )}
+          </div>
+          
+          <div className="grid grid-cols-3 gap-2">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-center">
+              <div className="flex items-center justify-center gap-1 text-blue-600 mb-1">
+                <Clock className="h-3 w-3" />
+                <span className="text-[10px] font-medium">Estimado</span>
+              </div>
+              {isEditingHours ? (
+                <Input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  value={estimatedHours}
+                  onChange={(e) => setEstimatedHours(Number(e.target.value))}
+                  className="h-7 text-center text-sm font-bold"
+                />
+              ) : (
+                <p className="text-lg font-bold text-blue-700">{task.estimated_hours || 0}h</p>
+              )}
+            </div>
+            
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 text-center">
+              <div className="flex items-center justify-center gap-1 text-orange-600 mb-1">
+                <Play className="h-3 w-3" />
+                <span className="text-[10px] font-medium">Restante</span>
+              </div>
+              {isEditingHours ? (
+                <Input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  value={remainingHours}
+                  onChange={(e) => setRemainingHours(Number(e.target.value))}
+                  className="h-7 text-center text-sm font-bold"
+                />
+              ) : (
+                <p className="text-lg font-bold text-orange-700">{task.remaining_hours || 0}h</p>
+              )}
+            </div>
+            
+            <div className="bg-green-50 border border-green-200 rounded-lg p-2 text-center">
+              <div className="flex items-center justify-center gap-1 text-green-600 mb-1">
+                <CheckCircle2 className="h-3 w-3" />
+                <span className="text-[10px] font-medium">Completado</span>
+              </div>
+              {isEditingHours ? (
+                <Input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  value={completedHours}
+                  onChange={(e) => setCompletedHours(Number(e.target.value))}
+                  className="h-7 text-center text-sm font-bold"
+                />
+              ) : (
+                <p className="text-lg font-bold text-green-700">{task.completed_hours || 0}h</p>
+              )}
+            </div>
+          </div>
+          
+          {/* Progress Bar */}
+          {(task.estimated_hours || 0) > 0 && (
+            <div className="mt-2">
+              <div className="flex justify-between text-[10px] text-muted-foreground mb-1">
+                <span>Progresso</span>
+                <span>{progressPercentage}%</span>
+              </div>
+              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-green-500 transition-all duration-300"
+                  style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="border-t pt-4">
           <h3 className="text-sm font-semibold text-slate-700 mb-3">Atualizar Status</h3>

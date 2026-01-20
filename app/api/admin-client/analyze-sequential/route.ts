@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { CNPJDetector } from "@/lib/analyzer/cnpj-detector"
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,11 +27,45 @@ export async function POST(request: NextRequest) {
       .single()
 
     // Buscar configuracoes de campos CNPJ e extensoes
-    const { data: clientSettings } = await supabase
+    const { data: clientSettingsRows } = await supabase
       .from("client_settings")
-      .select("cnpj_field_names, file_extensions")
+      .select("setting_key, setting_value")
       .eq("client_id", client_id)
-      .single()
+    
+    // Parse client settings - values are stored as JSON strings
+    const clientSettings: Record<string, any> = {}
+    if (clientSettingsRows) {
+      for (const row of clientSettingsRows) {
+        try {
+          clientSettings[row.setting_key] = JSON.parse(row.setting_value)
+        } catch {
+          clientSettings[row.setting_key] = row.setting_value
+        }
+      }
+    }
+    
+    // Get CNPJ field names (already parsed as array from JSON)
+    const cnpjFieldNames: string[] = Array.isArray(clientSettings.cnpj_field_names) 
+      ? clientSettings.cnpj_field_names
+      : typeof clientSettings.cnpj_field_names === "string"
+        ? clientSettings.cnpj_field_names.split(",").map((s: string) => s.trim())
+        : ["cnpj", "cpf_cnpj", "documento", "nr_cnpj", "num_cnpj", "inscricao", "inscricaofederal", "cadastro_nacional"]
+    
+    // Get file extensions (already parsed as array from JSON)
+    const fileExtensions: string[] = Array.isArray(clientSettings.file_extensions)
+      ? clientSettings.file_extensions
+      : typeof clientSettings.file_extensions === "string"
+        ? clientSettings.file_extensions.split(",").map((s: string) => s.trim())
+        : [".ts", ".tsx", ".js", ".jsx", ".java", ".cs", ".py", ".sql", ".php", ".go", ".rb"]
+    
+    console.log("========== ANALYSIS SETTINGS LOADED ==========")
+    console.log("CNPJ Field Names:", cnpjFieldNames)
+    console.log("File Extensions:", fileExtensions)
+    console.log("AI Enabled:", !!aiSettings)
+    console.log("===============================================")
+
+    // Initialize CNPJ Detector with configured field names
+    const detector = new CNPJDetector(cnpjFieldNames)
 
     // Criar registro de batch analysis
     const { data: batch, error: batchError } = await supabase
@@ -96,13 +131,34 @@ export async function POST(request: NextRequest) {
           continue
         }
 
+        console.log(`\n========== ANALYZING REPOSITORY ${i + 1}/${repository_ids.length}: ${repo.name} ==========`)
+
+        // Buscar integracao do cliente para obter tokens
+        const { data: integration } = await supabase
+          .from("integrations")
+          .select("*")
+          .eq("client_id", client_id)
+          .eq("provider", repo.provider || "azure")
+          .single()
+
+        if (!integration) {
+          failedRepos++
+          results.push({
+            repositoryId: repoId,
+            repositoryName: repo.name,
+            status: "error",
+            error: "Integracao nao encontrada para o provider",
+          })
+          continue
+        }
+
         // Criar log de clone
         const { data: cloneLog } = await supabase
           .from("repository_clone_logs")
           .insert({
             repository_id: repoId,
             analysis_id: analysis.id,
-            status: "cloning",
+            status: "analyzing",
             clone_started_at: new Date().toISOString(),
           })
           .select()
@@ -115,19 +171,45 @@ export async function POST(request: NextRequest) {
           .update({ progress, status: "processing" })
           .eq("id", analysis.id)
 
-        // Simular analise do repositorio
-        // Em producao real, aqui fariamos:
-        // 1. Clone via API do GitHub/GitLab
-        // 2. Analise de cada arquivo
-        // 3. Deteccao de CNPJ
-        // 4. Processamento com IA
+        // ANALISE REAL: Buscar arquivos via API do provider
+        let findings: any[] = []
+        let filesProcessed = 0
 
-        const mockFindings = generateMockFindings(repo, aiSettings)
+        if (repo.provider === "github" || integration.provider === "github") {
+          // GitHub API
+          const githubResult = await analyzeGitHubRepository(
+            repo, 
+            integration.access_token, 
+            fileExtensions, 
+            detector
+          )
+          findings = githubResult.findings
+          filesProcessed = githubResult.filesProcessed
+        } else {
+          // Azure DevOps API
+          const azureResult = await analyzeAzureRepository(
+            repo, 
+            integration, 
+            fileExtensions, 
+            detector
+          )
+          findings = azureResult.findings
+          filesProcessed = azureResult.filesProcessed
+        }
+
+        console.log(`Found ${findings.length} findings in ${filesProcessed} files`)
+
+        // Processar com IA se habilitado
+        if (aiSettings && findings.length > 0) {
+          console.log("Processing findings with AI...")
+          findings = await processWithAI(findings, aiSettings)
+        }
 
         // Salvar findings
-        if (mockFindings.length > 0) {
-          const findingsToInsert = mockFindings.map((f: any) => ({
+        if (findings.length > 0) {
+          const findingsToInsert = findings.map((f: any) => ({
             analysis_id: analysis.id,
+            repository_id: repoId,
             file_path: f.file_path,
             line_number: f.line_number,
             field_name: f.field_name,
@@ -144,7 +226,7 @@ export async function POST(request: NextRequest) {
           }))
 
           await supabase.from("findings").insert(findingsToInsert)
-          totalFindings += mockFindings.length
+          totalFindings += findings.length
         }
 
         // Atualizar log de clone
@@ -155,8 +237,8 @@ export async function POST(request: NextRequest) {
             clone_completed_at: new Date().toISOString(),
             analysis_completed_at: new Date().toISOString(),
             cleanup_at: new Date().toISOString(),
-            files_processed: Math.floor(Math.random() * 50) + 10,
-            findings_count: mockFindings.length,
+            files_processed: filesProcessed,
+            findings_count: findings.length,
           })
           .eq("id", cloneLog?.id)
 
@@ -165,9 +247,11 @@ export async function POST(request: NextRequest) {
           repositoryId: repoId,
           repositoryName: repo.name,
           status: "success",
-          findingsCount: mockFindings.length,
+          filesProcessed,
+          findingsCount: findings.length,
         })
       } catch (error: any) {
+        console.error(`Error analyzing repository ${repoId}:`, error)
         failedRepos++
         results.push({
           repositoryId: repoId,
@@ -219,59 +303,284 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * Gera findings de exemplo baseados no repositorio
- * Em producao, seria substituido por analise real do codigo
+ * Analisa repositorio do GitHub via API (sem git clone)
  */
-function generateMockFindings(repo: any, aiSettings: any) {
-  const hasAI = !!aiSettings
+async function analyzeGitHubRepository(
+  repo: any,
+  accessToken: string,
+  fileExtensions: string[],
+  detector: CNPJDetector
+): Promise<{ findings: any[]; filesProcessed: number }> {
+  const findings: any[] = []
+  let filesProcessed = 0
 
-  // Exemplos de findings para demonstracao
-  const sampleFindings = [
-    {
-      file_path: `src/services/${repo.name.toLowerCase()}/cnpj-validator.ts`,
-      line_number: 45,
-      field_name: "nr_cnpj",
-      context: "const nr_cnpj = documento.replace(/\\D/g, '');",
-      code_context: "const nr_cnpj = documento.replace(/\\D/g, '');",
-      code_before_lines: "// Valida CNPJ\nfunction validateCNPJ(documento: string) {",
-      code_after_lines: "  if (nr_cnpj.length !== 14) {\n    return false;\n  }",
-      suggestion: "Atualizar validacao para aceitar CNPJ alfanumerico de 12 caracteres",
-      action_required: "Remover replace de caracteres nao-numericos e atualizar validacao de tamanho",
-      ai_analysis: hasAI ? "Este codigo remove todos os caracteres nao-numericos do CNPJ, o que impedira o funcionamento com o novo formato alfanumerico." : null,
-      ai_suggestion: hasAI ? "// Valida CNPJ (suporta formato alfanumerico)\nfunction validateCNPJ(documento: string) {\n  const cnpj = documento.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();\n  if (cnpj.length !== 12) {\n    return false;\n  }\n  // Nova validacao com algoritmo alfanumerico\n  return validateAlphanumericCNPJ(cnpj);\n}" : null,
-      ai_confidence: hasAI ? 0.95 : null,
-    },
-    {
-      file_path: `src/components/${repo.name.toLowerCase()}/CnpjInput.tsx`,
-      line_number: 23,
-      field_name: "cnpj",
-      context: "mask=\"99.999.999/9999-99\"",
-      code_context: "<InputMask mask=\"99.999.999/9999-99\" value={cnpj} />",
-      code_before_lines: "export function CnpjInput({ value, onChange }) {\n  const [cnpj, setCnpj] = useState(value);",
-      code_after_lines: "  return (\n    <div className=\"cnpj-input\">\n      {/* ... */}",
-      suggestion: "Atualizar mascara para suportar caracteres alfanumericos",
-      action_required: "Substituir mascara numerica por mascara que aceite letras e numeros",
-      ai_analysis: hasAI ? "A mascara atual (99.999.999/9999-99) aceita apenas numeros. O novo formato CNPJ alfanumerico requer uma mascara que aceite letras maiusculas e numeros." : null,
-      ai_suggestion: hasAI ? "// Nova mascara para CNPJ alfanumerico\n<InputMask\n  mask=\"**.**.***/****-**\"\n  formatChars={{\n    '*': '[A-Za-z0-9]'\n  }}\n  value={cnpj}\n  onChange={handleChange}\n  beforeMaskedValueChange={(newState) => ({\n    ...newState,\n    value: newState.value.toUpperCase()\n  })}\n/>" : null,
-      ai_confidence: hasAI ? 0.92 : null,
-    },
-    {
-      file_path: `database/migrations/create_${repo.name.toLowerCase()}_table.sql`,
-      line_number: 12,
-      field_name: "cnpj",
-      context: "cnpj VARCHAR(14) NOT NULL,",
-      code_context: "cnpj VARCHAR(14) NOT NULL,",
-      code_before_lines: "CREATE TABLE empresas (\n  id UUID PRIMARY KEY,\n  nome VARCHAR(255),",
-      code_after_lines: "  razao_social VARCHAR(255),\n  CONSTRAINT uk_cnpj UNIQUE (cnpj)\n);",
-      suggestion: "Aumentar tamanho do campo para VARCHAR(12) e permitir caracteres alfanumericos",
-      action_required: "Criar migration para alterar tipo e tamanho do campo",
-      ai_analysis: hasAI ? "O campo CNPJ esta definido como VARCHAR(14) para armazenar o CNPJ numerico com formatacao. O novo formato alfanumerico tem 12 caracteres sem formatacao." : null,
-      ai_suggestion: hasAI ? "-- Migration: Atualizar campo CNPJ para formato alfanumerico\nALTER TABLE empresas\n  ALTER COLUMN cnpj TYPE VARCHAR(12);\n\n-- Adicionar check constraint para validar formato\nALTER TABLE empresas\n  ADD CONSTRAINT chk_cnpj_format\n  CHECK (cnpj ~ '^[A-Z0-9]{12}$');\n\n-- Criar funcao de conversao\nCREATE OR REPLACE FUNCTION convert_cnpj_to_alphanumeric(old_cnpj VARCHAR)\nRETURNS VARCHAR AS $$\nBEGIN\n  RETURN UPPER(REPLACE(REPLACE(REPLACE(old_cnpj, '.', ''), '/', ''), '-', ''));\nEND;\n$$ LANGUAGE plpgsql;" : null,
-      ai_confidence: hasAI ? 0.98 : null,
-    },
-  ]
+  try {
+    // Get repository tree
+    const treeUrl = `https://api.github.com/repos/${repo.full_name || repo.owner + '/' + repo.name}/git/trees/main?recursive=1`
+    const treeResponse = await fetch(treeUrl, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/vnd.github.v3+json",
+      },
+    })
 
-  // Retornar 1-3 findings aleatorios
-  const count = Math.floor(Math.random() * 3) + 1
-  return sampleFindings.slice(0, count)
+    if (!treeResponse.ok) {
+      // Try master branch
+      const masterTreeUrl = treeUrl.replace("/main?", "/master?")
+      const masterResponse = await fetch(masterTreeUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/vnd.github.v3+json",
+        },
+      })
+      if (!masterResponse.ok) {
+        console.error("Could not get repository tree")
+        return { findings: [], filesProcessed: 0 }
+      }
+      const treeData = await masterResponse.json()
+      return processGitHubTree(repo, treeData, accessToken, fileExtensions, detector)
+    }
+
+    const treeData = await treeResponse.json()
+    return processGitHubTree(repo, treeData, accessToken, fileExtensions, detector)
+  } catch (error) {
+    console.error("Error analyzing GitHub repository:", error)
+    return { findings, filesProcessed }
+  }
+}
+
+async function processGitHubTree(
+  repo: any,
+  treeData: any,
+  accessToken: string,
+  fileExtensions: string[],
+  detector: CNPJDetector
+): Promise<{ findings: any[]; filesProcessed: number }> {
+  const findings: any[] = []
+  let filesProcessed = 0
+
+  const files = (treeData.tree || []).filter((item: any) => {
+    if (item.type !== "blob") return false
+    const ext = "." + (item.path.split(".").pop()?.toLowerCase() || "")
+    return fileExtensions.some(allowedExt => allowedExt.toLowerCase() === ext)
+  })
+
+  console.log(`GitHub: Found ${files.length} files to analyze (filtered from ${treeData.tree?.length || 0})`)
+
+  // Analyze each file (limit to 50 files for performance)
+  const filesToAnalyze = files.slice(0, 50)
+
+  for (const file of filesToAnalyze) {
+    try {
+      const contentUrl = `https://api.github.com/repos/${repo.full_name || repo.owner + '/' + repo.name}/contents/${file.path}`
+      const contentResponse = await fetch(contentUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/vnd.github.v3+json",
+        },
+      })
+
+      if (!contentResponse.ok) continue
+
+      const contentData = await contentResponse.json()
+      const content = Buffer.from(contentData.content || "", "base64").toString("utf-8")
+
+      filesProcessed++
+
+      // Analyze content with CNPJ detector
+      const fileFindings = detector.analyze(content, file.path)
+      
+      for (const finding of fileFindings) {
+        findings.push({
+          file_path: file.path,
+          line_number: finding.lineNumber,
+          field_name: finding.fieldName,
+          context: finding.line,
+          code_context: finding.line,
+          code_before_lines: finding.codeBefore,
+          code_after_lines: finding.codeAfter,
+          suggestion: finding.suggestion || "Verificar compatibilidade com CNPJ alfanumerico",
+          action_required: "Atualizar para suportar novo formato CNPJ (12 caracteres alfanumericos)",
+        })
+      }
+    } catch (error) {
+      console.error(`Error reading file ${file.path}:`, error)
+    }
+  }
+
+  return { findings, filesProcessed }
+}
+
+/**
+ * Analisa repositorio do Azure DevOps via API (sem git clone)
+ */
+async function analyzeAzureRepository(
+  repo: any,
+  integration: any,
+  fileExtensions: string[],
+  detector: CNPJDetector
+): Promise<{ findings: any[]; filesProcessed: number }> {
+  const findings: any[] = []
+  let filesProcessed = 0
+
+  try {
+    const azureOrg = integration.azure_organization || integration.organization
+    const azureProject = repo.project_name || repo.project || repo.name
+    const accessToken = integration.access_token
+
+    const baseUrl = `https://dev.azure.com/${azureOrg}/${azureProject}/_apis/git/repositories/${repo.azure_repo_id || repo.name}`
+    const authHeader = `Basic ${Buffer.from(`:${accessToken}`).toString("base64")}`
+
+    // Get repository items (files)
+    const itemsUrl = `${baseUrl}/items?recursionLevel=Full&api-version=7.0`
+    const itemsResponse = await fetch(itemsUrl, {
+      headers: {
+        Authorization: authHeader,
+        "Content-Type": "application/json",
+      },
+    })
+
+    if (!itemsResponse.ok) {
+      console.error("Could not get Azure repository items:", await itemsResponse.text())
+      return { findings: [], filesProcessed: 0 }
+    }
+
+    const itemsData = await itemsResponse.json()
+    
+    // Filter files by extension
+    const files = (itemsData.value || []).filter((item: any) => {
+      if (item.isFolder) return false
+      const ext = "." + (item.path.split(".").pop()?.toLowerCase() || "")
+      return fileExtensions.some(allowedExt => allowedExt.toLowerCase() === ext)
+    })
+
+    console.log(`Azure: Found ${files.length} files to analyze (filtered from ${itemsData.value?.length || 0})`)
+
+    // Analyze each file (limit to 50 files for performance)
+    const filesToAnalyze = files.slice(0, 50)
+
+    for (const file of filesToAnalyze) {
+      try {
+        const contentUrl = `${baseUrl}/items?path=${encodeURIComponent(file.path)}&api-version=7.0`
+        const contentResponse = await fetch(contentUrl, {
+          headers: {
+            Authorization: authHeader,
+          },
+        })
+
+        if (!contentResponse.ok) continue
+
+        const content = await contentResponse.text()
+        filesProcessed++
+
+        // Analyze content with CNPJ detector
+        const fileFindings = detector.analyze(content, file.path)
+        
+        for (const finding of fileFindings) {
+          findings.push({
+            file_path: file.path,
+            line_number: finding.lineNumber,
+            field_name: finding.fieldName,
+            context: finding.line,
+            code_context: finding.line,
+            code_before_lines: finding.codeBefore,
+            code_after_lines: finding.codeAfter,
+            suggestion: finding.suggestion || "Verificar compatibilidade com CNPJ alfanumerico",
+            action_required: "Atualizar para suportar novo formato CNPJ (12 caracteres alfanumericos)",
+          })
+        }
+      } catch (error) {
+        console.error(`Error reading file ${file.path}:`, error)
+      }
+    }
+
+    return { findings, filesProcessed }
+  } catch (error) {
+    console.error("Error analyzing Azure repository:", error)
+    return { findings, filesProcessed }
+  }
+}
+
+/**
+ * Processa findings com IA (Gemini)
+ */
+async function processWithAI(findings: any[], aiSettings: any): Promise<any[]> {
+  const apiKey = aiSettings.api_key
+  const model = aiSettings.model_name || "gemini-1.5-flash"
+
+  // Process max 10 findings with AI to avoid timeout
+  const findingsToProcess = findings.slice(0, 10)
+  const processedFindings = [...findings]
+
+  for (let i = 0; i < findingsToProcess.length; i++) {
+    try {
+      const finding = findingsToProcess[i]
+      
+      const prompt = `Analise o seguinte codigo que contem um campo CNPJ e forneca:
+1. Uma explicacao do problema (por que precisa ser atualizado para CNPJ alfanumerico)
+2. Uma sugestao de codigo corrigido
+
+Arquivo: ${finding.file_path}
+Linha: ${finding.line_number}
+Campo encontrado: ${finding.field_name}
+
+Codigo atual:
+${finding.code_before_lines || ''}
+${finding.context}
+${finding.code_after_lines || ''}
+
+Responda em JSON com o formato:
+{
+  "analysis": "explicacao do problema",
+  "suggestion": "codigo sugerido para correcao",
+  "confidence": 0.0 a 1.0
+}`
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: aiSettings.temperature || 0.3,
+              maxOutputTokens: aiSettings.max_tokens || 2048,
+            },
+          }),
+        }
+      )
+
+      if (response.ok) {
+        const data = await response.json()
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || ""
+        
+        // Try to parse JSON from response
+        const jsonMatch = text.match(/\{[\s\S]*\}/)
+        if (jsonMatch) {
+          try {
+            const aiResult = JSON.parse(jsonMatch[0])
+            processedFindings[i] = {
+              ...finding,
+              ai_analysis: aiResult.analysis,
+              ai_suggestion: aiResult.suggestion,
+              ai_confidence: aiResult.confidence || 0.8,
+            }
+          } catch {
+            // If JSON parse fails, use raw text
+            processedFindings[i] = {
+              ...finding,
+              ai_analysis: text,
+              ai_suggestion: null,
+              ai_confidence: 0.5,
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error processing finding with AI:", error)
+    }
+  }
+
+  return processedFindings
 }

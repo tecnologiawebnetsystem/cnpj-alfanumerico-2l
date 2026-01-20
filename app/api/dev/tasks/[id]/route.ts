@@ -2,7 +2,15 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  return handleUpdate(request, params)
+}
+
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  return handleUpdate(request, params)
+}
+
+async function handleUpdate(request: NextRequest, params: Promise<{ id: string }>) {
   try {
     const { id } = await params
     const cookieStore = await cookies()
@@ -30,6 +38,17 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     if (body.status) {
       updateData.status = body.status
+    }
+
+    // Hours tracking fields
+    if (body.estimated_hours !== undefined) {
+      updateData.estimated_hours = body.estimated_hours
+    }
+    if (body.remaining_hours !== undefined) {
+      updateData.remaining_hours = body.remaining_hours
+    }
+    if (body.completed_hours !== undefined) {
+      updateData.completed_hours = body.completed_hours
     }
 
     if (body.status === "completed") {

@@ -110,18 +110,18 @@ export function HeroSection() {
       <header className="relative z-50 pt-8">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="bg-white p-3 rounded-xl shadow-md">
+            <div className="flex items-center gap-3">
+              <div className="rounded-xl overflow-hidden shadow-md border-2 border-[#0052CC]/30">
                 <Image
                   src="/images/act-logo-horizontal.jpeg"
                   alt="ACT Digital"
                   width={100}
                   height={40}
-                  className="rounded"
+                  className="object-cover"
                   priority
                 />
               </div>
-              <div className="hidden sm:block border-l-2 border-[#0052CC]/20 pl-4">
+              <div className="hidden sm:block border-l-2 border-[#0052CC]/20 pl-3">
                 <h1 className="text-lg font-bold text-gray-800">CNPJ Alfanumérico</h1>
                 <p className="text-xs text-gray-500">Powered by AI</p>
               </div>

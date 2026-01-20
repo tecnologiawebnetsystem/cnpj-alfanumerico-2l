@@ -151,39 +151,78 @@ export async function POST(request: NextRequest) {
       console.log(" Step 5: ✓ Loaded", repos.length, "repositories")
     }
 
-    console.log(" Step 6: Loading search patterns...")
-    let patterns = searchPatterns || []
-
-    if (!patterns.length) {
+    console.log(" Step 6: Loading client settings (CNPJ fields & file extensions)...")
+    
+    // Load client settings for CNPJ field names and file extensions
+    const { data: clientSettingsRows } = await supabase
+      .from("client_settings")
+      .select("setting_key, setting_value")
+      .eq("client_id", user.client_id)
+    
+    // Parse client settings - values are stored as JSON strings
+    const clientSettings: Record<string, any> = {}
+    if (clientSettingsRows) {
+      for (const row of clientSettingsRows) {
+        try {
+          clientSettings[row.setting_key] = JSON.parse(row.setting_value)
+        } catch {
+          clientSettings[row.setting_key] = row.setting_value
+        }
+      }
+    }
+    
+    // Get CNPJ field names from client settings
+    let cnpjFieldNames: string[] = Array.isArray(clientSettings.cnpj_field_names) 
+      ? clientSettings.cnpj_field_names
+      : typeof clientSettings.cnpj_field_names === "string"
+        ? clientSettings.cnpj_field_names.split(",").map((s: string) => s.trim())
+        : []
+    
+    // If no client settings, try user's custom patterns
+    if (cnpjFieldNames.length === 0 && searchPatterns?.length) {
+      cnpjFieldNames = searchPatterns.map((p) => p.field_name)
+      console.log(" Step 6: ✓ Using custom patterns from request:", cnpjFieldNames.length)
+    }
+    
+    // If still empty, try database patterns
+    if (cnpjFieldNames.length === 0) {
       try {
         const { data: dbPatterns } = await supabase
           .from("search_patterns")
-          .select("field_name, pattern, description")
+          .select("field_name")
           .eq("user_id", user.id)
           .eq("is_active", true)
 
         if (dbPatterns && dbPatterns.length > 0) {
-          patterns = dbPatterns
-          console.log(" Step 6: ✓ Loaded", patterns.length, "custom patterns")
-        } else {
-          patterns = [
-            { field_name: "CNPJ", pattern: "CNPJ", description: "CNPJ padrão" },
-            { field_name: "NR_INSCRICAO", pattern: "NR_INSCRICAO", description: "Número de inscrição" },
-          ]
-          console.log(" Step 6: ✓ Using default patterns")
+          cnpjFieldNames = dbPatterns.map((p: any) => p.field_name)
+          console.log(" Step 6: ✓ Loaded", cnpjFieldNames.length, "patterns from database")
         }
       } catch (patternError) {
-        patterns = [
-          { field_name: "CNPJ", pattern: "CNPJ", description: "CNPJ padrão" },
-          { field_name: "NR_INSCRICAO", pattern: "NR_INSCRICAO", description: "Número de inscrição" },
-        ]
-        console.log(" Step 6: Using default patterns (error loading custom patterns)")
+        console.log(" Step 6: Could not load patterns from database")
       }
     }
+    
+    // If still empty, use defaults
+    if (cnpjFieldNames.length === 0) {
+      cnpjFieldNames = ["cnpj", "cpf_cnpj", "documento", "nr_cnpj", "num_cnpj", "inscricao", "inscricaofederal", "cadastro_nacional", "NR_INSCRICAO"]
+      console.log(" Step 6: ✓ Using default CNPJ field names")
+    }
+    
+    // Get file extensions from client settings
+    const fileExtensions: string[] = Array.isArray(clientSettings.file_extensions)
+      ? clientSettings.file_extensions
+      : typeof clientSettings.file_extensions === "string"
+        ? clientSettings.file_extensions.split(",").map((s: string) => s.trim())
+        : [".ts", ".tsx", ".js", ".jsx", ".java", ".cs", ".py", ".sql", ".php", ".go", ".rb", ".kt"]
+    
+    console.log(" Step 6: ========== ANALYSIS CONFIGURATION ==========")
+    console.log(" Step 6: CNPJ Field Names:", cnpjFieldNames)
+    console.log(" Step 6: File Extensions:", fileExtensions)
+    console.log(" Step 6: ==============================================")
 
     console.log(" Step 7: Initializing CNPJ detector...")
-    const detector = new CNPJDetector(patterns.map((p) => p.field_name))
-    console.log(" Step 7: ✓ Detector initialized")
+    const detector = new CNPJDetector(cnpjFieldNames)
+    console.log(" Step 7: ✓ Detector initialized with", cnpjFieldNames.length, "field names")
 
     console.log(" Step 8: Starting repository analysis...")
     let completedCount = 0
@@ -237,10 +276,16 @@ export async function POST(request: NextRequest) {
         }
 
         const filesData = await filesResponse.json()
-        const files = filesData.value.filter((item: any) => !item.isFolder)
+        const allFiles = filesData.value.filter((item: any) => !item.isFolder)
+        
+        // Filter files by allowed extensions
+        const files = allFiles.filter((file: any) => {
+          const ext = "." + (file.path.split(".").pop()?.toLowerCase() || "")
+          return fileExtensions.some((allowedExt: string) => allowedExt.toLowerCase() === ext)
+        })
+        
         totalFiles += files.length
-
-        console.log(` Step 8.${i + 1}.3: Analyzing ${files.length} files...`)
+        console.log(` Step 8.${i + 1}.3: Analyzing ${files.length} files (filtered from ${allFiles.length} by extensions: ${fileExtensions.join(", ")})...`)
 
         for (const file of files) {
           try {

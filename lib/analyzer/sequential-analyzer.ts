@@ -1,10 +1,12 @@
 /**
  * Sequential Repository Analyzer
- * Fluxo: Clone -> Analyze -> Cleanup -> Next
- * Processa um repositorio por vez para otimizar recursos
+ * Fluxo: Fetch via API -> Analyze -> AI Processing -> Next
+ * Processa um repositorio por vez via APIs (GitHub/Azure DevOps)
+ * NAO usa git clone - funciona em ambiente serverless
  */
 
 import { createClient } from "@/lib/supabase/server"
+import { CNPJDetector } from "@/lib/analyzer/cnpj-detector"
 
 interface AnalysisResult {
   repositoryId: string
@@ -26,13 +28,16 @@ interface Finding {
   code_after_lines: string
   suggestion: string
   action_required: string
+  ai_analysis?: string
+  ai_suggestion?: string
+  ai_confidence?: number
 }
 
 interface AnalysisProgress {
   totalRepositories: number
   currentRepository: number
   currentRepositoryName: string
-  phase: "cloning" | "analyzing" | "ai_processing" | "cleanup" | "completed"
+  phase: "fetching" | "analyzing" | "ai_processing" | "saving" | "completed"
   filesProcessed: number
   findingsCount: number
   percentage: number
@@ -47,6 +52,7 @@ export class SequentialAnalyzer {
   private aiModel: string = "gemini-1.5-flash"
   private cnpjFields: string[] = []
   private fileExtensions: string[] = []
+  private detector: CNPJDetector
 
   constructor(
     clientId: string,
@@ -66,16 +72,18 @@ export class SequentialAnalyzer {
     this.aiEnabled = options?.aiEnabled || false
     this.aiApiKey = options?.aiApiKey || ""
     this.aiModel = options?.aiModel || "gemini-1.5-flash"
-    this.cnpjFields = options?.cnpjFields || ["cnpj", "nr_cnpj", "nrCnpj", "documento"]
-    this.fileExtensions = options?.fileExtensions || [".ts", ".tsx", ".js", ".jsx", ".java", ".cs", ".py", ".php"]
+    this.cnpjFields = options?.cnpjFields || ["cnpj", "nr_cnpj", "nrCnpj", "documento", "cpf_cnpj", "inscricao"]
+    this.fileExtensions = options?.fileExtensions || [".ts", ".tsx", ".js", ".jsx", ".java", ".cs", ".py", ".sql", ".php"]
+    this.detector = new CNPJDetector(this.cnpjFields)
   }
 
   /**
-   * Analisa multiplos repositorios sequencialmente
+   * Analisa multiplos repositorios sequencialmente usando APIs (sem git clone)
    */
   async analyzeRepositories(repositoryIds: string[]): Promise<AnalysisResult[]> {
     const results: AnalysisResult[] = []
     const totalRepositories = repositoryIds.length
+    const supabase = await createClient()
 
     for (let i = 0; i < repositoryIds.length; i++) {
       const repoId = repositoryIds[i]
@@ -83,7 +91,6 @@ export class SequentialAnalyzer {
 
       try {
         // Buscar informacoes do repositorio
-        const supabase = await createClient()
         const { data: repo } = await supabase
           .from("repositories")
           .select("*")
@@ -103,63 +110,58 @@ export class SequentialAnalyzer {
           continue
         }
 
-        // Atualizar progresso - Clonando
-        this.updateProgress({
-          totalRepositories,
-          currentRepository: i + 1,
-          currentRepositoryName: repo.name,
-          phase: "cloning",
-          filesProcessed: 0,
-          findingsCount: 0,
-          percentage: Math.round(((i / totalRepositories) * 100)),
-        })
-
-        // Criar log de clone
-        const { data: cloneLog } = await supabase
-          .from("repository_clone_logs")
-          .insert({
-            repository_id: repoId,
-            analysis_id: this.analysisId,
-            status: "cloning",
-            clone_started_at: new Date().toISOString(),
-          })
-          .select()
+        // Buscar integracao do cliente
+        const { data: integration } = await supabase
+          .from("integrations")
+          .select("*")
+          .eq("client_id", this.clientId)
+          .eq("provider", repo.provider || "azure")
           .single()
 
-        // Fase 1: Clonar repositorio (simulado - em producao usaria git clone real)
-        const cloneResult = await this.cloneRepository(repo)
-        
-        if (!cloneResult.success) {
-          await supabase
-            .from("repository_clone_logs")
-            .update({
-              status: "error",
-              error_message: cloneResult.error,
-            })
-            .eq("id", cloneLog?.id)
-
+        if (!integration) {
           results.push({
             repositoryId: repoId,
             repositoryName: repo.name,
             status: "error",
             filesProcessed: 0,
             findingsCount: 0,
-            error: cloneResult.error,
+            error: "Integracao nao encontrada",
             duration: Date.now() - startTime,
           })
           continue
         }
 
-        // Atualizar log - Clone completo
-        await supabase
+        // Atualizar progresso - Buscando arquivos
+        this.updateProgress({
+          totalRepositories,
+          currentRepository: i + 1,
+          currentRepositoryName: repo.name,
+          phase: "fetching",
+          filesProcessed: 0,
+          findingsCount: 0,
+          percentage: Math.round((i / totalRepositories) * 100),
+        })
+
+        // Criar log de analise
+        const { data: analysisLog } = await supabase
           .from("repository_clone_logs")
-          .update({
+          .insert({
+            repository_id: repoId,
+            analysis_id: this.analysisId,
             status: "analyzing",
-            clone_completed_at: new Date().toISOString(),
-            clone_path: cloneResult.path,
-            analysis_started_at: new Date().toISOString(),
+            clone_started_at: new Date().toISOString(),
           })
-          .eq("id", cloneLog?.id)
+          .select()
+          .single()
+
+        // Buscar e analisar arquivos via API
+        let analysisResult: { filesProcessed: number; findings: Finding[] }
+
+        if (repo.provider === "github" || integration.provider === "github") {
+          analysisResult = await this.analyzeGitHubRepository(repo, integration.access_token)
+        } else {
+          analysisResult = await this.analyzeAzureRepository(repo, integration)
+        }
 
         // Atualizar progresso - Analisando
         this.updateProgress({
@@ -167,16 +169,13 @@ export class SequentialAnalyzer {
           currentRepository: i + 1,
           currentRepositoryName: repo.name,
           phase: "analyzing",
-          filesProcessed: 0,
-          findingsCount: 0,
-          percentage: Math.round(((i + 0.3) / totalRepositories) * 100),
+          filesProcessed: analysisResult.filesProcessed,
+          findingsCount: analysisResult.findings.length,
+          percentage: Math.round(((i + 0.5) / totalRepositories) * 100),
         })
 
-        // Fase 2: Analisar codigo
-        const analysisResult = await this.analyzeCode(repo, cloneResult.files || [])
-
-        // Atualizar progresso - Processando IA (se habilitado)
-        if (this.aiEnabled && analysisResult.findings.length > 0) {
+        // Processar com IA se habilitado
+        if (this.aiEnabled && this.aiApiKey && analysisResult.findings.length > 0) {
           this.updateProgress({
             totalRepositories,
             currentRepository: i + 1,
@@ -184,17 +183,27 @@ export class SequentialAnalyzer {
             phase: "ai_processing",
             filesProcessed: analysisResult.filesProcessed,
             findingsCount: analysisResult.findings.length,
-            percentage: Math.round(((i + 0.6) / totalRepositories) * 100),
+            percentage: Math.round(((i + 0.7) / totalRepositories) * 100),
           })
 
-          // Fase 3: Processar com IA cada finding
-          await this.processWithAI(analysisResult.findings)
+          analysisResult.findings = await this.processWithAI(analysisResult.findings)
         }
 
         // Salvar findings no banco
         if (analysisResult.findings.length > 0) {
+          this.updateProgress({
+            totalRepositories,
+            currentRepository: i + 1,
+            currentRepositoryName: repo.name,
+            phase: "saving",
+            filesProcessed: analysisResult.filesProcessed,
+            findingsCount: analysisResult.findings.length,
+            percentage: Math.round(((i + 0.9) / totalRepositories) * 100),
+          })
+
           const findingsToInsert = analysisResult.findings.map((f) => ({
             analysis_id: this.analysisId,
+            repository_id: repoId,
             file_path: f.file_path,
             line_number: f.line_number,
             field_name: f.field_name,
@@ -204,36 +213,26 @@ export class SequentialAnalyzer {
             code_after_lines: f.code_after_lines,
             suggestion: f.suggestion,
             action_required: f.action_required,
+            ai_analysis: f.ai_analysis,
+            ai_suggestion: f.ai_suggestion,
+            ai_confidence: f.ai_confidence,
           }))
 
           await supabase.from("findings").insert(findingsToInsert)
         }
 
-        // Atualizar progresso - Limpando
-        this.updateProgress({
-          totalRepositories,
-          currentRepository: i + 1,
-          currentRepositoryName: repo.name,
-          phase: "cleanup",
-          filesProcessed: analysisResult.filesProcessed,
-          findingsCount: analysisResult.findings.length,
-          percentage: Math.round(((i + 0.9) / totalRepositories) * 100),
-        })
-
-        // Fase 4: Cleanup (remover arquivos clonados)
-        await this.cleanup(cloneResult.path)
-
-        // Atualizar log - Completo
+        // Atualizar log
         await supabase
           .from("repository_clone_logs")
           .update({
             status: "completed",
+            clone_completed_at: new Date().toISOString(),
             analysis_completed_at: new Date().toISOString(),
             cleanup_at: new Date().toISOString(),
             files_processed: analysisResult.filesProcessed,
             findings_count: analysisResult.findings.length,
           })
-          .eq("id", cloneLog?.id)
+          .eq("id", analysisLog?.id)
 
         results.push({
           repositoryId: repoId,
@@ -257,7 +256,7 @@ export class SequentialAnalyzer {
       }
     }
 
-    // Atualizar progresso - Completo
+    // Progresso final
     this.updateProgress({
       totalRepositories,
       currentRepository: totalRepositories,
@@ -272,154 +271,241 @@ export class SequentialAnalyzer {
   }
 
   /**
-   * Clona o repositorio (simulado para ambiente serverless)
+   * Analisa repositorio GitHub via API REST
    */
-  private async cloneRepository(repo: any): Promise<{ success: boolean; path?: string; files?: any[]; error?: string }> {
-    try {
-      // Em ambiente serverless, nao podemos fazer git clone real
-      // Usamos a API do GitHub/GitLab para buscar arquivos
-      
-      // Simular busca de arquivos do repositorio
-      // Em producao, usar API do provider (GitHub, GitLab, etc.)
-      
-      return {
-        success: true,
-        path: `/tmp/repos/${repo.id}`,
-        files: [], // Arquivos seriam buscados via API
-      }
-    } catch (error: any) {
-      return {
-        success: false,
-        error: error.message,
-      }
-    }
-  }
-
-  /**
-   * Analisa o codigo em busca de campos CNPJ
-   */
-  private async analyzeCode(repo: any, files: any[]): Promise<{ filesProcessed: number; findings: Finding[] }> {
+  private async analyzeGitHubRepository(
+    repo: any,
+    accessToken: string
+  ): Promise<{ filesProcessed: number; findings: Finding[] }> {
     const findings: Finding[] = []
     let filesProcessed = 0
 
-    // Padroes para buscar CNPJ
-    const cnpjPatterns = this.cnpjFields.map((field) => new RegExp(field, "gi"))
-    
-    // Padrao numerico de CNPJ
-    const cnpjNumericPattern = /\b\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}\b/g
+    try {
+      const repoFullName = repo.full_name || `${repo.owner}/${repo.name}`
+      
+      // Get repository tree
+      let treeUrl = `https://api.github.com/repos/${repoFullName}/git/trees/main?recursive=1`
+      let treeResponse = await fetch(treeUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/vnd.github.v3+json",
+        },
+      })
 
-    for (const file of files) {
-      if (!this.shouldAnalyzeFile(file.path)) continue
+      if (!treeResponse.ok) {
+        // Try master branch
+        treeUrl = `https://api.github.com/repos/${repoFullName}/git/trees/master?recursive=1`
+        treeResponse = await fetch(treeUrl, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            Accept: "application/vnd.github.v3+json",
+          },
+        })
+      }
 
-      filesProcessed++
-      const lines = (file.content || "").split("\n")
+      if (!treeResponse.ok) {
+        console.error("Could not get GitHub repository tree")
+        return { filesProcessed: 0, findings: [] }
+      }
 
-      for (let lineNum = 0; lineNum < lines.length; lineNum++) {
-        const line = lines[lineNum]
-        
-        // Verificar padroes de campo CNPJ
-        for (const pattern of cnpjPatterns) {
-          if (pattern.test(line)) {
-            const contextLines = this.getContextLines(lines, lineNum, 3)
-            
-            findings.push({
-              file_path: file.path,
-              line_number: lineNum + 1,
-              field_name: this.extractFieldName(line, pattern),
-              context: line.trim(),
-              code_context: contextLines.current,
-              code_before_lines: contextLines.before,
-              code_after_lines: contextLines.after,
-              suggestion: this.generateBasicSuggestion(line),
-              action_required: "Verificar se o campo suporta CNPJ alfanumerico (12 caracteres)",
-            })
-          }
-        }
+      const treeData = await treeResponse.json()
+      
+      // Filter files by extension
+      const files = (treeData.tree || []).filter((item: any) => {
+        if (item.type !== "blob") return false
+        const ext = "." + (item.path.split(".").pop()?.toLowerCase() || "")
+        return this.fileExtensions.some(allowedExt => allowedExt.toLowerCase() === ext)
+      })
 
-        // Verificar padroes numericos de CNPJ
-        if (cnpjNumericPattern.test(line)) {
-          const contextLines = this.getContextLines(lines, lineNum, 3)
-          
-          findings.push({
-            file_path: file.path,
-            line_number: lineNum + 1,
-            field_name: "CNPJ numerico",
-            context: line.trim(),
-            code_context: contextLines.current,
-            code_before_lines: contextLines.before,
-            code_after_lines: contextLines.after,
-            suggestion: "Converter validacao para suportar formato alfanumerico",
-            action_required: "Atualizar validacao e mascara para novo formato",
+      // Analyze files (limit to 50)
+      const filesToAnalyze = files.slice(0, 50)
+
+      for (const file of filesToAnalyze) {
+        try {
+          const contentUrl = `https://api.github.com/repos/${repoFullName}/contents/${file.path}`
+          const contentResponse = await fetch(contentUrl, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              Accept: "application/vnd.github.v3+json",
+            },
           })
+
+          if (!contentResponse.ok) continue
+
+          const contentData = await contentResponse.json()
+          const content = Buffer.from(contentData.content || "", "base64").toString("utf-8")
+
+          filesProcessed++
+          const fileFindings = this.analyzeFileContent(content, file.path)
+          findings.push(...fileFindings)
+        } catch (error) {
+          console.error(`Error reading GitHub file ${file.path}:`, error)
         }
       }
+    } catch (error) {
+      console.error("Error analyzing GitHub repository:", error)
     }
 
     return { filesProcessed, findings }
   }
 
   /**
-   * Processa findings com IA para gerar sugestoes detalhadas
+   * Analisa repositorio Azure DevOps via API REST
    */
-  private async processWithAI(findings: Finding[]): Promise<void> {
-    if (!this.aiEnabled || !this.aiApiKey) return
+  private async analyzeAzureRepository(
+    repo: any,
+    integration: any
+  ): Promise<{ filesProcessed: number; findings: Finding[] }> {
+    const findings: Finding[] = []
+    let filesProcessed = 0
 
-    // Processar sera implementado na proxima tarefa
-    // Por enquanto, apenas marca como pendente de IA
-  }
+    try {
+      const azureOrg = integration.azure_organization || integration.organization
+      const azureProject = repo.project_name || repo.project || repo.name
+      const accessToken = integration.access_token
 
-  /**
-   * Verifica se o arquivo deve ser analisado
-   */
-  private shouldAnalyzeFile(filePath: string): boolean {
-    const ext = "." + filePath.split(".").pop()?.toLowerCase()
-    return this.fileExtensions.includes(ext)
-  }
+      const baseUrl = `https://dev.azure.com/${azureOrg}/${azureProject}/_apis/git/repositories/${repo.azure_repo_id || repo.name}`
+      const authHeader = `Basic ${Buffer.from(`:${accessToken}`).toString("base64")}`
 
-  /**
-   * Extrai o nome do campo da linha
-   */
-  private extractFieldName(line: string, pattern: RegExp): string {
-    const match = line.match(pattern)
-    return match ? match[0] : "campo_cnpj"
-  }
+      // Get repository items
+      const itemsUrl = `${baseUrl}/items?recursionLevel=Full&api-version=7.0`
+      const itemsResponse = await fetch(itemsUrl, {
+        headers: {
+          Authorization: authHeader,
+          "Content-Type": "application/json",
+        },
+      })
 
-  /**
-   * Obtem linhas de contexto
-   */
-  private getContextLines(lines: string[], currentLine: number, contextSize: number): { before: string; current: string; after: string } {
-    const start = Math.max(0, currentLine - contextSize)
-    const end = Math.min(lines.length, currentLine + contextSize + 1)
+      if (!itemsResponse.ok) {
+        console.error("Could not get Azure repository items")
+        return { filesProcessed: 0, findings: [] }
+      }
 
-    return {
-      before: lines.slice(start, currentLine).join("\n"),
-      current: lines[currentLine],
-      after: lines.slice(currentLine + 1, end).join("\n"),
+      const itemsData = await itemsResponse.json()
+      
+      // Filter files by extension
+      const files = (itemsData.value || []).filter((item: any) => {
+        if (item.isFolder) return false
+        const ext = "." + (item.path.split(".").pop()?.toLowerCase() || "")
+        return this.fileExtensions.some(allowedExt => allowedExt.toLowerCase() === ext)
+      })
+
+      // Analyze files (limit to 50)
+      const filesToAnalyze = files.slice(0, 50)
+
+      for (const file of filesToAnalyze) {
+        try {
+          const contentUrl = `${baseUrl}/items?path=${encodeURIComponent(file.path)}&api-version=7.0`
+          const contentResponse = await fetch(contentUrl, {
+            headers: { Authorization: authHeader },
+          })
+
+          if (!contentResponse.ok) continue
+
+          const content = await contentResponse.text()
+          filesProcessed++
+          const fileFindings = this.analyzeFileContent(content, file.path)
+          findings.push(...fileFindings)
+        } catch (error) {
+          console.error(`Error reading Azure file ${file.path}:`, error)
+        }
+      }
+    } catch (error) {
+      console.error("Error analyzing Azure repository:", error)
     }
+
+    return { filesProcessed, findings }
   }
 
   /**
-   * Gera sugestao basica (sem IA)
+   * Analisa conteudo de arquivo usando CNPJDetector
    */
-  private generateBasicSuggestion(line: string): string {
-    if (line.includes("VARCHAR") || line.includes("CHAR")) {
-      return "Aumentar tamanho do campo para VARCHAR(12) para suportar CNPJ alfanumerico"
+  private analyzeFileContent(content: string, filePath: string): Finding[] {
+    const findings: Finding[] = []
+    const detectorFindings = this.detector.analyze(content, filePath)
+
+    for (const finding of detectorFindings) {
+      findings.push({
+        file_path: filePath,
+        line_number: finding.lineNumber,
+        field_name: finding.fieldName,
+        context: finding.line,
+        code_context: finding.line,
+        code_before_lines: finding.codeBefore,
+        code_after_lines: finding.codeAfter,
+        suggestion: finding.suggestion || "Verificar compatibilidade com CNPJ alfanumerico",
+        action_required: "Atualizar para suportar novo formato CNPJ (12 caracteres alfanumericos)",
+      })
     }
-    if (line.includes("mask") || line.includes("format")) {
-      return "Atualizar mascara para aceitar letras e numeros"
-    }
-    if (line.includes("valid") || line.includes("regex")) {
-      return "Atualizar validacao para novo formato alfanumerico"
-    }
-    return "Revisar para compatibilidade com CNPJ alfanumerico"
+
+    return findings
   }
 
   /**
-   * Limpa arquivos temporarios
+   * Processa findings com IA (Gemini)
    */
-  private async cleanup(path?: string): Promise<void> {
-    // Em ambiente serverless, nao ha arquivos para limpar
-    // Em producao local, removeria o diretorio clonado
+  private async processWithAI(findings: Finding[]): Promise<Finding[]> {
+    if (!this.aiApiKey) return findings
+
+    const processedFindings = [...findings]
+    const findingsToProcess = findings.slice(0, 10) // Limit to 10 for performance
+
+    for (let i = 0; i < findingsToProcess.length; i++) {
+      try {
+        const finding = findingsToProcess[i]
+        
+        const prompt = `Analise o seguinte codigo que contem um campo CNPJ e forneca:
+1. Uma explicacao do problema (por que precisa ser atualizado para CNPJ alfanumerico)
+2. Uma sugestao de codigo corrigido
+
+Arquivo: ${finding.file_path}
+Linha: ${finding.line_number}
+Campo: ${finding.field_name}
+
+Codigo:
+${finding.code_before_lines || ''}
+${finding.context}
+${finding.code_after_lines || ''}
+
+Responda em JSON: {"analysis": "...", "suggestion": "...", "confidence": 0.0-1.0}`
+
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${this.aiModel}:generateContent?key=${this.aiApiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: { temperature: 0.3, maxOutputTokens: 2048 },
+            }),
+          }
+        )
+
+        if (response.ok) {
+          const data = await response.json()
+          const text = data.candidates?.[0]?.content?.parts?.[0]?.text || ""
+          const jsonMatch = text.match(/\{[\s\S]*\}/)
+          
+          if (jsonMatch) {
+            try {
+              const aiResult = JSON.parse(jsonMatch[0])
+              processedFindings[i] = {
+                ...finding,
+                ai_analysis: aiResult.analysis,
+                ai_suggestion: aiResult.suggestion,
+                ai_confidence: aiResult.confidence || 0.8,
+              }
+            } catch {
+              processedFindings[i] = { ...finding, ai_analysis: text, ai_confidence: 0.5 }
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error processing finding with AI:", error)
+      }
+    }
+
+    return processedFindings
   }
 
   /**
