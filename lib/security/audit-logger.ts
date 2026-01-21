@@ -13,7 +13,7 @@ export async function logSecurityEvent(event: SecurityEvent): Promise<void> {
   try {
     const supabase = createClient()
     if (!supabase) {
-      console.error("[v0] Supabase client not available for security logging")
+      console.error(" Supabase client not available for security logging")
       return
     }
 
@@ -27,6 +27,6 @@ export async function logSecurityEvent(event: SecurityEvent): Promise<void> {
       timestamp: new Date().toISOString(),
     })
   } catch (error) {
-    console.error("[v0] Failed to log security event:", error)
+    console.error(" Failed to log security event:", error)
   }
 }

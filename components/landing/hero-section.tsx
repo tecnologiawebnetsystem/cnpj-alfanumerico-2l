@@ -41,7 +41,7 @@ export function HeroSection() {
     setError("")
 
     try {
-      console.log("[v0] Starting login for:", email)
+      console.log(" Starting login for:", email)
 
       const res = await fetch("/api/auth/login", {
         method: "POST",
@@ -51,7 +51,7 @@ export function HeroSection() {
       })
 
       const data = await res.json()
-      console.log("[v0] Login response:", { success: data.success, hasUser: !!data.user })
+      console.log(" Login response:", { success: data.success, hasUser: !!data.user })
 
       if (data.success && data.user) {
         const normalizedUser = {
@@ -66,7 +66,7 @@ export function HeroSection() {
         }
 
         toast.success("Login realizado com sucesso!")
-        console.log("[v0] Login successful, redirecting. Role:", normalizedUser.role)
+        console.log(" Login successful, redirecting. Role:", normalizedUser.role)
 
         await new Promise((resolve) => setTimeout(resolve, 100))
 
@@ -84,7 +84,7 @@ export function HeroSection() {
         toast.error(data.error || "Credenciais inválidas")
       }
     } catch (err) {
-      console.error("[v0] Login error:", err)
+      console.error(" Login error:", err)
       setError("Erro ao conectar com o servidor")
       toast.error("Erro ao conectar com o servidor")
     } finally {

@@ -31,8 +31,8 @@ export interface AuthResponse {
 // Login com email e senha
 export async function login(email: string, password: string): Promise<AuthResponse & { sessionToken?: string }> {
   try {
-    console.log("[v0] === LOGIN START ===")
-    console.log("[v0] Email:", email)
+    console.log(" === LOGIN START ===")
+    console.log(" Email:", email)
 
     const response = await fetch("/api/auth/login", {
       method: "POST",
@@ -43,7 +43,7 @@ export async function login(email: string, password: string): Promise<AuthRespon
       credentials: "include", // Include cookies in request
     })
 
-    console.log("[v0] Response status:", response.status)
+    console.log(" Response status:", response.status)
 
     if (!response.ok) {
       const result = await response.json()
@@ -51,7 +51,7 @@ export async function login(email: string, password: string): Promise<AuthRespon
     }
 
     const result = await response.json()
-    console.log("[v0] Response body parsed:", result)
+    console.log(" Response body parsed:", result)
 
     if (result.success && result.user) {
       localStorage.setItem("user", JSON.stringify(result.user))
@@ -68,16 +68,16 @@ export async function login(email: string, password: string): Promise<AuthRespon
           }),
         )
         document.cookie = `session_token=${cookieValue}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`
-        console.log("[v0] Session token saved to cookie")
+        console.log(" Session token saved to cookie")
       }
 
-      console.log("[v0] === LOGIN END - SUCCESS ===")
+      console.log(" === LOGIN END - SUCCESS ===")
       return { success: true, user: result.user, sessionToken: result.sessionToken }
     }
 
     return { success: false, error: result.error || "Credenciais inválidas" }
   } catch (error) {
-    console.error("[v0] === LOGIN EXCEPTION ===", error)
+    console.error(" === LOGIN EXCEPTION ===", error)
     return {
       success: false,
       error: error instanceof Error ? error.message : "Erro ao fazer login",

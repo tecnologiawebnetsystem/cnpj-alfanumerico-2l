@@ -88,7 +88,7 @@ export class SessionManager {
 
       return session
     } catch (error) {
-      console.error("[v0] Session retrieval error:", error)
+      console.error(" Session retrieval error:", error)
       return null
     }
   }
