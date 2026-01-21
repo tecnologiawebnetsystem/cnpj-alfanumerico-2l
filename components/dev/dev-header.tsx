@@ -45,7 +45,10 @@ import {
   Keyboard,
   Bot,
   GitBranch,
+  Code2,
+  Sparkles,
 } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { WorkTimer } from "./work-timer"
 import { DevAIAssistant } from "./dev-ai-assistant"
 import { GamificationPanel } from "./gamification-panel"
@@ -176,85 +179,130 @@ export function DevHeader({ user, activeView = "board" }: DevHeaderProps) {
           <div className="flex items-center h-14">
             {/* Left - Logo */}
             <div className="flex items-center gap-2 min-w-[160px]">
-              <Link href="/dev/board" className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-primary rounded flex items-center justify-center text-primary-foreground font-bold text-xs">
-                  ACT
+              <Link href="/dev/board" className="flex items-center gap-3 group">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-xl blur-md opacity-40 group-hover:opacity-60 transition-opacity" />
+                  <div className="relative bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl p-2 shadow-lg">
+                    <Code2 className="h-4 w-4 text-white" />
+                  </div>
                 </div>
-                <span className="font-semibold text-sm hidden sm:block">CNPJ Detector</span>
+                <div className="flex flex-col hidden sm:flex">
+                  <span className="text-sm font-bold text-foreground tracking-tight">
+                    CNPJ<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-400">Detector</span>
+                  </span>
+                  <span className="text-[9px] text-muted-foreground font-medium tracking-widest uppercase -mt-0.5">
+                    Dev Portal
+                  </span>
+                </div>
               </Link>
             </div>
 
             {/* Center - Navigation */}
-            <nav className="flex-1 hidden md:flex items-center justify-center gap-1">
-              <Link href="/dev/board">
-                <Button
-                  variant={activeView === "board" ? "secondary" : "ghost"}
-                  size="sm"
-                  className="gap-1.5 h-8 text-xs"
-                >
-                  <Kanban className="h-3.5 w-3.5" />
-                  Board Kanban
-                </Button>
-              </Link>
-              <Link href="/dev/tasks">
-                <Button
-                  variant={activeView === "tasks" ? "secondary" : "ghost"}
-                  size="sm"
-                  className="gap-1.5 h-8 text-xs"
-                >
-                  <ListTodo className="h-3.5 w-3.5" />
-                  Lista de Tarefas
-                </Button>
-              </Link>
-              <Link href="/documentacao">
-                <Button 
-                  variant={activeView === "docs" ? "secondary" : "ghost"} 
-                  size="sm" 
-                  className="gap-1.5 h-8 text-xs"
-                >
-                  <Code className="h-3.5 w-3.5" />
-                  Documentacao
-                </Button>
-              </Link>
+            <nav className="flex-1 hidden md:flex items-center justify-center">
+              {/* Floating Nav Pill */}
+              <div className="flex items-center gap-1 bg-muted/50 backdrop-blur-sm rounded-full px-2 py-1.5 border border-border/50 shadow-sm">
+                <Link href="/dev/board">
+                  <button
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300",
+                      activeView === "board"
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                    )}
+                  >
+                    <Kanban className={cn("h-4 w-4", activeView === "board" && "text-blue-500")} />
+                    Board
+                  </button>
+                </Link>
+                <Link href="/dev/tasks">
+                  <button
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300",
+                      activeView === "tasks"
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                    )}
+                  >
+                    <ListTodo className={cn("h-4 w-4", activeView === "tasks" && "text-blue-500")} />
+                    Tarefas
+                  </button>
+                </Link>
+                <Link href="/documentacao">
+                  <button
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300",
+                      activeView === "docs"
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                    )}
+                  >
+                    <Code className={cn("h-4 w-4", activeView === "docs" && "text-blue-500")} />
+                    Docs
+                  </button>
+                </Link>
+              </div>
               
               {/* New Features Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-1.5 h-8 text-xs">
-                    <Trophy className="h-3.5 w-3.5" />
+                  <button className="ml-4 flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-300 group">
+                    <Sparkles className="h-4 w-4 text-amber-500 group-hover:text-amber-400" />
                     Ferramentas
                     <ChevronDown className="h-3 w-3" />
-                  </Button>
+                  </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="center" className="w-48">
-                  <DropdownMenuItem onClick={() => setShowTimer(true)} className="gap-2 cursor-pointer">
-                    <Timer className="h-4 w-4" />
-                    Cronometro
+                <DropdownMenuContent align="center" className="w-56 p-2">
+                  <DropdownMenuLabel className="text-xs text-muted-foreground uppercase tracking-wider">Produtividade</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={() => setShowTimer(true)} className="gap-3 cursor-pointer rounded-lg py-2.5">
+                    <div className="p-1.5 rounded-md bg-blue-500/10">
+                      <Timer className="h-4 w-4 text-blue-500" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span>Cronometro</span>
+                      <span className="text-[10px] text-muted-foreground">Registrar tempo</span>
+                    </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setShowAIAssistant(true)} className="gap-2 cursor-pointer">
-                    <Bot className="h-4 w-4" />
-                    Assistente IA
-                    <span className="ml-auto text-[10px] text-muted-foreground">Ctrl+K</span>
+                  <DropdownMenuItem onClick={() => setShowAIAssistant(true)} className="gap-3 cursor-pointer rounded-lg py-2.5">
+                    <div className="p-1.5 rounded-md bg-purple-500/10">
+                      <Bot className="h-4 w-4 text-purple-500" />
+                    </div>
+                    <div className="flex flex-col flex-1">
+                      <span>Assistente IA</span>
+                      <span className="text-[10px] text-muted-foreground">Ajuda com codigo</span>
+                    </div>
+                    <kbd className="px-1.5 py-0.5 text-[10px] bg-muted rounded">Ctrl+K</kbd>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setShowFocusMode(true)} className="gap-2 cursor-pointer">
-                    <Focus className="h-4 w-4" />
-                    Modo Foco
-                    <span className="ml-auto text-[10px] text-muted-foreground">Ctrl+F</span>
+                  <DropdownMenuItem onClick={() => setShowFocusMode(true)} className="gap-3 cursor-pointer rounded-lg py-2.5">
+                    <div className="p-1.5 rounded-md bg-green-500/10">
+                      <Focus className="h-4 w-4 text-green-500" />
+                    </div>
+                    <div className="flex flex-col flex-1">
+                      <span>Modo Foco</span>
+                      <span className="text-[10px] text-muted-foreground">Pomodoro</span>
+                    </div>
+                    <kbd className="px-1.5 py-0.5 text-[10px] bg-muted rounded">Ctrl+F</kbd>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setShowHistory(true)} className="gap-2 cursor-pointer">
-                    <History className="h-4 w-4" />
-                    Historico
+                  <DropdownMenuSeparator className="my-2" />
+                  <DropdownMenuLabel className="text-xs text-muted-foreground uppercase tracking-wider">Estatisticas</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={() => setShowHistory(true)} className="gap-3 cursor-pointer rounded-lg py-2.5">
+                    <div className="p-1.5 rounded-md bg-orange-500/10">
+                      <History className="h-4 w-4 text-orange-500" />
+                    </div>
+                    <span>Historico</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setShowGamification(true)} className="gap-2 cursor-pointer">
-                    <Trophy className="h-4 w-4" />
-                    Conquistas
+                  <DropdownMenuItem onClick={() => setShowGamification(true)} className="gap-3 cursor-pointer rounded-lg py-2.5">
+                    <div className="p-1.5 rounded-md bg-amber-500/10">
+                      <Trophy className="h-4 w-4 text-amber-500" />
+                    </div>
+                    <span>Conquistas</span>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setShowKeyboardHelp(true)} className="gap-2 cursor-pointer">
-                    <Keyboard className="h-4 w-4" />
-                    Atalhos
-                    <span className="ml-auto text-[10px] text-muted-foreground">?</span>
+                  <DropdownMenuSeparator className="my-2" />
+                  <DropdownMenuItem onClick={() => setShowKeyboardHelp(true)} className="gap-3 cursor-pointer rounded-lg py-2.5">
+                    <div className="p-1.5 rounded-md bg-zinc-500/10">
+                      <Keyboard className="h-4 w-4 text-zinc-500" />
+                    </div>
+                    <span className="flex-1">Atalhos</span>
+                    <kbd className="px-1.5 py-0.5 text-[10px] bg-muted rounded">?</kbd>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

@@ -19,12 +19,12 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    console.log(" Login attempt for email:", body.email)
+    console.log("[v0] Login attempt for email:", body.email)
 
     // Validate input
     const validationResult = loginSchema.safeParse(body)
     if (!validationResult.success) {
-      console.log(" Validation failed:", validationResult.error.errors)
+      console.log("[v0] Validation failed:", validationResult.error.errors)
       return NextResponse.json({ success: false, error: validationResult.error.errors[0].message }, { status: 400 })
     }
 
@@ -39,15 +39,15 @@ export async function POST(request: NextRequest) {
       .eq("email", email)
       .limit(1)
 
-    console.log(" User query result:", { found: users?.length || 0, error: queryError?.message })
+    console.log("[v0] User query result:", { found: users?.length || 0, error: queryError?.message })
 
     if (queryError) {
-      console.error(" Database query error:", queryError)
+      console.error("[v0] Database query error:", queryError)
       return NextResponse.json({ success: false, error: "Erro ao consultar banco de dados" }, { status: 500 })
     }
 
     if (!users || users.length === 0) {
-      console.log(" User not found:", email)
+      console.log("[v0] User not found:", email)
       return NextResponse.json({ success: false, error: "Credenciais inválidas" }, { status: 401 })
     }
 
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     if (storedHash.length === 60 && storedHash.startsWith("$2")) {
       // Bcrypt hash - use bcrypt.compare
-      console.log(" Using bcrypt verification")
+      console.log("[v0] Using bcrypt verification")
       isValid = await bcrypt.compare(password, storedHash)
     } else if (storedHash.length >= 64) {
       // SHA-256 hash - use Node.js crypto
@@ -67,23 +67,23 @@ export async function POST(request: NextRequest) {
       isValid = inputHash.toLowerCase() === storedHashClean.toLowerCase()
     } else {
       // Direct comparison for plain text (development only - NOT recommended)
-      console.log(" WARNING: Plain text password detected")
+      console.log("[v0] WARNING: Plain text password detected")
       isValid = password === storedHash
     }
 
-    console.log(" Password verification:", {
+    console.log("[v0] Password verification:", {
       isValid,
       hashLength: storedHash.length,
       hashType: storedHash.startsWith("$2") ? "bcrypt" : "sha256",
     })
 
     if (!isValid) {
-      console.log(" Invalid password for user:", email)
+      console.log("[v0] Invalid password for user:", email)
       return NextResponse.json({ success: false, error: "Credenciais inválidas" }, { status: 401 })
     }
 
     if (userData.status !== "active") {
-      console.log(" User is inactive:", email)
+      console.log("[v0] User is inactive:", email)
       return NextResponse.json(
         { success: false, error: "Usuário inativo. Entre em contato com o administrador." },
         { status: 401 },
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
       client_name: clientName,
     }
 
-    console.log(" Login successful for:", email, "Role:", userData.role)
+    console.log("[v0] Login successful for:", email, "Role:", userData.role)
 
     const sessionToken = crypto.randomUUID()
 
@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
       sessionToken,
     })
   } catch (error: any) {
-    console.error(" Login error:", error)
+    console.error("[v0] Login error:", error)
     return NextResponse.json({ success: false, error: "Erro interno do servidor" }, { status: 500 })
   }
 }

@@ -34,6 +34,11 @@ import {
   Search,
   Filter,
   GripVertical,
+  Smartphone,
+  Zap,
+  AlertCircle,
+  Monitor,
+  ArrowRight,
 } from "lucide-react"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -97,11 +102,30 @@ export default function WikiPage() {
         "Criar e atribuir tasks para devs",
         "Visualizar relatorios e analises do cliente",
         "Gerenciar sprints e metodologia agil",
+        "Configurar alertas e notificacoes automaticas",
+        "Exportar tarefas para Jira/Azure Boards",
+        "Visualizar logs de auditoria do cliente",
       ],
       features: [
         {
-          title: "Dashboard do Cliente",
-          description: "Visao geral de repositorios, analises, tasks e metricas do cliente",
+          title: "Dashboard com Metricas em Tempo Real",
+          description: "Graficos de progresso, comparativo antes/depois, taxa de correcao e ranking de repositorios",
+        },
+        {
+          title: "Sistema de Alertas Automaticos",
+          description: "Alertas para findings criticos, analises concluidas, tarefas atrasadas e nao atribuidas",
+        },
+        {
+          title: "Assistente IA no Dashboard",
+          description: "Chat IA para gerar relatorios, responder perguntas e ajudar na tomada de decisoes",
+        },
+        {
+          title: "Integracao Jira/Azure Boards",
+          description: "Exportar tarefas automaticamente como Work Items ou Issues com mapeamento completo",
+        },
+        {
+          title: "Sistema de Auditoria",
+          description: "Log completo de todas as acoes: criar, atualizar, excluir, analisar e exportar",
         },
         {
           title: "Gerenciamento de Devs",
@@ -109,7 +133,7 @@ export default function WikiPage() {
         },
         {
           title: "Repositorios Git",
-          description: "Conectar GitHub, visualizar repos e executar analises automaticas",
+          description: "Conectar GitHub/Azure DevOps, visualizar repos e executar analises automaticas",
         },
         {
           title: "Analise de Banco de Dados",
@@ -120,16 +144,8 @@ export default function WikiPage() {
           description: "Criar tasks, atribuir para devs, acompanhar progresso com Kanban",
         },
         {
-          title: "Relatorios Personalizados",
-          description: "Gerar relatorios de analises por repositorio ou desenvolvedor",
-        },
-        {
-          title: "Sistema de Sprints",
-          description: "Criar sprints, daily standups e retrospectivas da equipe",
-        },
-        {
-          title: "Gamificacao",
-          description: "Acompanhar pontuacao, conquistas e ranking dos desenvolvedores",
+          title: "Relatorios e Exportacao",
+          description: "Gerar relatorios PDF/Excel com resumo executivo e detalhes tecnicos",
         },
       ],
     },
@@ -137,7 +153,7 @@ export default function WikiPage() {
       role: "Desenvolvedor (Dev)",
       icon: Code,
       color: "from-green-500 to-emerald-500",
-      description: "Executa tarefas usando board Kanban com controle de horas estilo Azure DevOps",
+      description: "Executa tarefas usando board Kanban com ferramentas avancadas de produtividade",
       permissions: [
         "Visualizar tasks atribuidas a ele no board Kanban",
         "Mover tasks entre Pendentes, Em Desenvolvimento e Finalizadas",
@@ -145,32 +161,50 @@ export default function WikiPage() {
         "Visualizar detalhes completos de cada task incluindo sugestao da IA",
         "Editar controle de horas (estimado, restante, completado)",
         "Receber notificacoes quando tasks sao atribuidas",
-        "Visualizar suas proprias metricas e pontos",
+        "Visualizar suas proprias metricas, pontos e conquistas",
+        "Usar assistente IA para ajuda com codigo",
+        "Iniciar modo foco com timer Pomodoro",
       ],
       features: [
         {
-          title: "Board Kanban com Drag-and-Drop",
-          description: "Interface visual com 3 colunas: Pendentes, Em Desenvolvimento e Finalizadas com arraste e solte",
+          title: "Timer/Cronometro de Trabalho",
+          description: "Iniciar/parar cronometro ao trabalhar em tarefa, registra horas automaticamente no banco",
         },
         {
-          title: "Modal de Detalhes Completo",
-          description: "Ao clicar em qualquer card, abre modal com codigo atual, codigo sugerido, analise e sugestao da IA",
+          title: "Assistente IA para Codigo (Ctrl+K)",
+          description: "Chat IA que explica codigo, gera correcao automatica e ajuda a entender mudancas necessarias",
         },
         {
-          title: "Controle de Horas (Azure DevOps)",
-          description: "Horas estimadas, restantes e completadas com barra de progresso visual",
+          title: "Checklist de Conclusao",
+          description: "Antes de finalizar: verificar codigo commitado, PR aberto e testes passando",
         },
         {
-          title: "Commit e PR Obrigatorios",
-          description: "Ao finalizar, deve informar o commit hash e numero do PR para documentacao",
+          title: "Historico de Atividades",
+          description: "Ver todas as tarefas concluidas, tempo gasto e commits feitos",
         },
         {
-          title: "Sistema de Notificacoes",
-          description: "Recebe notificacoes automaticas quando admin atribui novas tarefas",
+          title: "Notificacoes em Tempo Real",
+          description: "Alertas quando nova tarefa atribuida, prazo proximo ou comentario do admin",
         },
         {
-          title: "Filtros Avancados",
-          description: "Filtrar por repositorio, status, prioridade e busca por texto",
+          title: "Diff Viewer Integrado",
+          description: "Visualizar codigo antes/depois lado a lado com syntax highlighting",
+        },
+        {
+          title: "Atalhos de Teclado",
+          description: "Ctrl+K (IA), Ctrl+F (Foco), Ctrl+1-4 (navegar), ? (ajuda)",
+        },
+        {
+          title: "Modo Foco com Pomodoro",
+          description: "Timer 25/5 min, esconde distracoes, som de notificacao ao finalizar",
+        },
+        {
+          title: "Gamificacao",
+          description: "Pontos por tarefas, badges de conquistas, ranking entre desenvolvedores",
+        },
+        {
+          title: "Integracao Git",
+          description: "Ver branches relacionadas, status do PR e commits da tarefa",
         },
       ],
     },
@@ -301,12 +335,13 @@ export default function WikiPage() {
 
         <Tabs defaultValue="overview" className="mb-8">
           <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="overview">Visao Geral</TabsTrigger>
-            <TabsTrigger value="profiles">Perfis</TabsTrigger>
-            <TabsTrigger value="dev-flow">Fluxo Dev</TabsTrigger>
-            <TabsTrigger value="features">Funcionalidades</TabsTrigger>
-            <TabsTrigger value="api">API</TabsTrigger>
-            <TabsTrigger value="changelog">Novidades</TabsTrigger>
+<TabsTrigger value="overview">Visao Geral</TabsTrigger>
+                <TabsTrigger value="profiles">Perfis</TabsTrigger>
+                <TabsTrigger value="dev-flow">Fluxo Dev</TabsTrigger>
+                <TabsTrigger value="features">Funcionalidades</TabsTrigger>
+                <TabsTrigger value="api">API</TabsTrigger>
+                <TabsTrigger value="app">App Mobile/Desktop</TabsTrigger>
+                <TabsTrigger value="changelog">Novidades</TabsTrigger>
           </TabsList>
 
           {/* VISAO GERAL */}
@@ -744,6 +779,272 @@ export default function WikiPage() {
           </TabsContent>
 
           {/* CHANGELOG / NOVIDADES */}
+          {/* APP MOBILE/DESKTOP */}
+          <TabsContent value="app" className="space-y-6 mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Smartphone className="h-6 w-6 text-green-500" />
+                  App para Android, iOS e Desktop
+                </CardTitle>
+                <CardDescription>
+                  Instale o CNPJ Alfanumerico como um aplicativo nativo em qualquer dispositivo
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-8">
+                {/* Introducao */}
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 rounded-xl p-6 border border-green-200 dark:border-green-800">
+                  <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-green-500" />
+                    O que e PWA (Progressive Web App)?
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    O CNPJ Alfanumerico utiliza tecnologia PWA, que permite instalar o sistema como um 
+                    aplicativo nativo em seu dispositivo. Isso significa que voce pode acessar todas as 
+                    funcionalidades diretamente da tela inicial, sem precisar abrir o navegador.
+                  </p>
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div className="bg-white dark:bg-gray-900 rounded-lg p-4 text-center">
+                      <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mx-auto mb-2">
+                        <Zap className="h-6 w-6 text-green-600" />
+                      </div>
+                      <h4 className="font-medium">Rapido</h4>
+                      <p className="text-sm text-muted-foreground">Carrega instantaneamente</p>
+                    </div>
+                    <div className="bg-white dark:bg-gray-900 rounded-lg p-4 text-center">
+                      <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mx-auto mb-2">
+                        <Shield className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <h4 className="font-medium">Seguro</h4>
+                      <p className="text-sm text-muted-foreground">Conexao HTTPS</p>
+                    </div>
+                    <div className="bg-white dark:bg-gray-900 rounded-lg p-4 text-center">
+                      <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center mx-auto mb-2">
+                        <Download className="h-6 w-6 text-purple-600" />
+                      </div>
+                      <h4 className="font-medium">Instalavel</h4>
+                      <p className="text-sm text-muted-foreground">Na tela inicial</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Android */}
+                <div className="border rounded-xl overflow-hidden">
+                  <div className="bg-gradient-to-r from-green-500 to-green-600 px-6 py-4 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                      <Smartphone className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white text-lg">Android</h3>
+                      <p className="text-green-100 text-sm">Chrome ou navegador compativel</p>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <ol className="space-y-4">
+                      <li className="flex gap-4">
+                        <div className="w-8 h-8 rounded-full bg-green-100 text-green-600 font-bold flex items-center justify-center flex-shrink-0">1</div>
+                        <div>
+                          <p className="font-medium">Abra o site no Chrome</p>
+                          <p className="text-sm text-muted-foreground">Acesse o endereco do sistema no navegador Chrome</p>
+                        </div>
+                      </li>
+                      <li className="flex gap-4">
+                        <div className="w-8 h-8 rounded-full bg-green-100 text-green-600 font-bold flex items-center justify-center flex-shrink-0">2</div>
+                        <div>
+                          <p className="font-medium">Toque no menu (3 pontos)</p>
+                          <p className="text-sm text-muted-foreground">No canto superior direito da tela</p>
+                        </div>
+                      </li>
+                      <li className="flex gap-4">
+                        <div className="w-8 h-8 rounded-full bg-green-100 text-green-600 font-bold flex items-center justify-center flex-shrink-0">3</div>
+                        <div>
+                          <p className="font-medium">Selecione "Adicionar a tela inicial"</p>
+                          <p className="text-sm text-muted-foreground">Ou "Instalar aplicativo" se disponivel</p>
+                        </div>
+                      </li>
+                      <li className="flex gap-4">
+                        <div className="w-8 h-8 rounded-full bg-green-100 text-green-600 font-bold flex items-center justify-center flex-shrink-0">4</div>
+                        <div>
+                          <p className="font-medium">Confirme a instalacao</p>
+                          <p className="text-sm text-muted-foreground">O icone do app aparecera na sua tela inicial</p>
+                        </div>
+                      </li>
+                    </ol>
+                  </div>
+                </div>
+
+                {/* iOS */}
+                <div className="border rounded-xl overflow-hidden">
+                  <div className="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                      <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white text-lg">iOS (iPhone/iPad)</h3>
+                      <p className="text-gray-300 text-sm">Safari obrigatorio</p>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg p-3 mb-4 flex items-start gap-2">
+                      <AlertCircle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                      <p className="text-sm text-amber-700 dark:text-amber-300">
+                        <strong>Importante:</strong> No iOS, voce DEVE usar o Safari. Outros navegadores (Chrome, Firefox) nao suportam instalacao de PWA no iPhone/iPad.
+                      </p>
+                    </div>
+                    <ol className="space-y-4">
+                      <li className="flex gap-4">
+                        <div className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 font-bold flex items-center justify-center flex-shrink-0">1</div>
+                        <div>
+                          <p className="font-medium">Abra o site no Safari</p>
+                          <p className="text-sm text-muted-foreground">Navegador nativo da Apple</p>
+                        </div>
+                      </li>
+                      <li className="flex gap-4">
+                        <div className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 font-bold flex items-center justify-center flex-shrink-0">2</div>
+                        <div>
+                          <p className="font-medium">Toque no botao Compartilhar</p>
+                          <p className="text-sm text-muted-foreground">Icone de quadrado com seta para cima (parte inferior da tela)</p>
+                        </div>
+                      </li>
+                      <li className="flex gap-4">
+                        <div className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 font-bold flex items-center justify-center flex-shrink-0">3</div>
+                        <div>
+                          <p className="font-medium">Role e selecione "Adicionar a Tela de Inicio"</p>
+                          <p className="text-sm text-muted-foreground">Pode precisar rolar a lista de opcoes</p>
+                        </div>
+                      </li>
+                      <li className="flex gap-4">
+                        <div className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 font-bold flex items-center justify-center flex-shrink-0">4</div>
+                        <div>
+                          <p className="font-medium">Toque em "Adicionar"</p>
+                          <p className="text-sm text-muted-foreground">O app sera instalado na tela inicial</p>
+                        </div>
+                      </li>
+                    </ol>
+                  </div>
+                </div>
+
+                {/* Desktop */}
+                <div className="border rounded-xl overflow-hidden">
+                  <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-4 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                      <Monitor className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white text-lg">Windows / macOS / Linux</h3>
+                      <p className="text-blue-100 text-sm">Chrome ou Microsoft Edge</p>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <h4 className="font-medium mb-3 flex items-center gap-2">
+                          <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center">
+                            <span className="text-xs font-bold text-blue-600">C</span>
+                          </div>
+                          Google Chrome
+                        </h4>
+                        <ol className="space-y-2 text-sm">
+                          <li className="flex gap-2">
+                            <span className="text-blue-500 font-medium">1.</span>
+                            <span>Acesse o site no Chrome</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <span className="text-blue-500 font-medium">2.</span>
+                            <span>Clique no icone de instalar na barra de endereco (lado direito)</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <span className="text-blue-500 font-medium">3.</span>
+                            <span>Ou: Menu (3 pontos) → "Instalar CNPJ App"</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <span className="text-blue-500 font-medium">4.</span>
+                            <span>Confirme clicando em "Instalar"</span>
+                          </li>
+                        </ol>
+                      </div>
+                      <div>
+                        <h4 className="font-medium mb-3 flex items-center gap-2">
+                          <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center">
+                            <span className="text-xs font-bold text-blue-600">E</span>
+                          </div>
+                          Microsoft Edge
+                        </h4>
+                        <ol className="space-y-2 text-sm">
+                          <li className="flex gap-2">
+                            <span className="text-blue-500 font-medium">1.</span>
+                            <span>Acesse o site no Edge</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <span className="text-blue-500 font-medium">2.</span>
+                            <span>Clique no icone de instalar na barra de endereco</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <span className="text-blue-500 font-medium">3.</span>
+                            <span>Ou: Menu (3 pontos) → "Aplicativos" → "Instalar"</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <span className="text-blue-500 font-medium">4.</span>
+                            <span>Confirme a instalacao</span>
+                          </li>
+                        </ol>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Beneficios */}
+                <div className="bg-muted/50 rounded-xl p-6">
+                  <h3 className="font-semibold text-lg mb-4">Beneficios do App Instalado</h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                      <div>
+                        <p className="font-medium">Acesso Direto</p>
+                        <p className="text-sm text-muted-foreground">Abra direto da tela inicial, sem digitar URL</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                      <div>
+                        <p className="font-medium">Tela Cheia</p>
+                        <p className="text-sm text-muted-foreground">Sem barra de navegador, mais espaco util</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                      <div>
+                        <p className="font-medium">Carregamento Rapido</p>
+                        <p className="text-sm text-muted-foreground">Recursos em cache para acesso instantaneo</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                      <div>
+                        <p className="font-medium">Notificacoes</p>
+                        <p className="text-sm text-muted-foreground">Receba alertas mesmo com o app fechado</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* CTA */}
+                <div className="text-center">
+                  <Link href="/download">
+                    <Button size="lg" className="gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700">
+                      <Download className="h-5 w-5" />
+                      Ver Instrucoes Detalhadas
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* CHANGELOG / NOVIDADES */}
           <TabsContent value="changelog" className="space-y-6 mt-6">
             <Card>
               <CardHeader>
@@ -754,81 +1055,182 @@ export default function WikiPage() {
                 <CardDescription>Ultimas atualizacoes e melhorias do sistema</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Janeiro 2026 */}
-                <div className="border-l-4 border-green-500 pl-4">
-                  <h4 className="font-semibold text-lg mb-2">Janeiro 2026</h4>
+                {/* Janeiro 2026 - Novas Funcionalidades */}
+                <div className="border-l-4 border-blue-500 pl-4">
+                  <h4 className="font-semibold text-lg mb-2 flex items-center gap-2">
+                    <Badge className="bg-blue-500">NOVO</Badge>
+                    Janeiro 2026 - Admin Cliente
+                  </h4>
                   
                   <div className="space-y-4">
                     <div>
-                      <Badge className="bg-green-100 text-green-700 mb-2">Header Padronizado</Badge>
+                      <Badge className="bg-blue-100 text-blue-700 mb-2">Dashboard com Metricas</Badge>
                       <ul className="text-sm space-y-1 text-muted-foreground ml-4">
-                        <li>• Logo ACT + nome do sistema</li>
-                        <li>• Menu de navegacao centralizado</li>
-                        <li>• Sistema de notificacoes com badge</li>
-                        <li>• Dropdown de perfil com Meu Perfil, Configuracoes e Sair</li>
-                        <li>• Modais funcionais para perfil e configuracoes</li>
+                        <li>• Cards com total de CNPJs, tarefas pendentes e concluidas</li>
+                        <li>• Grafico de evolucao mensal das correcoes</li>
+                        <li>• Taxa de correcao (antes/depois)</li>
+                        <li>• Ranking de repositorios por findings</li>
                       </ul>
                     </div>
 
                     <div>
-                      <Badge className="bg-blue-100 text-blue-700 mb-2">Board Kanban Melhorado</Badge>
+                      <Badge className="bg-amber-100 text-amber-700 mb-2">Sistema de Alertas</Badge>
                       <ul className="text-sm space-y-1 text-muted-foreground ml-4">
-                        <li>• Drag-and-drop funcional entre colunas</li>
-                        <li>• Cards mais compactos e responsivos</li>
-                        <li>• Modal de detalhes ao clicar no card</li>
-                        <li>• Exibicao de codigo atual e sugerido</li>
-                        <li>• Analise e sugestao da IA visivel</li>
+                        <li>• Alertas automaticos para findings criticos</li>
+                        <li>• Notificacao quando analise e concluida</li>
+                        <li>• Alerta de tarefas atrasadas</li>
+                        <li>• Configuracao de regras de alerta</li>
                       </ul>
                     </div>
 
                     <div>
-                      <Badge className="bg-purple-100 text-purple-700 mb-2">Controle de Horas</Badge>
+                      <Badge className="bg-purple-100 text-purple-700 mb-2">Assistente IA</Badge>
                       <ul className="text-sm space-y-1 text-muted-foreground ml-4">
-                        <li>• Horas estimadas, restantes e completadas</li>
-                        <li>• Edicao inline no modal de detalhes</li>
-                        <li>• Barra de progresso visual</li>
-                        <li>• Estilo identico ao Azure DevOps</li>
+                        <li>• Chat IA integrado no dashboard</li>
+                        <li>• Gerar relatorios automaticos</li>
+                        <li>• Responder duvidas sobre o sistema</li>
+                        <li>• Ajudar na tomada de decisoes</li>
                       </ul>
                     </div>
 
                     <div>
-                      <Badge className="bg-orange-100 text-orange-700 mb-2">Sistema de Notificacoes</Badge>
+                      <Badge className="bg-cyan-100 text-cyan-700 mb-2">Integracao Jira/Azure Boards</Badge>
                       <ul className="text-sm space-y-1 text-muted-foreground ml-4">
-                        <li>• Notificacao automatica ao atribuir tarefas</li>
-                        <li>• Icone de sino com contador no header</li>
-                        <li>• Dropdown com lista de notificacoes</li>
-                        <li>• Marcar como lida individualmente ou todas</li>
+                        <li>• Exportar tarefas como Work Items no Azure</li>
+                        <li>• Exportar tarefas como Issues no Jira</li>
+                        <li>• Mapeamento de prioridade e descricao</li>
+                        <li>• Salva referencia externa na tarefa</li>
                       </ul>
                     </div>
 
                     <div>
-                      <Badge className="bg-teal-100 text-teal-700 mb-2">Filtros Avancados</Badge>
+                      <Badge className="bg-slate-100 text-slate-700 mb-2">Sistema de Auditoria</Badge>
                       <ul className="text-sm space-y-1 text-muted-foreground ml-4">
-                        <li>• Filtro por repositorio</li>
-                        <li>• Filtro por status</li>
-                        <li>• Busca por texto</li>
-                        <li>• Filtros combinaveis</li>
-                      </ul>
-                    </div>
-
-                    <div>
-                      <Badge className="bg-red-100 text-red-700 mb-2">Super Admin Atualizado</Badge>
-                      <ul className="text-sm space-y-1 text-muted-foreground ml-4">
-                        <li>• Mesmo padrao visual do desenvolvedor</li>
-                        <li>• Header com logo, menu centralizado, notificacoes e perfil</li>
-                        <li>• Modais de perfil e configuracoes</li>
+                        <li>• Log de todas as acoes (criar, editar, excluir)</li>
+                        <li>• Filtros por acao, entidade e usuario</li>
+                        <li>• Exportacao CSV dos logs</li>
+                        <li>• Historico completo com timestamps</li>
                       </ul>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-muted/50 rounded-lg p-4">
-                  <h4 className="font-semibold mb-2">Proximas Atualizacoes Planejadas:</h4>
+                {/* Desenvolvedor */}
+                <div className="border-l-4 border-green-500 pl-4">
+                  <h4 className="font-semibold text-lg mb-2 flex items-center gap-2">
+                    <Badge className="bg-green-500">NOVO</Badge>
+                    Janeiro 2026 - Desenvolvedor
+                  </h4>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <Badge className="bg-green-100 text-green-700 mb-2">Timer de Trabalho</Badge>
+                      <ul className="text-sm space-y-1 text-muted-foreground ml-4">
+                        <li>• Cronometro para registrar tempo em tarefas</li>
+                        <li>• Iniciar/pausar/parar com um clique</li>
+                        <li>• Salva automaticamente no banco de dados</li>
+                        <li>• Historico de sessoes de trabalho</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <Badge className="bg-purple-100 text-purple-700 mb-2">Assistente IA (Ctrl+K)</Badge>
+                      <ul className="text-sm space-y-1 text-muted-foreground ml-4">
+                        <li>• Chat IA para ajuda com codigo</li>
+                        <li>• Explica o codigo atual e sugerido</li>
+                        <li>• Gera correcoes automaticamente</li>
+                        <li>• Responde duvidas tecnicas</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <Badge className="bg-orange-100 text-orange-700 mb-2">Checklist de Conclusao</Badge>
+                      <ul className="text-sm space-y-1 text-muted-foreground ml-4">
+                        <li>• Verificar codigo commitado</li>
+                        <li>• Verificar PR aberto</li>
+                        <li>• Verificar testes passando</li>
+                        <li>• Bloqueio de finalizacao ate completar</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <Badge className="bg-blue-100 text-blue-700 mb-2">Modo Foco (Ctrl+F)</Badge>
+                      <ul className="text-sm space-y-1 text-muted-foreground ml-4">
+                        <li>• Timer Pomodoro (25min trabalho / 5min pausa)</li>
+                        <li>• Tela limpa sem distracoes</li>
+                        <li>• Som de notificacao ao finalizar</li>
+                        <li>• Estatisticas de sessoes focadas</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <Badge className="bg-amber-100 text-amber-700 mb-2">Gamificacao</Badge>
+                      <ul className="text-sm space-y-1 text-muted-foreground ml-4">
+                        <li>• Pontos por tarefas concluidas</li>
+                        <li>• Badges e conquistas desbloqueiaveis</li>
+                        <li>• Ranking entre desenvolvedores</li>
+                        <li>• Nivel e progresso visual</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <Badge className="bg-teal-100 text-teal-700 mb-2">Atalhos de Teclado</Badge>
+                      <ul className="text-sm space-y-1 text-muted-foreground ml-4">
+                        <li>• Ctrl+K - Abrir Assistente IA</li>
+                        <li>• Ctrl+F - Modo Foco</li>
+                        <li>• Ctrl+1/2/3/4 - Navegar entre abas</li>
+                        <li>• ? - Mostrar ajuda de atalhos</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <Badge className="bg-indigo-100 text-indigo-700 mb-2">Diff Viewer e Git</Badge>
+                      <ul className="text-sm space-y-1 text-muted-foreground ml-4">
+                        <li>• Visualizar codigo antes/depois lado a lado</li>
+                        <li>• Syntax highlighting por linguagem</li>
+                        <li>• Ver branches e PRs relacionados</li>
+                        <li>• Status do PR em tempo real</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Versao Anterior */}
+                <div className="border-l-4 border-gray-300 pl-4 opacity-70">
+                  <h4 className="font-semibold text-lg mb-2">Dezembro 2025</h4>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <Badge className="bg-gray-100 text-gray-700 mb-2">Board Kanban</Badge>
+                      <ul className="text-sm space-y-1 text-muted-foreground ml-4">
+                        <li>• Drag-and-drop entre colunas</li>
+                        <li>• Modal de detalhes completo</li>
+                        <li>• Controle de horas estilo Azure DevOps</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <Badge className="bg-gray-100 text-gray-700 mb-2">Sistema Base</Badge>
+                      <ul className="text-sm space-y-1 text-muted-foreground ml-4">
+                        <li>• Header padronizado</li>
+                        <li>• Notificacoes basicas</li>
+                        <li>• Filtros por repositorio e status</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                  <h4 className="font-semibold mb-2 flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-amber-500" />
+                    Proximas Atualizacoes Planejadas
+                  </h4>
                   <ul className="text-sm space-y-1 text-muted-foreground">
                     <li>• Tema escuro completo</li>
-                    <li>• Notificacoes por email</li>
-                    <li>• Dashboard com graficos de produtividade</li>
-                    <li>• Exportacao de relatorios em PDF</li>
+                    <li>• Notificacoes por email e Slack</li>
+                    <li>• Dashboard executivo para C-Level</li>
+                    <li>• Integracao com GitLab</li>
+                    <li>• App mobile para desenvolvedores</li>
                   </ul>
                 </div>
               </CardContent>

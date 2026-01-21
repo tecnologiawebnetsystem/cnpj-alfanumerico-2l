@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { logSecurityEvent } from "./audit-logger"
 
 export function safeErrorResponse(error: unknown, userId?: string): NextResponse {
-  console.error(" API Error:", error)
+  console.error("[v0] API Error:", error)
 
   // Log security event
   if (userId) {

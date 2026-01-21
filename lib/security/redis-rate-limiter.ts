@@ -57,7 +57,7 @@ export class RedisRateLimiter {
         reset: Math.ceil((now + this.window * 1000) / 1000),
       }
     } catch (error) {
-      console.error(" Redis rate limiter error:", error)
+      console.error("[v0] Redis rate limiter error:", error)
       // Fail open on Redis errors to not block legitimate users
       return {
         success: true,
