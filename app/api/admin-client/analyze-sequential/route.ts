@@ -427,8 +427,22 @@ async function analyzeAzureRepository(
     const azureOrg = integration.azure_organization || integration.organization
     const azureProject = repo.project_name || repo.project || repo.name
     const accessToken = integration.access_token
-
-    const baseUrl = `https://dev.azure.com/${azureOrg}/${azureProject}/_apis/git/repositories/${repo.azure_repo_id || repo.name}`
+    
+    // Check if On-Premise (has custom base_url)
+    const isOnPremise = !!integration.base_url && !integration.base_url.includes("dev.azure.com")
+    
+    // Build base URL based on Cloud vs On-Premise
+    let baseUrl: string
+    if (isOnPremise && integration.base_url) {
+      // On-Premise: https://tfs.empresa.com/tfs/{collection}/{project}/_apis/git/repositories/{repo}
+      const serverUrl = integration.base_url.replace(/\/+$/, "") // Remove trailing slashes
+      baseUrl = `${serverUrl}/${azureOrg}/${azureProject}/_apis/git/repositories/${repo.azure_repo_id || repo.name}`
+      console.log("Using On-Premise Azure DevOps URL:", baseUrl)
+    } else {
+      // Cloud: https://dev.azure.com/{org}/{project}/_apis/git/repositories/{repo}
+      baseUrl = `https://dev.azure.com/${azureOrg}/${azureProject}/_apis/git/repositories/${repo.azure_repo_id || repo.name}`
+    }
+    
     const authHeader = `Basic ${Buffer.from(`:${accessToken}`).toString("base64")}`
 
     // Get repository items (files)

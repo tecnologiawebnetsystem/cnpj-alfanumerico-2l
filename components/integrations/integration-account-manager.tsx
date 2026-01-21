@@ -21,14 +21,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Plus, Trash2, Edit, Github, Cloud, CheckCircle2, XCircle } from 'lucide-react'
+import { Plus, Trash2, Edit, Github, Cloud, CheckCircle2, XCircle, Server, Globe } from 'lucide-react'
 import { useToast } from "@/hooks/use-toast"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface Integration {
   id: string
   name: string
   organization?: string
   project?: string
+  base_url?: string
   status: string
   created_at: string
   integration_providers: {
@@ -51,6 +53,7 @@ export function IntegrationAccountManager() {
     project: "",
     access_token: "",
     base_url: "",
+    is_on_premise: false,
   })
 
   useEffect(() => {
@@ -120,13 +123,15 @@ export function IntegrationAccountManager() {
 
   const handleEdit = (integration: Integration) => {
     setEditingId(integration.id)
+    const isOnPremise = !!integration.base_url && !integration.base_url.includes("dev.azure.com")
     setFormData({
       name: integration.name,
       provider_name: integration.integration_providers.name,
       organization: integration.organization || "",
       project: integration.project || "",
       access_token: "",
-      base_url: "",
+      base_url: integration.base_url || "",
+      is_on_premise: isOnPremise,
     })
     setShowDialog(true)
   }
@@ -172,7 +177,12 @@ export function IntegrationAccountManager() {
       project: "",
       access_token: "",
       base_url: "",
+      is_on_premise: false,
     })
+  }
+
+  const isOnPremise = (integration: Integration) => {
+    return !!integration.base_url && !integration.base_url.includes("dev.azure.com")
   }
 
   const getProviderIcon = (providerName: string) => {
@@ -227,7 +237,7 @@ export function IntegrationAccountManager() {
                     {getProviderIcon(integration.integration_providers.name)}
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="font-semibold">{integration.name}</h3>
                       <Badge variant={integration.status === "active" ? "default" : "secondary"}>
                         {integration.status === "active" ? (
@@ -242,6 +252,17 @@ export function IntegrationAccountManager() {
                           </>
                         )}
                       </Badge>
+                      {isOnPremise(integration) ? (
+                        <Badge variant="outline" className="bg-orange-100 text-orange-700 border-orange-300">
+                          <Server className="h-3 w-3 mr-1" />
+                          On-Premise
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-300">
+                          <Globe className="h-3 w-3 mr-1" />
+                          Cloud
+                        </Badge>
+                      )}
                     </div>
                     <p className="text-sm text-muted-foreground">
                       {integration.integration_providers.display_name}
@@ -254,6 +275,11 @@ export function IntegrationAccountManager() {
                     {integration.project && (
                       <p className="text-xs text-muted-foreground">
                         Projeto: {integration.project}
+                      </p>
+                    )}
+                    {isOnPremise(integration) && integration.base_url && (
+                      <p className="text-xs text-muted-foreground">
+                        URL: {integration.base_url}
                       </p>
                     )}
                     <p className="text-xs text-muted-foreground mt-1">
@@ -319,15 +345,65 @@ export function IntegrationAccountManager() {
               />
             </div>
 
+            {/* On-Premise Checkbox - only for Azure DevOps */}
+            {formData.provider_name === "azure-devops" && (
+              <div className="flex items-center space-x-3 p-3 border rounded-lg bg-muted/50">
+                <Checkbox
+                  id="is_on_premise"
+                  checked={formData.is_on_premise}
+                  onCheckedChange={(checked) => 
+                    setFormData({ 
+                      ...formData, 
+                      is_on_premise: !!checked,
+                      base_url: checked ? formData.base_url : ""
+                    })
+                  }
+                />
+                <div className="flex-1">
+                  <Label htmlFor="is_on_premise" className="cursor-pointer flex items-center gap-2">
+                    <Server className="h-4 w-4 text-orange-600" />
+                    <span>On-Premise (TFS/Azure DevOps Server)</span>
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Marque se voce usa Azure DevOps Server local ao inves do Cloud
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Base URL - only show for On-Premise */}
+            {formData.is_on_premise && (
+              <div className="space-y-2">
+                <Label htmlFor="base_url">URL do Servidor</Label>
+                <Input
+                  id="base_url"
+                  placeholder="Ex: https://tfs.empresa.com/tfs ou https://azuredevops.empresa.com"
+                  value={formData.base_url}
+                  onChange={(e) => setFormData({ ...formData, base_url: e.target.value })}
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  URL base do seu servidor Azure DevOps/TFS (sem a organizacao/colecao)
+                </p>
+              </div>
+            )}
+
             <div className="space-y-2">
-              <Label htmlFor="organization">Organização</Label>
+              <Label htmlFor="organization">
+                {formData.is_on_premise ? "Colecao (Collection)" : "Organizacao"}
+              </Label>
               <Input
                 id="organization"
-                placeholder="Ex: klebergoncalvesk"
+                placeholder={formData.is_on_premise ? "Ex: DefaultCollection" : "Ex: klebergoncalvesk"}
                 value={formData.organization}
                 onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
                 required
               />
+              {formData.is_on_premise && (
+                <p className="text-xs text-muted-foreground">
+                  Nome da colecao no TFS/Azure DevOps Server
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">

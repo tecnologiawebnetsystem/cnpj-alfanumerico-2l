@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { user_id, access_token, provider = "github", organization, account_name } = body
+    const { user_id, access_token, provider = "github", organization, account_name, is_on_premise, base_url } = body
 
     if (!user_id || !access_token) {
       return NextResponse.json({ error: "user_id and access_token are required" }, { status: 400 })
@@ -94,6 +94,8 @@ export async function POST(request: NextRequest) {
           access_token,
           scope: scopeValue,
           provider,
+          is_on_premise: provider === "azure" ? is_on_premise : false,
+          base_url: provider === "azure" && is_on_premise ? base_url : null,
           updated_at: new Date().toISOString(),
         })
         .eq("id", existing.id)
@@ -114,6 +116,8 @@ export async function POST(request: NextRequest) {
         provider,
         token_type: "Bearer",
         account_name,
+        is_on_premise: provider === "azure" ? is_on_premise : false,
+        base_url: provider === "azure" && is_on_premise ? base_url : null,
       })
 
       if (error) {

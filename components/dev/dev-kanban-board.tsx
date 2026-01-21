@@ -24,6 +24,7 @@ import {
   Copy,
   AlertCircle,
   X,
+  Focus,
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
@@ -69,6 +70,8 @@ interface Task {
 interface DevKanbanBoardProps {
   tasks: Task[]
   onTaskUpdate: (taskId: string, updates: any) => Promise<void>
+  onTaskSelect?: (task: Task) => void
+  onStartFocus?: (task: Task) => void
 }
 
 function DroppableColumn({ 
@@ -116,7 +119,7 @@ function DroppableColumn({
   )
 }
 
-export function DevKanbanBoard({ tasks, onTaskUpdate }: DevKanbanBoardProps) {
+export function DevKanbanBoard({ tasks, onTaskUpdate, onTaskSelect, onStartFocus }: DevKanbanBoardProps) {
   const { toast } = useToast()
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [isCompletionDialogOpen, setIsCompletionDialogOpen] = useState(false)
@@ -195,6 +198,10 @@ export function DevKanbanBoard({ tasks, onTaskUpdate }: DevKanbanBoardProps) {
 
   const handleCardClick = (task: Task) => {
     setSelectedTask(task)
+    // Notify parent component of task selection
+    if (onTaskSelect) {
+      onTaskSelect(task)
+    }
     setEditedHours({
       estimated_hours: task.estimated_hours || 0,
       remaining_hours: task.remaining_hours || 0,
@@ -731,6 +738,19 @@ export function DevKanbanBoard({ tasks, onTaskUpdate }: DevKanbanBoardProps) {
             <Button variant="outline" onClick={() => setIsDetailDialogOpen(false)}>
               Fechar
             </Button>
+            {onStartFocus && selectedTask && selectedTask.status !== "completed" && (
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setIsDetailDialogOpen(false)
+                  onStartFocus(selectedTask)
+                }}
+                className="gap-2"
+              >
+                <Focus className="h-4 w-4" />
+                Modo Foco
+              </Button>
+            )}
             {selectedTask?.status === "pending" && (
               <Button 
                 className="bg-blue-600 hover:bg-blue-700"

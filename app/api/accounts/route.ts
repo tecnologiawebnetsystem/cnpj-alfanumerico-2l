@@ -35,11 +35,18 @@ export async function GET(request: NextRequest) {
     const supabase = await createServerClient()
 
     console.log(" Querying github_tokens table...")
-    const { data: accounts, error } = await supabase
+    const { data: rawAccounts, error } = await supabase
       .from("github_tokens")
-      .select("id, provider, account_name, created_at, updated_at")
+      .select("id, provider, account_name, scope, base_url, created_at, updated_at, is_on_premise")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
+    
+    // Map the accounts to include organization from scope for Azure
+    const accounts = rawAccounts?.map((acc: any) => ({
+      ...acc,
+      // For Azure, organization is stored in scope field
+      organization: acc.provider === "azure" ? acc.scope : acc.base_url,
+    })) || []
 
     if (error) {
       console.error(" Error fetching accounts:", error)

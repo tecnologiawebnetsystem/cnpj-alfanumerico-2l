@@ -38,7 +38,21 @@ import {
   Mail,
   Shield,
   Save,
+  History,
+  Trophy,
+  Timer,
+  Focus,
+  Keyboard,
+  Bot,
+  GitBranch,
 } from "lucide-react"
+import { WorkTimer } from "./work-timer"
+import { DevAIAssistant } from "./dev-ai-assistant"
+import { GamificationPanel } from "./gamification-panel"
+import { ActivityHistory } from "./activity-history"
+import { FocusMode } from "./focus-mode"
+import { KeyboardShortcutsHelp } from "./keyboard-shortcuts-help"
+import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts"
 import { logout } from "@/lib/auth"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -67,6 +81,30 @@ export function DevHeader({ user, activeView = "board" }: DevHeaderProps) {
   const [loadingNotifications, setLoadingNotifications] = useState(true)
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [showSettingsModal, setShowSettingsModal] = useState(false)
+  
+  // New feature states
+  const [showTimer, setShowTimer] = useState(false)
+  const [showAIAssistant, setShowAIAssistant] = useState(false)
+  const [showGamification, setShowGamification] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
+  const [showFocusMode, setShowFocusMode] = useState(false)
+  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false)
+  const [currentTask, setCurrentTask] = useState<any>(null)
+  
+  // Keyboard shortcuts
+  useKeyboardShortcuts({
+    "ctrl+k": () => setShowAIAssistant(true),
+    "ctrl+f": () => setShowFocusMode(true),
+    "?": () => setShowKeyboardHelp(true),
+    "escape": () => {
+      setShowAIAssistant(false)
+      setShowFocusMode(false)
+      setShowKeyboardHelp(false)
+      setShowTimer(false)
+      setShowGamification(false)
+      setShowHistory(false)
+    }
+  })
 
   useEffect(() => {
     fetchNotifications()
@@ -178,6 +216,48 @@ export function DevHeader({ user, activeView = "board" }: DevHeaderProps) {
                   Documentacao
                 </Button>
               </Link>
+              
+              {/* New Features Menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-1.5 h-8 text-xs">
+                    <Trophy className="h-3.5 w-3.5" />
+                    Ferramentas
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="center" className="w-48">
+                  <DropdownMenuItem onClick={() => setShowTimer(true)} className="gap-2 cursor-pointer">
+                    <Timer className="h-4 w-4" />
+                    Cronometro
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowAIAssistant(true)} className="gap-2 cursor-pointer">
+                    <Bot className="h-4 w-4" />
+                    Assistente IA
+                    <span className="ml-auto text-[10px] text-muted-foreground">Ctrl+K</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowFocusMode(true)} className="gap-2 cursor-pointer">
+                    <Focus className="h-4 w-4" />
+                    Modo Foco
+                    <span className="ml-auto text-[10px] text-muted-foreground">Ctrl+F</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setShowHistory(true)} className="gap-2 cursor-pointer">
+                    <History className="h-4 w-4" />
+                    Historico
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowGamification(true)} className="gap-2 cursor-pointer">
+                    <Trophy className="h-4 w-4" />
+                    Conquistas
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setShowKeyboardHelp(true)} className="gap-2 cursor-pointer">
+                    <Keyboard className="h-4 w-4" />
+                    Atalhos
+                    <span className="ml-auto text-[10px] text-muted-foreground">?</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </nav>
 
             {/* Right - Notifications and Profile */}
@@ -372,6 +452,80 @@ export function DevHeader({ user, activeView = "board" }: DevHeaderProps) {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Timer Modal */}
+      <Dialog open={showTimer} onOpenChange={setShowTimer}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Timer className="h-5 w-5" />
+              Cronometro de Trabalho
+            </DialogTitle>
+            <DialogDescription>
+              Registre o tempo gasto nas suas tarefas
+            </DialogDescription>
+          </DialogHeader>
+          <WorkTimer 
+            taskId={currentTask?.id || ""} 
+            taskTitle={currentTask?.title || "Selecione uma tarefa"} 
+            userId={user.id}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* AI Assistant */}
+      <DevAIAssistant 
+        userId={user.id} 
+        isOpen={showAIAssistant} 
+        onClose={() => setShowAIAssistant(false)}
+        currentTask={currentTask}
+      />
+
+      {/* Focus Mode */}
+      <FocusMode 
+        open={showFocusMode} 
+        onOpenChange={setShowFocusMode}
+        task={currentTask}
+        onComplete={() => setShowFocusMode(false)}
+      />
+
+      {/* Activity History Modal */}
+      <Dialog open={showHistory} onOpenChange={setShowHistory}>
+        <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="h-5 w-5" />
+              Historico de Atividades
+            </DialogTitle>
+            <DialogDescription>
+              Veja todas as suas atividades recentes
+            </DialogDescription>
+          </DialogHeader>
+          <ActivityHistory userId={user.id} />
+        </DialogContent>
+      </Dialog>
+
+      {/* Gamification Modal */}
+      <Dialog open={showGamification} onOpenChange={setShowGamification}>
+        <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Trophy className="h-5 w-5" />
+              Conquistas e Ranking
+            </DialogTitle>
+            <DialogDescription>
+              Acompanhe seu progresso e conquistas
+            </DialogDescription>
+          </DialogHeader>
+          <GamificationPanel userId={user.id} />
+        </DialogContent>
+      </Dialog>
+
+      {/* Keyboard Shortcuts Help */}
+      <KeyboardShortcutsHelp 
+        isOpen={showKeyboardHelp} 
+        onClose={() => setShowKeyboardHelp(false)} 
+      />
 
       {/* Settings Modal */}
       <Dialog open={showSettingsModal} onOpenChange={setShowSettingsModal}>

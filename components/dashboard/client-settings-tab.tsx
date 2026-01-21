@@ -9,8 +9,9 @@ import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, X, Save, Loader2, Settings, Brain, Eye, EyeOff, CheckCircle2, AlertCircle } from "lucide-react"
+import { Plus, X, Save, Loader2, Settings, Brain, Eye, EyeOff, CheckCircle2, AlertCircle, FolderOpen, HardDrive, Chrome } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { useLocalFolder } from "@/hooks/use-local-folder"
 
 interface ClientSettingsTabProps {
   clientId: string
@@ -33,6 +34,35 @@ export function ClientSettingsTab({ clientId }: ClientSettingsTabProps) {
   const [savingAI, setSavingAI] = useState(false)
 
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  
+  // Local folder hook
+  const { 
+    folderPath, 
+    isSupported: isFolderSupported, 
+    error: folderError, 
+    isSelecting: isSelectingFolder,
+    selectFolder, 
+    clearFolder 
+  } = useLocalFolder()
+  
+  // Save to local storage when folder is selected
+  const [savedFolderName, setSavedFolderName] = useState<string | null>(null)
+  
+  // Load saved folder name from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem(`local_folder_${clientId}`)
+    if (saved) {
+      setSavedFolderName(saved)
+    }
+  }, [clientId])
+  
+  // Save folder name when selected
+  useEffect(() => {
+    if (folderPath) {
+      localStorage.setItem(`local_folder_${clientId}`, folderPath)
+      setSavedFolderName(folderPath)
+    }
+  }, [folderPath, clientId])
 
   // CNPJ field names
   const [cnpjFields, setCnpjFields] = useState<string[]>([])
@@ -312,6 +342,116 @@ export function ClientSettingsTab({ clientId }: ClientSettingsTabProps) {
       </div>
 
       <Separator />
+
+      {/* Local Folder Settings Section */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                <HardDrive className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <CardTitle>Pasta Local para Repositorios</CardTitle>
+                <CardDescription>
+                  Configure uma pasta no seu computador para salvar os repositorios durante a analise
+                </CardDescription>
+              </div>
+            </div>
+            {(savedFolderName || folderPath) && (
+              <Badge className="bg-green-100 text-green-700">
+                <CheckCircle2 className="h-3 w-3 mr-1" />
+                Configurada
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {!isFolderSupported ? (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+              <div className="flex items-start gap-3">
+                <Chrome className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-amber-900">Navegador nao suportado</p>
+                  <p className="text-xs text-amber-800 mt-1">
+                    A funcionalidade de salvar arquivos localmente so esta disponivel no <strong>Google Chrome</strong> ou <strong>Microsoft Edge</strong>.
+                    Por favor, use um desses navegadores para habilitar esta funcao.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="rounded-lg border p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <FolderOpen className="h-5 w-5 text-blue-600" />
+                    <div>
+                      <p className="text-sm font-medium">Pasta Selecionada</p>
+                      <p className="text-xs text-muted-foreground">
+                        {savedFolderName || folderPath || "Nenhuma pasta selecionada"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    {(savedFolderName || folderPath) && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          clearFolder()
+                          localStorage.removeItem(`local_folder_${clientId}`)
+                          setSavedFolderName(null)
+                          toast({
+                            title: "Pasta removida",
+                            description: "A configuracao de pasta local foi removida",
+                          })
+                        }}
+                      >
+                        <X className="h-4 w-4 mr-1" />
+                        Remover
+                      </Button>
+                    )}
+                    <Button 
+                      onClick={selectFolder}
+                      disabled={isSelectingFolder}
+                      variant={savedFolderName || folderPath ? "outline" : "default"}
+                    >
+                      {isSelectingFolder ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Selecionando...
+                        </>
+                      ) : (
+                        <>
+                          <FolderOpen className="h-4 w-4 mr-2" />
+                          {savedFolderName || folderPath ? "Alterar Pasta" : "Selecionar Pasta"}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+                
+                {folderError && (
+                  <div className="rounded-md bg-red-50 p-3">
+                    <p className="text-sm text-red-600">{folderError}</p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="text-xs text-muted-foreground space-y-1">
+                <p><strong>Como funciona:</strong></p>
+                <ul className="list-disc list-inside space-y-0.5 ml-2">
+                  <li>Selecione uma pasta do seu computador (ex: C:/Projetos ou ~/Documents/Projetos)</li>
+                  <li>Ao analisar repositorios, o sistema perguntara se deseja salvar os arquivos localmente</li>
+                  <li>Os arquivos serao baixados via API e salvos na pasta escolhida</li>
+                  <li>Voce pode analisar os arquivos offline ou usar sua IDE favorita</li>
+                </ul>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       {/* AI Settings Section */}
       <Card>

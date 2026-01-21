@@ -9,7 +9,8 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Github, Gitlab, Trash2, Plus, Key, CheckCircle2, AlertCircle, Info, Cloud } from "lucide-react"
+import { ArrowLeft, Github, Gitlab, Trash2, Plus, Key, CheckCircle2, AlertCircle, Info, Cloud, Server } from "lucide-react"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import Link from "next/link"
 import { getCurrentUser } from "@/lib/auth"
 import { NotificationDialog } from "@/components/ui/notification-dialog"
@@ -41,6 +42,7 @@ export default function IntegrationsPage() {
   const [selectedProvider, setSelectedProvider] = useState<"github" | "azure" | "gitlab">("github")
   const [organization, setOrganization] = useState("")
   const [pat, setPat] = useState("")
+  const [isOnPremise, setIsOnPremise] = useState(false)
   const [userRole, setUserRole] = useState<string>("")
   const [canManageTokens, setCanManageTokens] = useState(false)
   const [notificationOpen, setNotificationOpen] = useState(false)
@@ -176,6 +178,8 @@ export default function IntegrationsPage() {
           provider: selectedProvider,
           organization: selectedProvider === "azure" ? organization : undefined,
           account_name: accountName,
+          is_on_premise: selectedProvider === "azure" ? isOnPremise : undefined,
+          base_url: selectedProvider === "azure" && isOnPremise ? organization : undefined,
         }),
       })
 
@@ -187,6 +191,7 @@ export default function IntegrationsPage() {
         setAccountName("")
         setOrganization("")
         setPat("")
+        setIsOnPremise(false)
         setShowAddForm(false)
         loadTokens()
       } else {
@@ -400,6 +405,8 @@ export default function IntegrationsPage() {
           provider: selectedProvider,
           organization: organization.trim(),
           account_name: accountName,
+          is_on_premise: selectedProvider === "azure" ? isOnPremise : undefined,
+          base_url: selectedProvider === "azure" && isOnPremise ? organization.trim() : undefined,
         }),
       })
 
@@ -572,16 +579,15 @@ export default function IntegrationsPage() {
                           {token.provider === "github" && "GitHub"}
                           {token.provider === "gitlab" && "GitLab"}
                           {token.provider === "azure" && "Azure DevOps"}
-                          {token.account_name &&
-                            token.provider === "azure" &&
+                          {token.provider === "azure" &&
+                            token.organization &&
                             token.project &&
                             ` • ${token.organization}/${token.project}`}
-                          {token.account_name &&
-                            token.provider === "azure" &&
+                          {token.provider === "azure" &&
+                            token.organization &&
                             !token.project &&
                             ` • Organização: ${token.organization}`}
-                          {token.account_name &&
-                            token.provider !== "azure" &&
+                          {token.provider !== "azure" &&
                             token.organization &&
                             ` • Organização: ${token.organization}`}
                           {token.gitlab_username && ` • Usuário: ${token.gitlab_username}`}
@@ -735,21 +741,55 @@ export default function IntegrationsPage() {
 
                 {selectedProvider === "azure" && (
                   <>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <Label htmlFor="organization">URL da Organização do Azure DevOps *</Label>
-                      <Input
-                        id="organization"
-                        type="text"
-                        placeholder="https://dev.azure.com/webnet-systems ou https://devops.bs2.com/BS2Tech/"
-                        value={organization}
-                        onChange={(e) => setOrganization(e.target.value)}
-                        disabled={saving}
-                      />
+                      <div className="flex gap-3">
+                        <div className="flex-1">
+                          <Input
+                            id="organization"
+                            type="text"
+                            placeholder={isOnPremise 
+                              ? "https://devops.suaempresa.com/Projeto/" 
+                              : "https://dev.azure.com/sua-organizacao"
+                            }
+                            value={organization}
+                            onChange={(e) => setOrganization(e.target.value)}
+                            disabled={saving}
+                          />
+                        </div>
+                        <RadioGroup
+                          value={isOnPremise ? "on-premise" : "cloud"}
+                          onValueChange={(value) => setIsOnPremise(value === "on-premise")}
+                          className="flex gap-2"
+                        >
+                          <div className="flex items-center gap-2 border rounded-lg px-3 py-2 cursor-pointer hover:bg-muted/50 transition-colors">
+                            <RadioGroupItem value="cloud" id="cloud" />
+                            <Label htmlFor="cloud" className="flex items-center gap-1.5 cursor-pointer text-sm font-normal">
+                              <Cloud className="h-4 w-4 text-blue-500" />
+                              Cloud
+                            </Label>
+                          </div>
+                          <div className="flex items-center gap-2 border rounded-lg px-3 py-2 cursor-pointer hover:bg-muted/50 transition-colors">
+                            <RadioGroupItem value="on-premise" id="on-premise" />
+                            <Label htmlFor="on-premise" className="flex items-center gap-1.5 cursor-pointer text-sm font-normal">
+                              <Server className="h-4 w-4 text-orange-500" />
+                              On-Premise
+                            </Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
                       <p className="text-xs text-muted-foreground">
-                        Cole a URL completa da organização. Exemplos:
-                        <br />•{" "}
-                        <code className="px-1 py-0.5 bg-muted rounded">https://dev.azure.com/webnet-systems</code>
-                        <br />• <code className="px-1 py-0.5 bg-muted rounded">https://devops.bs2.com/BS2Tech/</code>
+                        {isOnPremise ? (
+                          <>
+                            <strong>On-Premise:</strong> Cole a URL completa do seu servidor Azure DevOps local.
+                            <br />• Exemplo: <code className="px-1 py-0.5 bg-muted rounded">https://devops.bs2.com/BS2Tech/</code>
+                          </>
+                        ) : (
+                          <>
+                            <strong>Cloud:</strong> Cole a URL da sua organizacao no Azure DevOps Services.
+                            <br />• Exemplo: <code className="px-1 py-0.5 bg-muted rounded">https://dev.azure.com/webnet-systems</code>
+                          </>
+                        )}
                       </p>
                     </div>
                   </>

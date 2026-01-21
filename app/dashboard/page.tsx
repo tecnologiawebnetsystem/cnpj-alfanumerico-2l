@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, Users, FileText, BarChart3, Settings, Search, UserPlus, Code } from "lucide-react"
+import { Loader2, Users, FileText, BarChart3, Settings, Search, UserPlus, Code, LineChart, Bell, History, MessageSquare } from "lucide-react"
 import { getCurrentUser } from "@/lib/auth"
 import { cn } from "@/lib/utils"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
@@ -14,13 +14,20 @@ import { ClientSettingsTab } from "@/components/dashboard/client-settings-tab"
 import { ClientAnalysesTab } from "@/components/dashboard/client-analyses-tab"
 import { DeveloperAssignmentTab } from "@/components/dashboard/developer-assignment-tab"
 import { DocumentationTab } from "@/components/dashboard/documentation-tab"
+import { MetricsDashboard } from "@/components/dashboard/metrics-dashboard"
+import { AlertsPanel } from "@/components/dashboard/alerts-panel"
+import { AuditPanel } from "@/components/dashboard/audit-panel"
+import { AIAssistant } from "@/components/dashboard/ai-assistant"
 
 const navItems = [
   { id: "overview", label: "Visao Geral", icon: BarChart3 },
+  { id: "metricas", label: "Metricas", icon: LineChart },
   { id: "analise", label: "Analise", icon: Search },
   { id: "atribuicoes", label: "Atribuicoes", icon: UserPlus },
   { id: "devs", label: "Desenvolvedores", icon: Users },
   { id: "relatorios", label: "Relatorios", icon: FileText },
+  { id: "alertas", label: "Alertas", icon: Bell },
+  { id: "auditoria", label: "Auditoria", icon: History },
   { id: "configuracoes", label: "Configuracoes", icon: Settings },
   { id: "documentacao", label: "Documentacao", icon: Code },
 ]
@@ -68,7 +75,7 @@ export default function DashboardPage() {
     return null
   }
 
-  const userRole = user?.role || "admin"
+  let userRole = user?.role || "admin"
 
   return (
     <div className="min-h-screen bg-background">
@@ -130,16 +137,21 @@ export default function DashboardPage() {
           {/* Content Area */}
           <div className="p-4 md:p-6 lg:p-8 max-w-[1200px]">
             {activeTab === "overview" && <ClientOverview onChangeTab={setActiveTab} userRole={userRole} />}
+            {activeTab === "metricas" && <MetricsDashboard clientId={user.client_id} />}
             {activeTab === "analise" && <ClientAnalysesTab clientId={user.client_id} />}
             {activeTab === "atribuicoes" && <DeveloperAssignmentTab clientId={user.client_id} />}
             {activeTab === "devs" && <ClientDevsTab clientId={user.client_id} />}
             {activeTab === "relatorios" && <ClientReportsTab clientId={user.client_id} />}
+            {activeTab === "alertas" && <AlertsPanel clientId={user.client_id} />}
+            {activeTab === "auditoria" && <AuditPanel clientId={user.client_id} />}
             {activeTab === "configuracoes" && <ClientSettingsTab clientId={user.client_id} />}
             {activeTab === "documentacao" && <DocumentationTab />}
           </div>
+          
+          {/* AI Assistant - Floating Button */}
+          <AIAssistant clientId={user.client_id} />
         </main>
       </div>
-
       <MobileNav activeTab={activeTab} onTabChange={setActiveTab} userRole={userRole} />
     </div>
   )

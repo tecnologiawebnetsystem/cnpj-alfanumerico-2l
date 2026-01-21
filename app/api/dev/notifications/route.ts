@@ -34,6 +34,40 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// Mark notification as read
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { notification_id, user_id, mark_all } = body
+
+    if (!user_id) {
+      return NextResponse.json({ error: "user_id obrigatorio" }, { status: 400 })
+    }
+
+    const supabase = await createClient()
+
+    if (mark_all) {
+      await supabase
+        .from("notifications")
+        .update({ read: true })
+        .eq("user_id", user_id)
+        .eq("read", false)
+    } else if (notification_id) {
+      await supabase
+        .from("notifications")
+        .update({ read: true })
+        .eq("id", notification_id)
+        .eq("user_id", user_id)
+    }
+
+    return NextResponse.json({ success: true })
+
+  } catch (error: any) {
+    console.error("Error updating notification:", error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
