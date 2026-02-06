@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@/lib/supabase/server"
 
-export async function GET(request: NextRequest, { params }: { params: { analysisId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id: analysisId } = await params
     const searchParams = request.nextUrl.searchParams
     const user_id = searchParams.get("user_id")
-    const analysisId = params.analysisId
 
     console.log(" Admin findings API - user_id:", user_id, "analysisId:", analysisId)
 
