@@ -18,8 +18,6 @@ import {
   CheckCircle,
   Code,
   Database,
-  Menu,
-  BookOpen,
   Download,
   Smartphone,
 } from "lucide-react"
@@ -35,8 +33,6 @@ export function HeroSection() {
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -94,174 +90,14 @@ export function HeroSection() {
     }
   }
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id)
-    element?.scrollIntoView({ behavior: "smooth" })
-    setMobileMenuOpen(false)
-  }
-
   return (
-    <section className="relative min-h-screen overflow-hidden">
+    <section className="relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-[#FAF7F2] via-[#FFF5E6] to-[#FFE4C4]" />
 
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-gradient-to-bl from-[#FFD4A3]/30 to-transparent" />
         <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-to-tr from-[#0052CC]/5 to-transparent" />
       </div>
-
-      <header className="relative z-50 pt-6">
-        <div className="container mx-auto px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="rounded-xl overflow-hidden shadow-md border-2 border-[#0052CC]/30">
-                <Image
-                  src="/images/act-logo-horizontal.jpeg"
-                  alt="ACT Digital"
-                  width={100}
-                  height={40}
-                  className="object-cover"
-                  priority
-                />
-              </div>
-              <div className="hidden sm:block border-l-2 border-[#0052CC]/20 pl-3">
-                <h1 className="text-lg font-bold text-gray-800">CNPJ Alfanumérico</h1>
-                <p className="text-xs text-gray-500">Powered by AI</p>
-              </div>
-            </div>
-
-            {/* Desktop Navigation - Floating Pill Style */}
-            <nav className="hidden md:flex items-center">
-              <div className="flex items-center bg-white/80 backdrop-blur-md rounded-full px-2 py-1.5 border border-gray-200/60 shadow-lg shadow-gray-200/30">
-                <button
-                  onClick={() => scrollToSection("solucao")}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-gray-600 hover:text-[#0052CC] hover:bg-[#0052CC]/5 transition-all duration-200"
-                >
-                  <Zap className="h-4 w-4" />
-                  Solucao
-                </button>
-                <button
-                  onClick={() => scrollToSection("validador")}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-gray-600 hover:text-[#0052CC] hover:bg-[#0052CC]/5 transition-all duration-200"
-                >
-                  <CheckCircle className="h-4 w-4" />
-                  Validador
-                </button>
-                <button
-                  onClick={() => scrollToSection("exemplos")}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-gray-600 hover:text-[#0052CC] hover:bg-[#0052CC]/5 transition-all duration-200"
-                >
-                  <Code className="h-4 w-4" />
-                  Exemplos
-                </button>
-                <Link
-                  href="/wiki"
-                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-gray-600 hover:text-[#0052CC] hover:bg-[#0052CC]/5 transition-all duration-200"
-                >
-                  <BookOpen className="h-4 w-4" />
-                  Wiki
-                </Link>
-                <Link
-                  href="/download"
-                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-white bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 transition-all duration-200 shadow-sm"
-                >
-                  <Download className="h-4 w-4" />
-                  App
-                </Link>
-              </div>
-
-              {/* Login Button with Glow */}
-              <button
-                onClick={() => scrollToSection("login")}
-                className="ml-4 group relative"
-              >
-                <div className="absolute -inset-1 bg-gradient-to-r from-[#0052CC] to-[#00A3E0] rounded-xl blur opacity-30 group-hover:opacity-50 transition-all duration-300" />
-                <div className="relative flex items-center gap-2 bg-gradient-to-r from-[#0052CC] to-[#0052CC]/90 hover:from-[#0052CC]/90 hover:to-[#00A3E0] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 shadow-lg">
-                  <Lock className="h-4 w-4" />
-                  Entrar
-                  <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
-                </div>
-              </button>
-            </nav>
-
-            {/* Mobile Menu Button */}
-            <button 
-              className="md:hidden p-2.5 rounded-xl bg-white/80 backdrop-blur-md border border-gray-200/60 text-gray-600 hover:text-[#0052CC] hover:bg-white transition-all shadow-md" 
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              <Menu className="h-5 w-5" />
-            </button>
-          </div>
-
-          {/* Mobile Menu */}
-          {mobileMenuOpen && (
-            <nav className="md:hidden absolute left-4 right-4 top-24 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/60 p-4 space-y-2 animate-in slide-in-from-top-2 duration-200">
-              <button
-                onClick={() => scrollToSection("solucao")}
-                className="flex items-center gap-3 w-full p-3 rounded-xl text-left text-gray-700 hover:text-[#0052CC] hover:bg-[#0052CC]/5 transition-all"
-              >
-                <div className="p-2 rounded-lg bg-[#0052CC]/10">
-                  <Zap className="h-4 w-4 text-[#0052CC]" />
-                </div>
-                <span className="font-medium">Solucao</span>
-                <ArrowRight className="h-4 w-4 ml-auto text-gray-400" />
-              </button>
-              <button
-                onClick={() => scrollToSection("validador")}
-                className="flex items-center gap-3 w-full p-3 rounded-xl text-left text-gray-700 hover:text-[#0052CC] hover:bg-[#0052CC]/5 transition-all"
-              >
-                <div className="p-2 rounded-lg bg-[#27AE60]/10">
-                  <CheckCircle className="h-4 w-4 text-[#27AE60]" />
-                </div>
-                <span className="font-medium">Validador</span>
-                <ArrowRight className="h-4 w-4 ml-auto text-gray-400" />
-              </button>
-              <button
-                onClick={() => scrollToSection("exemplos")}
-                className="flex items-center gap-3 w-full p-3 rounded-xl text-left text-gray-700 hover:text-[#0052CC] hover:bg-[#0052CC]/5 transition-all"
-              >
-                <div className="p-2 rounded-lg bg-[#E67E22]/10">
-                  <Code className="h-4 w-4 text-[#E67E22]" />
-                </div>
-                <span className="font-medium">Exemplos</span>
-                <ArrowRight className="h-4 w-4 ml-auto text-gray-400" />
-              </button>
-              <Link
-                href="/wiki"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 w-full p-3 rounded-xl text-left text-gray-700 hover:text-[#0052CC] hover:bg-[#0052CC]/5 transition-all"
-              >
-                <div className="p-2 rounded-lg bg-purple-500/10">
-                  <BookOpen className="h-4 w-4 text-purple-500" />
-                </div>
-                <span className="font-medium">Wiki</span>
-                <ArrowRight className="h-4 w-4 ml-auto text-gray-400" />
-              </Link>
-              <Link
-                href="/download"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 w-full p-3 rounded-xl text-left text-gray-700 hover:text-green-600 hover:bg-green-50 transition-all"
-              >
-                <div className="p-2 rounded-lg bg-green-500/10">
-                  <Smartphone className="h-4 w-4 text-green-500" />
-                </div>
-                <span className="font-medium">Baixar App</span>
-                <ArrowRight className="h-4 w-4 ml-auto text-gray-400" />
-              </Link>
-              <div className="pt-2 mt-2 border-t border-gray-100">
-                <button
-                  onClick={() => scrollToSection("login")}
-                  className="flex items-center justify-center gap-2 w-full p-3 rounded-xl bg-gradient-to-r from-[#0052CC] to-[#00A3E0] text-white font-semibold shadow-lg hover:shadow-xl transition-all"
-                >
-                  <Lock className="h-4 w-4" />
-                  Entrar na Plataforma
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
-            </nav>
-          )}
-        </div>
-      </header>
 
       <div className="container relative mx-auto px-6 lg:px-8 pt-16 pb-20">
         <div className="grid lg:grid-cols-2 gap-16 items-center max-w-7xl mx-auto">

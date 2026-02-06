@@ -18,9 +18,9 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: "CNPJ Alfanumérico - Solução Completa para Migração",
+  title: "ACT Digital - Reforma Tributaria 2026 | Solucoes para sua Empresa",
   description:
-    "Prepare seus sistemas para o novo formato de CNPJ alfanumérico que entra em vigor em julho de 2026. Análise automatizada, relatórios detalhados e suporte especializado.",
+    "A reforma tributaria esta chegando e a ACT Digital ajuda voce a passar por ela com seguranca. Entenda IBS, CBS, o periodo de transicao e como preparar sua empresa.",
   generator: "v0.app",
   manifest: "/manifest.json",
   appleWebApp: {
