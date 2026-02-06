@@ -250,24 +250,24 @@ const endpoints: Endpoint[] = [
   // Relatorios
   {
     method: "GET",
-    path: "/api/reports/[analysisId]/pdf",
+    path: "/api/reports/[id]/pdf",
     description: "Gerar relatorio em PDF de uma analise",
     auth: true,
     category: "Relatorios",
     parameters: [
-      { name: "analysisId", type: "string", required: true, description: "ID da analise" }
+      { name: "id", type: "string", required: true, description: "ID da analise" }
     ],
     response: "PDF file (application/pdf)",
     example: `fetch('/api/reports/analysis-123/pdf')`
   },
   {
     method: "GET",
-    path: "/api/reports/[analysisId]/csv",
+    path: "/api/reports/[id]/csv",
     description: "Exportar findings em CSV",
     auth: true,
     category: "Relatorios",
     parameters: [
-      { name: "analysisId", type: "string", required: true, description: "ID da analise" }
+      { name: "id", type: "string", required: true, description: "ID da analise" }
     ],
     response: "CSV file (text/csv)",
     example: `fetch('/api/reports/analysis-123/csv')`

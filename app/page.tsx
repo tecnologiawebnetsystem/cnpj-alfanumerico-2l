@@ -1,21 +1,24 @@
-import { Footer } from "@/components/landing/footer"
-import { HeroSection } from "@/components/landing/hero-section"
-import { ValidatorSection } from "@/components/landing/validator-section"
-import { ExamplesSection } from "@/components/landing/examples-section"
-import { FeaturesSection } from "@/components/landing/features-section"
-import { RoadmapSection } from "@/components/landing/roadmap-section"
-import { CTASection } from "@/components/landing/cta-section"
+import { SiteHeader } from "@/components/site-header"
+import { ReformaHero } from "@/components/reforma/hero"
+import { PorQueReforma, OQueMuda, NovosImpostos } from "@/components/reforma/content-sections"
+import { Timeline } from "@/components/reforma/timeline"
+import { NaPratica, PrepareSection } from "@/components/reforma/prepare-section"
+import { CTAAct } from "@/components/reforma/cta-act"
+import { ReformaFooter } from "@/components/reforma/footer"
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
-      <HeroSection />
-      <ValidatorSection />
-      <ExamplesSection />
-      <FeaturesSection />
-      <RoadmapSection />
-      <CTASection />
-      <Footer />
+      <SiteHeader />
+      <ReformaHero />
+      <PorQueReforma />
+      <OQueMuda />
+      <NovosImpostos />
+      <Timeline />
+      <NaPratica />
+      <PrepareSection />
+      <CTAAct />
+      <ReformaFooter />
     </div>
   )
 }
