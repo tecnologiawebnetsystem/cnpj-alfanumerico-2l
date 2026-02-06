@@ -53,9 +53,9 @@ export function SiteHeader() {
       )}
     >
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="flex h-16 lg:h-20 items-center justify-between">
+        <div className="flex h-16 lg:h-20 items-center">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3 shrink-0">
             <div className="rounded-xl overflow-hidden shadow-sm border border-border">
               <Image
                 src="/images/act-logo-horizontal.jpeg"
@@ -68,8 +68,8 @@ export function SiteHeader() {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1">
+          {/* Desktop Navigation - Centered */}
+          <nav className="hidden lg:flex items-center gap-1 flex-1 justify-center">
             <Link
               href="/"
               className="px-4 py-2 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors rounded-lg hover:bg-muted"
@@ -91,7 +91,7 @@ export function SiteHeader() {
               {solucoesOpen && (
                 <div
                   onMouseLeave={() => setSolucoesOpen(false)}
-                  className="absolute top-full right-0 mt-2 w-[480px] bg-card border border-border rounded-xl shadow-xl p-3 animate-in fade-in slide-in-from-top-2 duration-200"
+                  className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[520px] bg-card border border-border rounded-xl shadow-xl p-3 animate-in fade-in slide-in-from-top-2 duration-200"
                 >
                   <div className="grid grid-cols-2 gap-0.5">
                     {[
@@ -127,10 +127,13 @@ export function SiteHeader() {
             </div>
           </nav>
 
+          {/* Spacer for balance on desktop */}
+          <div className="hidden lg:block w-[110px] shrink-0" />
+
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl bg-muted/50 border border-border text-muted-foreground hover:text-foreground transition-all"
+            className="lg:hidden ml-auto p-2 rounded-xl bg-muted/50 border border-border text-muted-foreground hover:text-foreground transition-all"
             aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

@@ -72,14 +72,8 @@ export function CTAAct() {
           <div className="text-center">
             <p className="text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
               Com a ACT Digital, voce ganha tranquilidade para focar no crescimento enquanto nossas solucoes cuidam da
-              complexidade tributaria. Conheca o CNPJ Detector e veja como sua rotina pode ficar muito mais leve.
+              complexidade tributaria. Explore nossas ferramentas e veja como sua rotina pode ficar muito mais leve.
             </p>
-            <Link href="/solucoes/cnpj-detector">
-              <Button size="lg" className="gap-2 text-base font-semibold px-10 h-13 bg-primary text-primary-foreground hover:bg-primary/90">
-                Conheca o CNPJ Detector
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
           </div>
         </div>
       </div>

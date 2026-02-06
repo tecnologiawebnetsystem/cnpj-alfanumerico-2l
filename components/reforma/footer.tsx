@@ -25,11 +25,22 @@ export function ReformaFooter() {
           <div>
             <h4 className="font-semibold text-foreground mb-4">Solucoes</h4>
             <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/solucoes/cnpj-detector" className="text-muted-foreground hover:text-foreground transition-colors">
-                  CNPJ Detector
-                </Link>
-              </li>
+              {[
+                { href: "/solucoes/cnpj-detector", name: "CNPJ Detector" },
+                { href: "/solucoes/nfe-reform-adapter", name: "NF-e Reform Adapter" },
+                { href: "/solucoes/tax-rule-migrator", name: "Tax Rule Migrator" },
+                { href: "/solucoes/split-payment-inspector", name: "Split Payment Inspector" },
+                { href: "/solucoes/nfse-harmonizer", name: "NFS-e Harmonizer" },
+                { href: "/solucoes/erp-compliance-scanner", name: "ERP Compliance Scanner" },
+                { href: "/solucoes/fiscal-document-validator", name: "Fiscal Document Validator" },
+                { href: "/solucoes/dere-builder", name: "DeRE Builder" },
+              ].map((sol) => (
+                <li key={sol.href}>
+                  <Link href={sol.href} className="text-muted-foreground hover:text-foreground transition-colors">
+                    {sol.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
