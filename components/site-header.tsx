@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, X, ChevronDown, ChevronRight, Search, Lock, ArrowRight } from "lucide-react"
+import { Menu, X, ChevronDown, ChevronRight, Search } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function SiteHeader() {
@@ -103,21 +103,6 @@ export function SiteHeader() {
             </div>
           </nav>
 
-          {/* Login CTA */}
-          <div className="hidden lg:flex items-center gap-4">
-            <Link
-              href="/solucoes/cnpj-detector#login"
-              className="group relative"
-            >
-              <div className="absolute -inset-1 bg-primary/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-all duration-300" />
-              <div className="relative flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 shadow-sm">
-                <Lock className="h-4 w-4" />
-                Entrar
-                <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
-              </div>
-            </Link>
-          </div>
-
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -167,17 +152,7 @@ export function SiteHeader() {
               <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground" />
             </Link>
 
-            <div className="border-t border-border my-2" />
 
-            <Link
-              href="/solucoes/cnpj-detector#login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-2 w-full p-3 rounded-xl bg-primary text-primary-foreground font-semibold shadow-sm hover:bg-primary/90 transition-all"
-            >
-              <Lock className="h-4 w-4" />
-              Entrar na Plataforma
-              <ArrowRight className="h-4 w-4" />
-            </Link>
           </div>
         </div>
       </div>
