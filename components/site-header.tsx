@@ -91,7 +91,7 @@ export function SiteHeader() {
               {solucoesOpen && (
                 <div
                   onMouseLeave={() => setSolucoesOpen(false)}
-                  className="absolute top-full left-0 mt-2 w-[520px] bg-card border border-border rounded-xl shadow-xl p-3 animate-in fade-in slide-in-from-top-2 duration-200"
+                  className="absolute top-full right-0 mt-2 w-[480px] bg-card border border-border rounded-xl shadow-xl p-3 animate-in fade-in slide-in-from-top-2 duration-200"
                 >
                   <div className="grid grid-cols-2 gap-0.5">
                     {[
@@ -116,7 +116,7 @@ export function SiteHeader() {
                         >
                           <sol.icon className="h-3.5 w-3.5" style={{ color: sol.color }} />
                         </div>
-                        <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                        <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors whitespace-nowrap">
                           {sol.name}
                         </span>
                       </Link>
