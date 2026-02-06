@@ -91,42 +91,34 @@ export function SiteHeader() {
               {solucoesOpen && (
                 <div
                   onMouseLeave={() => setSolucoesOpen(false)}
-                  className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[640px] bg-card border border-border rounded-xl shadow-xl p-4 animate-in fade-in slide-in-from-top-2 duration-200"
+                  className="absolute top-full left-0 mt-2 w-[520px] bg-card border border-border rounded-xl shadow-xl p-3 animate-in fade-in slide-in-from-top-2 duration-200"
                 >
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">
-                    Solucoes ACT Digital
-                  </p>
-                  <div className="grid grid-cols-2 gap-1">
+                  <div className="grid grid-cols-2 gap-0.5">
                     {[
-                      { href: "/solucoes/cnpj-detector", icon: Search, color: "#0052CC", name: "CNPJ Detector", desc: "Migracao para CNPJ alfanumerico" },
-                      { href: "/solucoes/nfe-reform-adapter", icon: FileText, color: "#0052CC", name: "NF-e Reform Adapter", desc: "Adaptacao de notas fiscais CBS/IBS" },
-                      { href: "/solucoes/tax-rule-migrator", icon: ArrowRightLeft, color: "#E67E22", name: "Tax Rule Migrator", desc: "Migracao de regras tributarias" },
-                      { href: "/solucoes/split-payment-inspector", icon: CreditCard, color: "#27AE60", name: "Split Payment Inspector", desc: "Adaptacao de sistemas de pagamento" },
-                      { href: "/solucoes/nfse-harmonizer", icon: MapPin, color: "#8E44AD", name: "NFS-e Harmonizer", desc: "Compatibilizacao multi-municipal" },
-                      { href: "/solucoes/erp-compliance-scanner", icon: Server, color: "#2980B9", name: "ERP Compliance Scanner", desc: "Diagnostico de aderencia ERP" },
-                      { href: "/solucoes/fiscal-document-validator", icon: FileCheck, color: "#C0392B", name: "Fiscal Document Validator", desc: "Validacao pre-envio ao SEFAZ" },
-                      { href: "/solucoes/dere-builder", icon: Landmark, color: "#16A085", name: "DeRE Builder", desc: "Declaracao de regimes especificos" },
+                      { href: "/solucoes/cnpj-detector", icon: Search, color: "#0052CC", name: "CNPJ Detector" },
+                      { href: "/solucoes/nfe-reform-adapter", icon: FileText, color: "#0052CC", name: "NF-e Reform Adapter" },
+                      { href: "/solucoes/tax-rule-migrator", icon: ArrowRightLeft, color: "#E67E22", name: "Tax Rule Migrator" },
+                      { href: "/solucoes/split-payment-inspector", icon: CreditCard, color: "#27AE60", name: "Split Payment Inspector" },
+                      { href: "/solucoes/nfse-harmonizer", icon: MapPin, color: "#8E44AD", name: "NFS-e Harmonizer" },
+                      { href: "/solucoes/erp-compliance-scanner", icon: Server, color: "#2980B9", name: "ERP Compliance Scanner" },
+                      { href: "/solucoes/fiscal-document-validator", icon: FileCheck, color: "#C0392B", name: "Fiscal Document Validator" },
+                      { href: "/solucoes/dere-builder", icon: Landmark, color: "#16A085", name: "DeRE Builder" },
                     ].map((sol) => (
                       <Link
                         key={sol.href}
                         href={sol.href}
                         onClick={() => setSolucoesOpen(false)}
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-muted transition-colors group"
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-muted transition-colors group"
                       >
                         <div
-                          className="p-1.5 rounded-lg mt-0.5 shrink-0"
+                          className="p-1.5 rounded-md shrink-0"
                           style={{ backgroundColor: `${sol.color}15` }}
                         >
-                          <sol.icon className="h-4 w-4" style={{ color: sol.color }} />
+                          <sol.icon className="h-3.5 w-3.5" style={{ color: sol.color }} />
                         </div>
-                        <div className="min-w-0">
-                          <span className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors block truncate">
-                            {sol.name}
-                          </span>
-                          <p className="text-xs text-muted-foreground mt-0.5 truncate">
-                            {sol.desc}
-                          </p>
-                        </div>
+                        <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                          {sol.name}
+                        </span>
                       </Link>
                     ))}
                   </div>
@@ -170,31 +162,28 @@ export function SiteHeader() {
             </p>
 
             {[
-              { href: "/solucoes/cnpj-detector", icon: Search, color: "#0052CC", name: "CNPJ Detector", desc: "Migracao CNPJ alfanumerico" },
-              { href: "/solucoes/nfe-reform-adapter", icon: FileText, color: "#0052CC", name: "NF-e Reform Adapter", desc: "Adaptacao notas fiscais CBS/IBS" },
-              { href: "/solucoes/tax-rule-migrator", icon: ArrowRightLeft, color: "#E67E22", name: "Tax Rule Migrator", desc: "Migracao regras tributarias" },
-              { href: "/solucoes/split-payment-inspector", icon: CreditCard, color: "#27AE60", name: "Split Payment Inspector", desc: "Sistemas de pagamento" },
-              { href: "/solucoes/nfse-harmonizer", icon: MapPin, color: "#8E44AD", name: "NFS-e Harmonizer", desc: "Compatibilizacao municipal" },
-              { href: "/solucoes/erp-compliance-scanner", icon: Server, color: "#2980B9", name: "ERP Compliance Scanner", desc: "Diagnostico ERP" },
-              { href: "/solucoes/fiscal-document-validator", icon: FileCheck, color: "#C0392B", name: "Fiscal Document Validator", desc: "Validacao pre-SEFAZ" },
-              { href: "/solucoes/dere-builder", icon: Landmark, color: "#16A085", name: "DeRE Builder", desc: "Regimes especificos" },
+              { href: "/solucoes/cnpj-detector", icon: Search, color: "#0052CC", name: "CNPJ Detector" },
+              { href: "/solucoes/nfe-reform-adapter", icon: FileText, color: "#0052CC", name: "NF-e Reform Adapter" },
+              { href: "/solucoes/tax-rule-migrator", icon: ArrowRightLeft, color: "#E67E22", name: "Tax Rule Migrator" },
+              { href: "/solucoes/split-payment-inspector", icon: CreditCard, color: "#27AE60", name: "Split Payment Inspector" },
+              { href: "/solucoes/nfse-harmonizer", icon: MapPin, color: "#8E44AD", name: "NFS-e Harmonizer" },
+              { href: "/solucoes/erp-compliance-scanner", icon: Server, color: "#2980B9", name: "ERP Compliance Scanner" },
+              { href: "/solucoes/fiscal-document-validator", icon: FileCheck, color: "#C0392B", name: "Fiscal Document Validator" },
+              { href: "/solucoes/dere-builder", icon: Landmark, color: "#16A085", name: "DeRE Builder" },
             ].map((sol) => (
               <Link
                 key={sol.href}
                 href={sol.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 w-full p-3 rounded-xl text-foreground/70 hover:text-foreground hover:bg-muted transition-all"
+                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-foreground/70 hover:text-foreground hover:bg-muted transition-all"
               >
                 <div
-                  className="p-2 rounded-lg shrink-0"
+                  className="p-1.5 rounded-lg shrink-0"
                   style={{ backgroundColor: `${sol.color}15` }}
                 >
                   <sol.icon className="h-4 w-4" style={{ color: sol.color }} />
                 </div>
-                <div className="min-w-0">
-                  <span className="font-medium text-foreground block truncate">{sol.name}</span>
-                  <p className="text-xs text-muted-foreground truncate">{sol.desc}</p>
-                </div>
+                <span className="font-medium text-foreground text-sm">{sol.name}</span>
                 <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground shrink-0" />
               </Link>
             ))}
