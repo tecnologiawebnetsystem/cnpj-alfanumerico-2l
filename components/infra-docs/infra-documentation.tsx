@@ -7,14 +7,12 @@ import { AzureInfraSection } from "./azure-infra-section"
 import { SqlServerSection } from "./sql-server-section"
 import { ArchitectureOverview } from "./architecture-overview"
 import { NetworkDiagram } from "./network-diagram"
-import { CostEstimate } from "./cost-estimate"
 import {
   Cloud,
   Server,
   Database,
   LayoutDashboard,
   Network,
-  DollarSign,
   ArrowLeft,
   Download,
   Printer,
@@ -118,10 +116,6 @@ export function InfraDocumentation() {
               <Network className="h-4 w-4" />
               Rede e Seguranca
             </TabsTrigger>
-            <TabsTrigger value="costs" className="gap-2 text-sm">
-              <DollarSign className="h-4 w-4" />
-              Custos
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -138,9 +132,6 @@ export function InfraDocumentation() {
           </TabsContent>
           <TabsContent value="network">
             <NetworkDiagram />
-          </TabsContent>
-          <TabsContent value="costs">
-            <CostEstimate />
           </TabsContent>
         </Tabs>
       </main>
