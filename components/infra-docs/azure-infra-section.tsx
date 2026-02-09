@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {
   Server,
   Shield,
@@ -15,6 +15,7 @@ import {
   ArrowRight,
   Container,
   Globe,
+  ChevronDown,
 } from "lucide-react"
 
 const azureServices = [
@@ -473,19 +474,20 @@ VNet: 10.0.0.0/16
       {/* Services Detail */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-foreground">Servicos Azure Necessarios</h2>
-        <Accordion type="multiple" className="space-y-2">
+        <div className="space-y-2">
           {azureServices.map((service) => (
-            <AccordionItem key={service.name} value={service.name} className="border border-border rounded-lg px-4">
-              <AccordionTrigger className="hover:no-underline">
-                <div className="flex items-center gap-3 text-left">
+            <Collapsible key={service.name} className="border border-border rounded-lg px-4">
+              <CollapsibleTrigger className="flex w-full items-center justify-between py-4 text-left hover:underline-none [&[data-state=open]>svg.chevron]:rotate-180">
+                <div className="flex items-center gap-3">
                   <service.icon className="h-5 w-5 text-primary shrink-0" />
                   <div>
                     <span className="font-medium text-foreground">{service.name}</span>
                     <span className="ml-2 text-xs text-muted-foreground">({service.category})</span>
                   </div>
                 </div>
-              </AccordionTrigger>
-              <AccordionContent className="space-y-4 pt-2">
+                <ChevronDown className="chevron h-4 w-4 text-muted-foreground transition-transform duration-200" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-4 pb-4">
                 <p className="text-sm text-muted-foreground">{service.purpose}</p>
                 <div className="rounded-md bg-muted/50 p-4 font-mono text-xs">
                   <pre className="whitespace-pre-wrap text-foreground">{service.config}</pre>
@@ -494,10 +496,10 @@ VNet: 10.0.0.0/16
                   <AlertTriangle className="h-4 w-4 text-chart-3 mt-0.5 shrink-0" />
                   <p className="text-xs text-muted-foreground">{service.notes}</p>
                 </div>
-              </AccordionContent>
-            </AccordionItem>
+              </CollapsibleContent>
+            </Collapsible>
           ))}
-        </Accordion>
+        </div>
       </div>
 
       {/* Deploy Steps */}

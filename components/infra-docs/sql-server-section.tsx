@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {
   Database,
   Shield,
@@ -13,6 +13,7 @@ import {
   Lock,
   Search,
   Wrench,
+  ChevronDown,
 } from "lucide-react"
 
 export function SqlServerSection() {
@@ -444,12 +445,13 @@ GO
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Accordion type="multiple" className="space-y-2">
-            <AccordionItem value="sizing" className="border border-border rounded-lg px-4">
-              <AccordionTrigger className="hover:no-underline text-sm font-medium">
+          <div className="space-y-2">
+            <Collapsible className="border border-border rounded-lg px-4">
+              <CollapsibleTrigger className="flex w-full items-center justify-between py-4 text-left text-sm font-medium [&[data-state=open]>svg.chevron]:rotate-180">
                 Dimensionamento por Volume
-              </AccordionTrigger>
-              <AccordionContent>
+                <ChevronDown className="chevron h-4 w-4 text-muted-foreground transition-transform duration-200" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pb-4">
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead>
@@ -486,14 +488,15 @@ GO
                     </tbody>
                   </table>
                 </div>
-              </AccordionContent>
-            </AccordionItem>
+              </CollapsibleContent>
+            </Collapsible>
 
-            <AccordionItem value="indexes" className="border border-border rounded-lg px-4">
-              <AccordionTrigger className="hover:no-underline text-sm font-medium">
+            <Collapsible className="border border-border rounded-lg px-4">
+              <CollapsibleTrigger className="flex w-full items-center justify-between py-4 text-left text-sm font-medium [&[data-state=open]>svg.chevron]:rotate-180">
                 Indices Recomendados para Scan
-              </AccordionTrigger>
-              <AccordionContent>
+                <ChevronDown className="chevron h-4 w-4 text-muted-foreground transition-transform duration-200" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pb-4">
                 <div className="rounded-md bg-muted/50 p-4 font-mono text-xs">
                   <pre className="whitespace-pre-wrap text-foreground">{`-- Indices para otimizar queries de scan CNPJ
 -- em bancos de clientes que serao escaneados
@@ -516,14 +519,15 @@ CREATE INDEX IX_tabela_cnpj_like ON [dbo].[sua_tabela](
 -- Estatisticas para o query optimizer
 UPDATE STATISTICS [dbo].[sua_tabela] WITH FULLSCAN;`}</pre>
                 </div>
-              </AccordionContent>
-            </AccordionItem>
+              </CollapsibleContent>
+            </Collapsible>
 
-            <AccordionItem value="maintenance" className="border border-border rounded-lg px-4">
-              <AccordionTrigger className="hover:no-underline text-sm font-medium">
+            <Collapsible className="border border-border rounded-lg px-4">
+              <CollapsibleTrigger className="flex w-full items-center justify-between py-4 text-left text-sm font-medium [&[data-state=open]>svg.chevron]:rotate-180">
                 Jobs de Manutencao
-              </AccordionTrigger>
-              <AccordionContent>
+                <ChevronDown className="chevron h-4 w-4 text-muted-foreground transition-transform duration-200" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pb-4">
                 <div className="rounded-md bg-muted/50 p-4 font-mono text-xs">
                   <pre className="whitespace-pre-wrap text-foreground">{`-- Job diario: Rebuild de indices fragmentados
 ALTER INDEX ALL ON [dbo].[findings] REBUILD
@@ -549,14 +553,15 @@ INNER JOIN [dbo].[analyses] a ON f.analysis_id = a.id
 WHERE a.completed_at < DATEADD(MONTH, -6, GETUTCDATE())
   AND a.status = 'completed';`}</pre>
                 </div>
-              </AccordionContent>
-            </AccordionItem>
+              </CollapsibleContent>
+            </Collapsible>
 
-            <AccordionItem value="backup" className="border border-border rounded-lg px-4">
-              <AccordionTrigger className="hover:no-underline text-sm font-medium">
+            <Collapsible className="border border-border rounded-lg px-4">
+              <CollapsibleTrigger className="flex w-full items-center justify-between py-4 text-left text-sm font-medium [&[data-state=open]>svg.chevron]:rotate-180">
                 Estrategia de Backup
-              </AccordionTrigger>
-              <AccordionContent className="space-y-3">
+                <ChevronDown className="chevron h-4 w-4 text-muted-foreground transition-transform duration-200" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-3 pb-4">
                 <div className="rounded-md bg-muted/50 p-4 font-mono text-xs">
                   <pre className="whitespace-pre-wrap text-foreground">{`-- FULL backup diario (madrugada)
 BACKUP DATABASE [CnpjDetectorDB]
@@ -577,9 +582,9 @@ WITH COMPRESSION, CHECKSUM;`}</pre>
                   No AWS RDS e Azure SQL, o backup e automatico. Esses comandos se aplicam
                   apenas a instalacoes on-premises ou em VMs.
                 </p>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
         </CardContent>
       </Card>
 
