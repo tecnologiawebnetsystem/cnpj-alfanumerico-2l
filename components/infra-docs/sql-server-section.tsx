@@ -44,12 +44,12 @@ export function SqlServerSection() {
               </p>
             </div>
             <div className="rounded-lg border border-border p-4 space-y-2">
-              <Badge variant="secondary">Uso Secundario</Badge>
-              <h3 className="text-sm font-semibold text-foreground">Banco da Aplicacao (Opcional)</h3>
+              <Badge variant="secondary" className="bg-primary/15 text-primary">Banco Principal</Badge>
+              <h3 className="text-sm font-semibold text-foreground">Banco de Dados da Aplicacao</h3>
               <p className="text-xs text-muted-foreground">
-                Atualmente a aplicacao usa Supabase (PostgreSQL). Porem, para clientes que
-                exigem SQL Server como banco principal, o sistema pode ser adaptado.
-                Nesse caso, as tabelas do Supabase devem ser replicadas no SQL Server.
+                O SQL Server e o banco de dados principal da aplicacao, armazenando
+                todos os dados de clientes, usuarios, tarefas, findings e configuracoes.
+                O schema completo esta documentado abaixo com todas as tabelas necessarias.
               </p>
             </div>
           </div>
@@ -165,7 +165,7 @@ FLUXO DE SCAN SQL SERVER
       - Valida digitos verificadores (modulo 11)
       - Identifica se precisa migracao (numerico -> alfanumerico)
       
-5. Resultado salvo como Finding no Supabase
+5. Resultado salvo como Finding no SQL Server
 6. Task criada automaticamente para desenvolvedor corrigir
 
 QUERY UTILIZADA:
@@ -183,17 +183,17 @@ WHERE [coluna] LIKE '%[0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9]/[0-9][0-9][0-9]
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Wrench className="h-5 w-5 text-primary" />
-            Schema SQL Server (Caso use como banco da aplicacao)
+            Schema SQL Server - Banco Principal
           </CardTitle>
           <CardDescription>
-            DDL para replicar as tabelas do Supabase no SQL Server, caso o cliente exija SQL Server como banco principal
+            DDL completo com todas as tabelas do SQL Server utilizadas pela aplicacao
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="rounded-md bg-muted/50 p-4 font-mono text-xs overflow-x-auto">
             <pre className="whitespace-pre-wrap text-foreground">{`-- =============================================
 -- CNPJ DETECTOR - Schema SQL Server
--- Equivalente ao Supabase (PostgreSQL)
+-- Banco Principal da Aplicacao
 -- =============================================
 
 -- Tabela: clients

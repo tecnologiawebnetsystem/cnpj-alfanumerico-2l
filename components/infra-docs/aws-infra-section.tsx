@@ -356,11 +356,11 @@ AWS Region: sa-east-1 (Sao Paulo)
      +-----+-----+---------+----+------+
      |            |                     |
 +----+-----+ +---+--------+ +---------+--------+
-| Supabase | | ElastiCache| |   RDS SQL Server  |
-| (externo)| | (Redis)    | |   Multi-AZ        |
-| Postgres | | Primary +  | |   Standard Ed.    |
-| Auth/RLS | | Replica    | |   4vCPU/16GB      |
-+----------+ +------------+ +------------------+
+|  RDS SQL  | | ElastiCache| |   RDS SQL Server  |
+|  Server   | | (Redis)    | |   (Clientes)      |
+|  (App DB) | | Primary +  | |   Multi-AZ        |
+|  Auth/RLS | | Replica    | |   4vCPU/16GB      |
++-----------+ +------------+ +------------------+
 `}</pre>
           </div>
         </CardContent>

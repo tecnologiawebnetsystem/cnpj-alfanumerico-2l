@@ -176,9 +176,10 @@ Caching:
   SKU: Standard
   
 Secrets:
-  - SUPABASE-URL
-  - SUPABASE-SERVICE-ROLE-KEY
-  - SUPABASE-ANON-KEY
+  - SQL-SERVER-HOST
+  - SQL-SERVER-USER
+  - SQL-SERVER-PASSWORD
+  - SQL-CONNECTION-STRING-APP
   - UPSTASH-REDIS-URL
   - UPSTASH-REDIS-TOKEN
   - ENCRYPTION-KEY
@@ -355,9 +356,9 @@ az keyvault create \\
 
 # Adicionar Secrets
 az keyvault secret set --vault-name cnpj-detector-kv \\
-  --name "SUPABASE-URL" --value "https://xxx.supabase.co"
+  --name "SQL-SERVER-HOST" --value "<HOST>.database.windows.net"
 az keyvault secret set --vault-name cnpj-detector-kv \\
-  --name "SUPABASE-SERVICE-ROLE-KEY" --value "eyJ..."
+  --name "SQL-SERVER-PASSWORD" --value "..."
 az keyvault secret set --vault-name cnpj-detector-kv \\
   --name "ENCRYPTION-KEY" --value "..."
 
@@ -381,8 +382,8 @@ az webapp config appsettings set \\
   --resource-group rg-cnpj-detector \\
   --name cnpj-detector-app \\
   --settings \\
-    SUPABASE_URL="@Microsoft.KeyVault(SecretUri=https://cnpj-detector-kv.vault.azure.net/secrets/SUPABASE-URL)" \\
-    SUPABASE_SERVICE_ROLE_KEY="@Microsoft.KeyVault(SecretUri=https://cnpj-detector-kv.vault.azure.net/secrets/SUPABASE-SERVICE-ROLE-KEY)"`,
+    SQL_SERVER_HOST="@Microsoft.KeyVault(SecretUri=https://cnpj-detector-kv.vault.azure.net/secrets/SQL-SERVER-HOST)" \\
+    SQL_SERVER_PASSWORD="@Microsoft.KeyVault(SecretUri=https://cnpj-detector-kv.vault.azure.net/secrets/SQL-SERVER-PASSWORD)"`,
   },
   {
     step: "5",
@@ -450,10 +451,10 @@ Azure Region: Brazil South (Sao Paulo)
 +-------+------------------+--------------------+----------+
         |                  |                     |
 +-------+------+  +--------+--------+  +--------+---------+
-|   Supabase   |  | Azure Cache for |  |   Azure SQL      |
-|   (externo)  |  | Redis           |  |   Database       |
-|   Postgres   |  | Standard C2     |  |   GP Gen5 4vCore |
-|   Auth/RLS   |  | 6 GB            |  |   Zone Redundant |
+|  Azure SQL   |  | Azure Cache for |  |   Azure SQL      |
+|  (App DB)    |  | Redis           |  |   (Clientes)     |
+|  Auth/RLS    |  | Standard C2     |  |   GP Gen5 4vCore |
+|  Multi-tenant|  | 6 GB            |  |   Zone Redundant |
 +--------------+  +-----------------+  +------------------+
         |
 +-------+------+

@@ -90,7 +90,7 @@ export function InfraDocumentation() {
             Next.js 16 + React 19
           </span>
           <span className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-            SQL Server + Supabase
+            SQL Server
           </span>
         </div>
 

@@ -31,7 +31,7 @@ const stackItems = [
     icon: Server,
     items: [
       { name: "Next.js API Routes", detail: "REST + Server Actions" },
-      { name: "Supabase", detail: "PostgreSQL 15 + Auth + RLS" },
+      { name: "SQL Server", detail: "Banco principal da aplicacao" },
       { name: "Upstash Redis", detail: "Cache + Rate Limiting" },
       { name: "Worker System", detail: "Jobs assincronos" },
     ],
@@ -40,8 +40,7 @@ const stackItems = [
     category: "Banco de Dados",
     icon: Database,
     items: [
-      { name: "Supabase (PostgreSQL)", detail: "Dados da aplicacao" },
-      { name: "SQL Server", detail: "Scan de CNPJs em bancos clientes" },
+      { name: "SQL Server", detail: "Banco principal + Scan de CNPJs" },
       { name: "Oracle DB", detail: "Scan de CNPJs em bancos clientes" },
       { name: "Redis", detail: "Cache, sessoes, rate limit" },
     ],
@@ -63,7 +62,7 @@ const stackItems = [
       { name: "2FA (TOTP)", detail: "Obrigatorio para admins" },
       { name: "bcrypt", detail: "Hash de senhas" },
       { name: "CSRF Protection", detail: "Token-based" },
-      { name: "RLS", detail: "Row Level Security (Supabase)" },
+      { name: "RLS", detail: "Row Level Security (SQL Server)" },
     ],
   },
   {
@@ -82,7 +81,7 @@ const environments = [
   {
     name: "Desenvolvimento",
     color: "bg-chart-3/15 text-chart-3",
-    desc: "Local + Supabase Dev",
+    desc: "Local + SQL Server Dev",
     specs: "Node.js 20+, 8GB RAM, SSD",
   },
   {
@@ -100,10 +99,11 @@ const environments = [
 ]
 
 const envVars = [
-  { key: "NEXT_PUBLIC_SUPABASE_URL", desc: "URL do projeto Supabase", required: true },
-  { key: "NEXT_PUBLIC_SUPABASE_ANON_KEY", desc: "Chave anonima do Supabase", required: true },
-  { key: "SUPABASE_SERVICE_ROLE_KEY", desc: "Chave de servico (server-side)", required: true },
-  { key: "SUPABASE_URL", desc: "URL alternativa (server-side)", required: false },
+  { key: "SQL_SERVER_HOST", desc: "Host do SQL Server principal", required: true },
+  { key: "SQL_SERVER_PORT", desc: "Porta do SQL Server (padrao 1433)", required: true },
+  { key: "SQL_SERVER_DATABASE", desc: "Nome do banco de dados", required: true },
+  { key: "SQL_SERVER_USER", desc: "Usuario de conexao", required: true },
+  { key: "SQL_SERVER_PASSWORD", desc: "Senha de conexao (armazenada em Key Vault / Secrets Manager)", required: true },
   { key: "UPSTASH_REDIS_REST_URL", desc: "URL do Redis (Upstash)", required: true },
   { key: "UPSTASH_REDIS_REST_TOKEN", desc: "Token do Redis (Upstash)", required: true },
   { key: "ENCRYPTION_KEY", desc: "Chave de criptografia AES", required: true },
@@ -126,7 +126,7 @@ export function ArchitectureOverview() {
             O CNPJ Detector e um sistema multi-tenant para deteccao, analise e migracao de campos
             CNPJ para o formato alfanumerico. A aplicacao possui duas frentes: uma aplicacao web
             Next.js (SSR/SSG) e um desktop WPF (.NET 8) que compartilham o mesmo banco de dados
-            Supabase.
+            SQL Server.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -151,19 +151,19 @@ export function ArchitectureOverview() {
 |    ---------------------- |           |    -----------------       |
 |    - App Router (SSR)     |           |    - MVVM Pattern         |
 |    - API Routes           |           |    - Clean Architecture   |
-|    - React 19             |           |    - Supabase SDK         |
+|    - React 19             |           |    - SQL Server SDK       |
 |    - Worker System        |           |    - LibGit2Sharp         |
 +----------+---------+-----+           +-----------+---------------+
            |         |                              |
            v         v                              v
 +------------------+ +------------------+ +------------------+
-|   SUPABASE       | |   UPSTASH REDIS  | |  SQL SERVER      |
-|   (PostgreSQL)   | |   (Cache)        | |  (Clientes)      |
+|   SQL SERVER     | |   UPSTASH REDIS  | |  SQL SERVER      |
+|   (Principal)    | |   (Cache)        | |  (Clientes)      |
 |   -----------    | |   -----------    | |  -----------      |
 |   - Auth         | |   - Sessions    | |  - Scan CNPJ     |
 |   - RLS          | |   - Rate Limit  | |  - mssql driver  |
-|   - Storage      | |   - Job Queue   | |  - INFORMATION    |
-|   - Realtime     | |                  | |    _SCHEMA scan  |
+|   - Dados App    | |   - Job Queue   | |  - INFORMATION    |
+|   - Multi-tenant | |                  | |    _SCHEMA scan  |
 +------------------+ +------------------+ +------------------+
 
 +------------------------------------------------------------------+
@@ -286,7 +286,7 @@ export function ArchitectureOverview() {
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
             O sistema utiliza isolamento de dados por <code className="rounded bg-muted px-1 text-foreground">client_id</code> em
-            todas as tabelas via Row Level Security (RLS) no Supabase. Cada cliente possui seu
+            todas as tabelas via Row Level Security (RLS) no SQL Server. Cada cliente possui seu
             proprio namespace com admins e desenvolvedores isolados.
           </p>
           <div className="rounded-lg border border-border bg-muted/30 p-4 font-mono text-sm">

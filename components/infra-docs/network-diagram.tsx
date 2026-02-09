@@ -48,7 +48,7 @@ const securityLayers = [
     layer: "Camada 4 - Autenticacao",
     color: "bg-chart-5/15 text-chart-5",
     items: [
-      { name: "Supabase Auth", desc: "JWT + bcrypt password hashing" },
+      { name: "Auth Customizado", desc: "JWT + bcrypt password hashing" },
       { name: "2FA (TOTP)", desc: "Obrigatorio para admins (otplib)" },
       { name: "Session Management", desc: "Redis-backed, timeout 30 min" },
       { name: "Account Lockout", desc: "5 tentativas -> bloqueio temporario" },
@@ -90,7 +90,7 @@ const securityGroups = {
       outbound: [
         { port: "1433", dest: "sg-rds", desc: "SQL Server" },
         { port: "6379", dest: "sg-redis", desc: "Redis" },
-        { port: "443", dest: "0.0.0.0/0", desc: "Internet (Supabase, GitHub)" },
+        { port: "443", dest: "0.0.0.0/0", desc: "Internet (GitHub, APIs externas)" },
       ],
     },
     {
@@ -120,7 +120,7 @@ const securityGroups = {
       outbound: [
         { port: "1433", dest: "snet-data", desc: "Azure SQL" },
         { port: "6380", dest: "snet-cache", desc: "Redis (SSL)" },
-        { port: "443", dest: "Internet", desc: "Supabase, GitHub" },
+        { port: "443", dest: "Internet", desc: "GitHub, APIs externas" },
       ],
     },
     {
@@ -381,7 +381,7 @@ export function NetworkDiagram() {
                   { port: "1433", proto: "TDS", service: "SQL Server", exposure: "Privada" },
                   { port: "6379", proto: "RESP", service: "Redis", exposure: "Privada" },
                   { port: "6380", proto: "RESP+TLS", service: "Redis (Azure SSL)", exposure: "Privada" },
-                  { port: "5432", proto: "PostgreSQL", service: "Supabase (externo)", exposure: "Internet (TLS)" },
+                  { port: "1433", proto: "TDS", service: "SQL Server (App DB)", exposure: "Privada" },
                 ].map((row) => (
                   <tr key={row.port + row.service} className="border-b border-border/50">
                     <td className="py-2 pr-4 font-mono text-foreground">{row.port}</td>
