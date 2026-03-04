@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { db as supabase } from '@/lib/db/sqlserver'
 import { getCurrentUser } from '@/lib/auth'
 import { createTaskManagementClient } from '@/lib/task-management/factory'
 import type { TaskManagementConfig } from '@/lib/task-management/types'
@@ -16,10 +16,7 @@ export async function POST(request: NextRequest) {
     const { task_id, provider } = await request.json()
     console.log(' Syncing task:', task_id, 'to provider:', provider)
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
+    // supabase = db (bound from @/lib/db/sqlserver)
 
     // Get task details
     const { data: task, error: taskError } = await supabase

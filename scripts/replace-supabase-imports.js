@@ -1,81 +1,87 @@
-/**
- * scripts/replace-supabase-imports.js
- * Substitui imports diretos de @supabase/supabase-js e @supabase/ssr
- * pelo wrapper lib/db/sqlserver nas API routes restantes.
- */
-import { readFileSync, writeFileSync } from "fs"
-import { resolve } from "path"
-import { fileURLToPath } from "url"
-import { dirname } from "path"
+const { readFileSync, writeFileSync, readdirSync, statSync, existsSync } = require("fs")
+const { join, resolve } = require("path")
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+// Try both possible root locations
+const CANDIDATES = ["/vercel/share/v0-project", resolve(__dirname, "..")]
+const BASE = CANDIDATES.find((p) => existsSync(join(p, "app"))) || CANDIDATES[0]
+console.log("Using BASE:", BASE)
+const DB_IMPORT = 'import { db as supabase } from "@/lib/db/sqlserver"\n'
 
-const files = [
-  "app/api/v1/reports/[id]/route.ts",
-  "app/api/v1/analyze/[id]/route.ts",
-  "app/api/tasks/sync-external/route.ts",
-  "app/api/tasks/azure-sync/route.ts",
-  "app/api/tasks/azure-devops/route.ts",
-  "app/api/reports/templates/route.ts",
-  "app/api/reports/scheduled/route.ts",
-  "app/api/reports/scheduled/[id]/route.ts",
-  "app/api/reports/comparison/route.ts",
-  "app/api/reports/analytics/route.ts",
-  "app/api/reports/[id]/route.ts",
-  "app/api/errors/[id]/route.ts",
-  "app/api/profile/avatar/route.ts",
-  "app/api/client/tasks/[taskId]/route.ts",
-  "app/api/notifications/preferences/route.ts",
-  "app/api/dev/tasks/[id]/route.ts",
-  "app/api/admin/cleanup-client-tasks/route.ts",
-  "app/api/analyses/[id]/route.ts",
-  "app/api/ai/enrich-findings/route.ts",
-  "app/api/accounts/[id]/route.ts",
+// Recursively get all .ts files under a directory
+function walkTs(dir) {
+  const entries = readdirSync(dir)
+  let results = []
+  for (const entry of entries) {
+    const full = join(dir, entry)
+    const stat = statSync(full)
+    if (stat.isDirectory()) {
+      results = results.concat(walkTs(full))
+    } else if (entry.endsWith(".ts") || entry.endsWith(".tsx")) {
+      results.push(full)
+    }
+  }
+  return results
+}
+
+// Only process files under app/api and lib
+const targets = [
+  ...walkTs(join(BASE, "app/api")),
+  ...walkTs(join(BASE, "lib")),
 ]
-
-const BASE = resolve(__dirname, "..")
 
 let totalChanged = 0
 
-for (const rel of files) {
-  const filePath = resolve(BASE, rel)
+for (const filePath of targets) {
   let content
-
   try {
     content = readFileSync(filePath, "utf8")
   } catch {
-    console.log(`  SKIP (not found): ${rel}`)
+    continue
+  }
+
+  // Skip files that don't reference @supabase packages directly
+  if (
+    !content.includes("@supabase/supabase-js") &&
+    !content.includes("@supabase/ssr")
+  ) {
     continue
   }
 
   const original = content
 
   // 1. Remove import lines from @supabase packages
-  content = content.replace(/^import\s+[^\n]*from\s+["']@supabase\/(supabase-js|ssr)["'][^\n]*\n?/gm, "")
+  content = content.replace(/^import\s+[^\n]+from\s+['"]@supabase\/(supabase-js|ssr)['"]\s*\n?/gm, "")
 
-  // 2. Remove getSupabaseClient function definition
-  content = content.replace(/\n?function getSupabaseClient\(\)\s*\{[^}]*\}\n?/g, "\n")
+  // 2. Remove getSupabaseClient/getSupabaseServiceClient function blocks (multi-line)
+  content = content.replace(/\n?(?:export\s+)?function\s+getSupabase\w*\(\)[^{]*\{[\s\S]*?\n\}\n?/g, "\n")
 
-  // 3. Replace getSupabaseClient() calls
-  content = content.replace(/getSupabaseClient\(\)/g, "supabase")
-
-  // 4. Replace inline createClient/createServerClient (simple one-liner assignments)
+  // 3. Replace inline createClient calls assigned to supabase variable
   content = content.replace(
-    /(?:const|let)\s+supabase\s*=\s*(?:await\s+)?(?:createClient|createServerClient)\([^;]+\);?\n?/gm,
-    "// supabase = db (bound from @/lib/db/sqlserver)\n"
+    /(?:const|let)\s+supabase\s*=\s*(?:await\s+)?(?:createClient|createServerClient)\([^)]+(?:\([^)]*\)[^)]*)*\)\s*[;\n]/gm,
+    ""
   )
 
-  // 5. Add import at top if supabase is still used
+  // 4. Replace remaining createClient / createServerClient calls to supabase (bare)
+  content = content.replace(/(?:createClient|createServerClient)\([^)]+\)/g, "supabase")
+
+  // 5. Replace getSupabaseClient() / getSupabaseServiceClient() remnants
+  content = content.replace(/getSupabase\w+\(\)/g, "supabase")
+
+  // 6. Add db import at very top if supabase is still referenced and not yet imported
   if (content.includes("supabase") && !content.includes("@/lib/db/sqlserver")) {
-    content = `import { db as supabase } from "@/lib/db/sqlserver"\n` + content
+    if (content.startsWith('"use ') || content.startsWith("'use ")) {
+      const nl = content.indexOf("\n")
+      content = content.slice(0, nl + 1) + DB_IMPORT + content.slice(nl + 1)
+    } else {
+      content = DB_IMPORT + content
+    }
   }
 
   if (content !== original) {
     writeFileSync(filePath, content, "utf8")
+    const rel = filePath.replace(BASE + "/", "")
     console.log(`  UPDATED: ${rel}`)
     totalChanged++
-  } else {
-    console.log(`  NO CHANGE: ${rel}`)
   }
 }
 

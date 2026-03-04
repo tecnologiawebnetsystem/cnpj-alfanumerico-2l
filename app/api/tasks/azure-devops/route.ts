@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { db as supabase } from "@/lib/db/sqlserver"
 import { getCurrentUser } from "@/lib/auth"
 
 export async function POST(request: NextRequest) {
@@ -17,10 +17,7 @@ export async function POST(request: NextRequest) {
     const { task_id } = await request.json()
     console.log(" Azure DevOps: Creating Work Item for task ID:", task_id)
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
+    // supabase = db (bound from @/lib/db/sqlserver)
 
     console.log(" Azure DevOps: Fetching task details from database...")
     const { data: task, error: taskError } = await supabase
