@@ -18,7 +18,6 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { getSupabaseClient } from "@/lib/supabase"
 import {
   Dialog,
   DialogContent,
@@ -85,307 +84,136 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
   }, [id])
 
   useEffect(() => {
-    // Only start polling if status is processing/pending or if analysis hasn't loaded yet
     if (!analysis || ((analysis.status === "processing" || analysis.status === "pending") && analysis.progress < 100)) {
-      console.log(
-        " Starting progress polling - status:",
-        analysis?.status || "loading",
-        "progress:",
-        analysis?.progress || 0,
-      )
-
       let pollCount = 0
-      const MAX_POLLS = 1800 // 1 hora (2 segundos cada)
+      const MAX_POLLS = 1800
 
       const progressInterval = setInterval(async () => {
         try {
           pollCount++
-
-          // Add security timeout
           if (pollCount > MAX_POLLS) {
-            console.log(" Polling timeout reached, stopping...")
             clearInterval(progressInterval)
             setError("Tempo limite de análise excedido. Por favor, tente novamente.")
             return
           }
 
-          console.log(" Polling progress for analysis:", id, `(attempt ${pollCount}/${MAX_POLLS})`)
           const response = await fetch(`/api/analyses/${id}/progress`)
           if (response.ok) {
             const data = await response.json()
-            console.log(" Progress update:", data)
-
             setProgress(data.progress || 0)
             setCurrentStep(data.current_step || "Processando...")
             setTotalFiles(data.total_steps || 100)
 
             if (data.current_step && data.current_step !== currentStep) {
               const timestamp = new Date().toLocaleTimeString("pt-BR")
-              setAnalysisLogs((prev) => [
-                ...prev,
-                {
-                  time: timestamp,
-                  message: data.current_step,
-                },
-              ])
+              setAnalysisLogs((prev) => [...prev, { time: timestamp, message: data.current_step }])
             }
 
-            // Correct stop condition for 100%
             if (data.status === "completed" || data.progress >= 100) {
-              console.log(" Analysis completed (status or progress >= 100), reloading full data...")
               clearInterval(progressInterval)
-              setTimeout(() => {
-                loadAnalysisData()
-              }, 1000)
+              setTimeout(() => { loadAnalysisData() }, 1000)
             }
 
-            // Add handling for stuck analyses
             if (data.status === "failed") {
-              console.log(" Analysis failed, stopping polling")
               clearInterval(progressInterval)
               setError(data.error_message || "Análise falhou")
               loadAnalysisData()
             }
-          } else {
-            console.log(" Progress API returned non-OK status:", response.status)
-            // After 3 consecutive errors, stop polling
-            if (pollCount % 3 === 0) {
-              console.warn(" Multiple progress fetch failures, reloading data...")
-              loadAnalysisData()
-            }
+          } else if (pollCount % 3 === 0) {
+            loadAnalysisData()
           }
         } catch (error) {
-          console.error(" Error fetching progress:", error)
+          console.error("Error fetching progress:", error)
         }
       }, 2000)
 
-      return () => {
-        console.log(" Clearing progress polling interval")
-        clearInterval(progressInterval)
-      }
-    } else {
-      console.log(" Not starting polling - status:", analysis?.status, "progress:", analysis?.progress)
+      return () => { clearInterval(progressInterval) }
     }
-  }, [id, analysis]) // Updated dependency to include analysis
+  }, [id, analysis])
 
   const loadAnalysisData = async () => {
     try {
-      const supabase = getSupabaseClient()
-
-      console.log(" Loading analysis:", id)
-      console.log(" Loading findings for analysis:", id)
-
-      const [singleAnalysisResult, findingsResult, dbFindingsResult] = await Promise.all([
-        supabase.from("analyses").select("*").eq("id", id).maybeSingle(),
-        supabase.from("findings").select("*").eq("analysis_id", id).order("file_path", { ascending: true }),
-        supabase.from("database_findings").select("*").eq("analysis_id", id).order("table_name", { ascending: true }),
+      // Fetch all data via API routes — never import db/mssql in client components
+      const [analysisRes, findingsRes, dbFindingsRes] = await Promise.all([
+        fetch(`/api/analyses/${id}`),
+        fetch(`/api/analyses/${id}/findings`),
+        fetch(`/api/analyses/${id}/db-findings`),
       ])
 
-      if (!singleAnalysisResult.data) {
-        console.log(" No analysis found with id:", id, "- checking if this is a batch_id")
-
-        // Check if this is a batch analysis
-        const { data: batchData } = await supabase.from("batch_analyses").select("*").eq("id", id).maybeSingle()
-
-        if (batchData) {
-          console.log(" This is a batch_id, fetching individual analyses")
-
-          // Get all analyses for this batch
-          const { data: batchAnalyses } = await supabase
-            .from("analyses")
-            .select("*")
-            .eq("batch_id", id)
-            .order("created_at", { ascending: false })
-
-          if (batchAnalyses && batchAnalyses.length > 0) {
-            // Use the first (most recent) analysis
-            const firstAnalysis = batchAnalyses[0]
-            console.log(" Using first analysis from batch:", firstAnalysis.id)
-
-            // Redirect to the correct analysis page
-            window.location.href = `/analysis/${firstAnalysis.id}`
+      if (!analysisRes.ok) {
+        // Check if this could be a batch_id
+        const batchRes = await fetch(`/api/analyses/${id}/batch`)
+        if (batchRes.ok) {
+          const batchData = await batchRes.json()
+          if (batchData.firstAnalysisId) {
+            window.location.href = `/analysis/${batchData.firstAnalysisId}`
             return
           }
         }
-
-        console.log(" No analysis or batch found, redirecting to /analyzer")
         window.location.href = "/analyzer"
         return
       }
 
-      if (singleAnalysisResult.data) {
-        setAnalysis(singleAnalysisResult.data)
-        console.log(" Single analysis loaded:", singleAnalysisResult.data)
-        console.log(
-          " Analysis status:",
-          singleAnalysisResult.data.status,
-          "progress:",
-          singleAnalysisResult.data.progress,
-        )
+      const analysisData = await analysisRes.json()
 
-        if (singleAnalysisResult.data.batch_id) {
-          const { data: batchData } = await supabase
-            .from("batch_analyses")
-            .select("account_name, estimated_hours")
-            .eq("id", singleAnalysisResult.data.batch_id)
-            .maybeSingle()
-
-          if (batchData) {
-            if (batchData.account_name) {
-              setAccountName(batchData.account_name)
-            }
-            if (batchData.estimated_hours) {
-              setTotalEstimatedHours(Number.parseFloat(batchData.estimated_hours))
-            }
-          }
-        }
-
-        if (singleAnalysisResult.data.repository_id) {
-          const { data: repoData } = await supabase
-            .from("repositories")
-            .select("name")
-            .eq("id", singleAnalysisResult.data.repository_id)
-            .maybeSingle()
-
-          if (repoData) {
-            setRepositoryName(repoData.name || "N/A")
-          }
-        } else if (singleAnalysisResult.data.repository_name) {
-          setRepositoryName(singleAnalysisResult.data.repository_name)
-        }
-
-        if (findingsResult.data) {
-          console.log(" Code findings loaded:", findingsResult.data.length)
-          setCodeFindings(findingsResult.data)
-
-          if (!totalEstimatedHours) {
-            const totalHours = findingsResult.data.reduce((sum: number, f: any) => sum + (f.estimated_hours || 4), 0)
-            setTotalEstimatedHours(totalHours)
-          }
-
-          const grouped = new Map<string, any[]>()
-          findingsResult.data.forEach((finding: any) => {
-            const filePath = finding.file_path
-            if (!grouped.has(filePath)) {
-              grouped.set(filePath, [])
-            }
-            grouped.get(filePath)!.push(finding)
-          })
-          setFindingsByFile(grouped)
-          console.log(" Grouped findings into", grouped.size, "files")
-        } else {
-          console.log(" No code findings found")
-        }
-
-        if (dbFindingsResult.data) {
-          console.log(" DB findings loaded:", dbFindingsResult.data.length)
-          setDbFindings(dbFindingsResult.data)
-        } else {
-          console.log(" No DB findings found")
-        }
-
-        setLoading(false)
+      if (!analysisData || !analysisData.id) {
+        window.location.href = "/analyzer"
         return
       }
 
-      const { data: batchAnalyses, error: batchError } = await supabase
-        .from("analyses")
-        .select("*")
-        .eq("batch_id", id)
-        .order("created_at", { ascending: true })
+      setAnalysis(analysisData)
 
-      if (batchError || !batchAnalyses || batchAnalyses.length === 0) {
-        console.error(" Error loading batch analysis:", batchError)
-        setError("Análise não encontrada")
-        setLoading(false)
-        return
-      }
+      // Batch extra lookups in parallel
+      const extraFetches: Promise<void>[] = []
 
-      console.log(" Batch analysis loaded with", batchAnalyses.length, "repositories")
-
-      const totalFindings = batchAnalyses.reduce((sum, a) => sum + (a.total_findings || 0), 0)
-      const totalHours = batchAnalyses.reduce((sum, a) => sum + (a.estimated_hours || 0), 0)
-      const totalFiles = batchAnalyses.reduce((sum, a) => sum + (a.total_files || 0), 0)
-
-      const languageBreakdown: Record<string, number> = {}
-      batchAnalyses.forEach((a) => {
-        if (a.results?.language_breakdown) {
-          Object.entries(a.results.language_breakdown).forEach(([lang, count]) => {
-            languageBreakdown[lang] = (languageBreakdown[lang] || 0) + (count as number)
-          })
-        }
-      })
-
-      const aggregatedAnalysis = {
-        id: id,
-        batch_id: id,
-        repository_name: `${batchAnalyses.length} Repositórios`,
-        status: batchAnalyses.every((a) => a.status === "completed")
-          ? "completed"
-          : batchAnalyses.some((a) => a.status === "processing" || a.status === "pending")
-            ? "processing"
-            : "failed",
-        estimated_hours: totalHours,
-        total_files: totalFiles,
-        total_findings: totalFindings,
-        language: batchAnalyses
-          .map((a) => a.language)
-          .filter(Boolean)
-          .join(", "),
-        results: {
-          summary: {
-            total_repositories: batchAnalyses.length,
-            estimated_hours: totalHours,
-            total_files: totalFiles,
-            total_findings: totalFindings,
-          },
-          language_breakdown: languageBreakdown,
-          state: {
-            current: "Campos CNPJ no formato atual (14 caracteres numéricos) em múltiplos repositórios",
-            future: "Campos CNPJ atualizados para formato alfanumérico (18 caracteres) em todos os repositórios",
-          },
-        },
-      }
-
-      setAnalysis(aggregatedAnalysis)
-
-      const { data: allFindings } = await supabase
-        .from("findings")
-        .select("*")
-        .in(
-          "analysis_id",
-          batchAnalyses.map((a) => a.id),
+      if (analysisData.batch_id) {
+        extraFetches.push(
+          fetch(`/api/analyses/${analysisData.batch_id}/batch-meta`)
+            .then((r) => (r.ok ? r.json() : null))
+            .then((meta) => {
+              if (meta?.account_name) setAccountName(meta.account_name)
+              if (meta?.estimated_hours) setTotalEstimatedHours(Number.parseFloat(meta.estimated_hours))
+            }),
         )
-        .order("file_path", { ascending: true })
+      }
 
-      if (allFindings) {
-        setCodeFindings(allFindings)
+      if (analysisData.repository_id) {
+        extraFetches.push(
+          fetch(`/api/repositories/${analysisData.repository_id}`)
+            .then((r) => (r.ok ? r.json() : null))
+            .then((repo) => { if (repo?.name) setRepositoryName(repo.name) }),
+        )
+      } else if (analysisData.repository_name) {
+        setRepositoryName(analysisData.repository_name)
+      }
+
+      await Promise.all(extraFetches)
+
+      if (findingsRes.ok) {
+        const findingsData = await findingsRes.json()
+        const list = findingsData.findings || findingsData || []
+        setCodeFindings(list)
+        if (!totalEstimatedHours) {
+          const totalHours = list.reduce((sum: number, f: any) => sum + (f.estimated_hours || 4), 0)
+          setTotalEstimatedHours(totalHours)
+        }
         const grouped = new Map<string, any[]>()
-        allFindings.forEach((finding: any) => {
-          const filePath = finding.file_path
-          if (!grouped.has(filePath)) {
-            grouped.set(filePath, [])
-          }
-          grouped.get(filePath)!.push(finding)
+        list.forEach((finding: any) => {
+          const fp = finding.file_path
+          if (!grouped.has(fp)) grouped.set(fp, [])
+          grouped.get(fp)!.push(finding)
         })
         setFindingsByFile(grouped)
-        console.log(" Grouped findings into", grouped.size, "files")
       }
 
-      const { data: allDbFindings } = await supabase
-        .from("database_findings")
-        .select("*")
-        .in(
-          "analysis_id",
-          batchAnalyses.map((a) => a.id),
-        )
-        .order("table_name", { ascending: true })
-
-      if (allDbFindings) setDbFindings(allDbFindings)
+      if (dbFindingsRes.ok) {
+        const dbData = await dbFindingsRes.json()
+        setDbFindings(dbData.findings || dbData || [])
+      }
 
       setLoading(false)
     } catch (err) {
-      console.error(" Error loading analysis data:", err)
+      console.error("Error loading analysis data:", err)
       setError(err instanceof Error ? err.message : "Erro ao carregar análise")
       setLoading(false)
     }
