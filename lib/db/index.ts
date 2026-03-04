@@ -13,7 +13,7 @@ const config: sql.config = {
   password: process.env.SQLSERVER_PASSWORD!,
   options: {
     encrypt: process.env.SQLSERVER_ENCRYPT === "true",
-    trustServerCertificate: process.env.SQLSERVER_TRUST_CERT === "true",
+    trustServerCertificate: process.env.SQLSERVER_TRUST_SERVER_CERTIFICATE === "true",
     enableArithAbort: true,
   },
   pool: {
