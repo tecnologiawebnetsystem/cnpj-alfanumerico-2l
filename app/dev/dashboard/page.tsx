@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Image from "next/image"
 import { DevDashboardClean } from "@/components/dev/dev-dashboard-clean"
 
 interface DashboardData {
@@ -73,13 +72,9 @@ export default function DevDashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
-              <Image
-                src="/images/act-logo-square.jfif"
-                alt="WebNetSystem"
-                width={48}
-                height={48}
-                className="rounded-xl shadow-lg"
-              />
+              <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-lg">W</span>
+              </div>
               <div>
                 <h1 className="text-2xl font-bold text-white">Dashboard do Desenvolvedor</h1>
                 <p className="text-primary-foreground/80">Suas tarefas e performance</p>

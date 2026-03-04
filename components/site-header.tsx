@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import {
   Menu,
   X,
@@ -56,16 +55,7 @@ export function SiteHeader() {
         <div className="flex h-16 lg:h-20 items-center">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 shrink-0">
-            <div className="rounded-xl overflow-hidden shadow-sm border border-border">
-              <Image
-                src="/images/act-logo-horizontal.jpeg"
-                alt="WebNetSystem"
-                width={110}
-                height={44}
-                className="object-cover"
-                priority
-              />
-            </div>
+            <span className="text-xl font-bold tracking-tight text-foreground">WebNetSystem</span>
           </Link>
 
           {/* Desktop Navigation - Centered */}
