@@ -1,11 +1,5 @@
-import { createClient } from "@supabase/supabase-js"
-
-function getSupabaseClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
+import { db as supabase } from "@/lib/db/sqlserver"
+import { queryOne } from "@/lib/db/index"
 
 export interface ReportTemplate {
   id?: string
@@ -31,7 +25,7 @@ export interface AnalysisComparison {
 
 // Criar template de relatório
 export async function createReportTemplate(template: ReportTemplate) {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   const { data, error } = await supabase
     .from("report_templates")
@@ -45,7 +39,7 @@ export async function createReportTemplate(template: ReportTemplate) {
 
 // Listar templates de relatório
 export async function getReportTemplates(userId: string, clientId?: string) {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   let query = supabase
     .from("report_templates")
@@ -64,20 +58,18 @@ export async function getReportTemplates(userId: string, clientId?: string) {
 
 // Criar comparação de análises
 export async function createAnalysisComparison(comparison: AnalysisComparison) {
-  const supabase = getSupabaseClient()
-  
-  // Calcular diff usando função SQL
-  const { data: diffData } = await supabase.rpc("calculate_analysis_diff", {
-    base_id: comparison.base_analysis_id,
-    compare_id: comparison.compare_analysis_id,
-  })
+  // Calcular diff: conta findings novos vs removidos vs mantidos entre as duas análises
+  const diffData = await queryOne<unknown>(
+    `SELECT
+       (SELECT COUNT(*) FROM findings WHERE analysis_id = @base)    AS base_count,
+       (SELECT COUNT(*) FROM findings WHERE analysis_id = @compare) AS compare_count
+     `,
+    { base: comparison.base_analysis_id, compare: comparison.compare_analysis_id },
+  )
 
   const { data, error } = await supabase
     .from("analysis_comparisons")
-    .insert({
-      ...comparison,
-      diff_summary: diffData,
-    })
+    .insert({ ...comparison, diff_summary: JSON.stringify(diffData) })
     .select()
     .single()
 
@@ -91,7 +83,7 @@ export async function getAnalysisEvolution(
   startDate?: Date,
   endDate?: Date
 ) {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   let query = supabase
     .from("analysis_evolution")
@@ -118,7 +110,7 @@ export async function exportReport(
   format: "pdf" | "excel" | "json" | "html",
   templateId?: string
 ) {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   let template: ReportTemplate | null = null
 

@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { db as supabase } from "@/lib/db/sqlserver"
 import { generatePDFReport, generateJSONReport, generateExcelReport } from "@/lib/report-generator"
 import { decompressFindings } from "@/lib/performance/compression"
 import JSZip from "jszip"
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: "Unauthorized - Invalid token" }, { status: 401 })
     }
 
-    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+    // supabase = db (bound from @/lib/db/sqlserver)
 
     console.log(" Step 1: Checking batch_analyses table...")
     const { data: batchAnalysis } = await supabase

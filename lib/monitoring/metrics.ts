@@ -1,11 +1,4 @@
-import { createClient } from "@supabase/supabase-js"
-
-function getSupabaseClient() {
-  return createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
+import { db } from "@/lib/db/sqlserver"
 
 export type MetricType =
   | "analysis_duration"
@@ -21,8 +14,8 @@ export interface MetricOptions {
   user_id?: string
   entity_type?: string
   entity_id?: string
-  tags?: Record<string, any>
-  metadata?: Record<string, any>
+  tags?: Record<string, unknown>
+  metadata?: Record<string, unknown>
 }
 
 export async function recordMetric(
@@ -30,12 +23,10 @@ export async function recordMetric(
   metricName: string,
   value: number,
   unit?: string,
-  options: MetricOptions = {}
+  options: MetricOptions = {},
 ): Promise<void> {
-  const supabase = getSupabaseClient()
-  
   try {
-    await supabase.from("system_metrics").insert({
+    await db.from("system_metrics").insert({
       metric_type: metricType,
       metric_name: metricName,
       value,
@@ -44,8 +35,6 @@ export async function recordMetric(
       user_id: options.user_id,
       entity_type: options.entity_type,
       entity_id: options.entity_id,
-      tags: options.tags,
-      metadata: options.metadata,
     })
   } catch (error) {
     console.error("Failed to record metric:", error)
@@ -58,11 +47,7 @@ export class MetricTimer {
   private metricName: string
   private options: MetricOptions
 
-  constructor(
-    metricType: MetricType,
-    metricName: string,
-    options: MetricOptions = {}
-  ) {
+  constructor(metricType: MetricType, metricName: string, options: MetricOptions = {}) {
     this.startTime = Date.now()
     this.metricType = metricType
     this.metricName = metricName
@@ -71,59 +56,38 @@ export class MetricTimer {
 
   async stop(): Promise<number> {
     const duration = Date.now() - this.startTime
-    await recordMetric(
-      this.metricType,
-      this.metricName,
-      duration,
-      "ms",
-      this.options
-    )
+    await recordMetric(this.metricType, this.metricName, duration, "ms", this.options)
     return duration
   }
 }
 
-export async function getRealtimeMetrics(): Promise<any[]> {
-  const supabase = getSupabaseClient()
-  
+export async function getRealtimeMetrics(): Promise<unknown[]> {
   try {
-    const { data, error } = await supabase
-      .from("realtime_metrics_dashboard")
-      .select("*")
-
-    if (error) throw error
-    return data || []
+    const { data, error } = await db.from("realtime_metrics_dashboard").select("*")
+    if (error) throw new Error(error.message)
+    return Array.isArray(data) ? data : data ? [data] : []
   } catch (error) {
     console.error("Failed to get realtime metrics:", error)
     return []
   }
 }
 
-export async function getJobQueueStats(): Promise<any[]> {
-  const supabase = getSupabaseClient()
-  
+export async function getJobQueueStats(): Promise<unknown[]> {
   try {
-    const { data, error } = await supabase
-      .from("job_queue_stats")
-      .select("*")
-
-    if (error) throw error
-    return data || []
+    const { data, error } = await db.from("job_queue_stats").select("*")
+    if (error) throw new Error(error.message)
+    return Array.isArray(data) ? data : data ? [data] : []
   } catch (error) {
     console.error("Failed to get job queue stats:", error)
     return []
   }
 }
 
-export async function getProblematicAnalyses(): Promise<any[]> {
-  const supabase = getSupabaseClient()
-  
+export async function getProblematicAnalyses(): Promise<unknown[]> {
   try {
-    const { data, error } = await supabase
-      .from("problematic_analyses")
-      .select("*")
-
-    if (error) throw error
-    return data || []
+    const { data, error } = await db.from("problematic_analyses").select("*")
+    if (error) throw new Error(error.message)
+    return Array.isArray(data) ? data : data ? [data] : []
   } catch (error) {
     console.error("Failed to get problematic analyses:", error)
     return []

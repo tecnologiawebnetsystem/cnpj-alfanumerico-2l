@@ -1,7 +1,6 @@
 "use client"
 
 import { use, useEffect, useState } from "react"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -651,13 +650,9 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
           <div className="container mx-auto px-4">
             <div className="flex h-16 items-center justify-between">
               <div className="flex items-center gap-3">
-                <Image
-                  src="/images/act-logo-square.jfif"
-                  alt="WebNetSystem"
-                  width={40}
-                  height={40}
-                  className="rounded-md"
-                />
+                <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
+                  <span className="text-primary font-bold text-sm">W</span>
+                </div>
                 <div>
                   <h1 className="text-base font-bold leading-none">CNPJ Detector</h1>
                   <p className="text-xs text-muted-foreground">Resultado da Análise</p>
@@ -731,19 +726,15 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
       <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Image
-                src="/images/act-logo-square.jfif"
-                alt="ACT Digital"
-                width={40}
-                height={40}
-                className="rounded-md"
-              />
-              <div>
-                <h1 className="text-base font-bold leading-none">CNPJ Detector</h1>
-                <p className="text-xs text-muted-foreground">Resultado da Análise</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
+                  <span className="text-primary font-bold text-sm">W</span>
+                </div>
+                <div>
+                  <h1 className="text-base font-bold leading-none">CNPJ Detector</h1>
+                  <p className="text-xs text-muted-foreground">Resultado da Análise</p>
+                </div>
               </div>
-            </div>
             <div className="flex items-center gap-3">
               <Button onClick={() => downloadReport("zip")} variant="outline" size="sm">
                 <Download className="mr-2 h-4 w-4" />

@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createServerClient } from "@supabase/ssr"
+import { db } from "@/lib/db/sqlserver"
 import { cookies } from "next/headers"
 
 export async function GET(request: NextRequest) {
@@ -17,47 +17,30 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value
-          },
-          set() {},
-          remove() {},
-        },
-      }
-    )
-
-    // Get all DEVs performance
-    const { data: devsPerformance, error: devsError } = await supabase
+    const { data: devsPerformance, error: devsError } = await db
       .from("dev_performance_dashboard")
       .select("*")
       .eq("client_id", user.client_id)
 
-    if (devsError) throw devsError
+    if (devsError) throw new Error(devsError.message)
 
-    // Get DEVs without progress update
-    const { data: devsNoUpdate, error: noUpdateError } = await supabase
+    const { data: devsNoUpdate, error: noUpdateError } = await db
       .from("devs_no_progress_update")
       .select("*")
       .eq("client_id", user.client_id)
 
-    if (noUpdateError) throw noUpdateError
+    if (noUpdateError) throw new Error(noUpdateError.message)
 
-    // Get all delayed tasks
-    const devIds = devsPerformance.map((d) => d.dev_id)
-    const { data: delayedTasks, error: delayedError } = await supabase
-      .from("dev_delayed_tasks")
-      .select("*")
-      .in("dev_id", devIds)
+    const devArr = Array.isArray(devsPerformance) ? devsPerformance : devsPerformance ? [devsPerformance] : []
+    const devIds = devArr.map((d: Record<string, unknown>) => d.dev_id as string)
 
-    if (delayedError) throw delayedError
+    const { data: delayedTasks, error: delayedError } = devIds.length
+      ? await db.from("dev_delayed_tasks").select("*").in("dev_id", devIds)
+      : { data: [], error: null }
 
-    // Get unread notifications
-    const { data: notifications, error: notifError } = await supabase
+    if (delayedError) throw new Error(delayedError.message)
+
+    const { data: notifications, error: notifError } = await db
       .from("admin_dev_notifications")
       .select("*")
       .eq("admin_id", user.id)
@@ -65,16 +48,16 @@ export async function GET(request: NextRequest) {
       .order("created_at", { ascending: false })
       .limit(50)
 
-    if (notifError) throw notifError
+    if (notifError) throw new Error(notifError.message)
 
     return NextResponse.json({
-      devsPerformance,
-      devsNoUpdate,
-      delayedTasks,
-      notifications,
+      devsPerformance: devArr,
+      devsNoUpdate: Array.isArray(devsNoUpdate) ? devsNoUpdate : devsNoUpdate ? [devsNoUpdate] : [],
+      delayedTasks: Array.isArray(delayedTasks) ? delayedTasks : delayedTasks ? [delayedTasks] : [],
+      notifications: Array.isArray(notifications) ? notifications : notifications ? [notifications] : [],
     })
   } catch (error) {
-    console.error(" Error fetching dev monitoring:", error)
+    console.error("Error fetching dev monitoring:", error)
     return NextResponse.json({ error: "Failed to fetch monitoring data" }, { status: 500 })
   }
 }

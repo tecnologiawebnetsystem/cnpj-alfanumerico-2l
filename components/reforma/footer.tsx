@@ -1,5 +1,4 @@
 import Link from "next/link"
-import Image from "next/image"
 
 export function ReformaFooter() {
   return (
@@ -7,14 +6,8 @@ export function ReformaFooter() {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           <div>
-            <div className="mb-4 rounded-xl overflow-hidden w-fit border border-border">
-              <Image
-                src="/images/act-logo-horizontal.jpeg"
-                alt="WebNetSystem"
-                width={100}
-                height={40}
-                className="object-cover"
-              />
+            <div className="mb-4">
+              <span className="text-xl font-bold tracking-tight text-foreground">WebNetSystem</span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
               Solucoes tecnologicas para preparar sua empresa para a reforma tributaria e as mudancas regulatorias do

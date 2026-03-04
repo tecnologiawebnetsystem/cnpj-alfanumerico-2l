@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { db as supabase } from "@/lib/db/sqlserver"
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
 
     console.log(" Azure DevOps sync request:", { task_id, user_id })
 
-    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+    // supabase = db (bound from @/lib/db/sqlserver)
 
     const { data: task, error: taskError } = await supabase
       .from("tasks")

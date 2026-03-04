@@ -1,74 +1,50 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createServerClient } from "@supabase/ssr"
+import { db } from "@/lib/db/sqlserver"
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  console.log(` ========== PREVIEW TASK FIX ==========`)
-  console.log(` Task ID: ${params.id}`)
-
   try {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      {
-        cookies: {
-          get: (name) => request.cookies.get(name)?.value,
-          set: () => {},
-          remove: () => {},
-        },
-      }
-    )
-
-    const { data: task, error: taskError } = await supabase
+    const { data: task, error: taskError } = await db
       .from("tasks")
-      .select(`
-        *,
-        repository:repositories(name, full_name, provider, url),
-        client:clients(name)
-      `)
+      .select("*")
       .eq("id", params.id)
       .single()
 
     if (taskError || !task) {
-      console.error(" Task not found:", taskError)
       return NextResponse.json({ error: "Task not found" }, { status: 404 })
     }
 
-    console.log(" Task found:", task.title)
-    console.log(" File:", task.file_path)
-    console.log(" Line:", task.line_number)
-    console.log(" Repository:", task.repository?.full_name)
+    const t = task as Record<string, unknown>
 
-    if (!task.code_current || !task.code_suggested) {
-      console.error(" Task does not have code context")
+    if (!t.code_current || !t.code_suggested) {
       return NextResponse.json(
         { error: "This task does not have auto-fix available. Code context is missing." },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
+    // Busca repositório
+    const { data: repository } = t.repository_id
+      ? await db.from("repositories").select("name, full_name, provider, url").eq("id", t.repository_id as string).single()
+      : { data: null }
+
     const preview = {
-      task_id: task.id,
-      title: task.title,
-      file_path: task.file_path,
-      line_number: task.line_number,
-      language: task.file_language || "text",
-      repository: task.repository,
-      code_context_before: task.code_context_before || [],
-      code_current: task.code_current,
-      code_suggested: task.code_suggested,
-      code_context_after: task.code_context_after || [],
+      task_id: t.id,
+      title: t.title,
+      file_path: t.file_path,
+      line_number: t.line_number,
+      language: t.file_language || "text",
+      repository,
+      code_context_before: t.code_context_before || [],
+      code_current: t.code_current,
+      code_suggested: t.code_suggested,
+      code_context_after: t.code_context_after || [],
       can_apply: true,
-      validations: {
-        file_exists: true, // We'll validate when applying
-        line_unchanged: true, // We'll validate when applying
-        syntax_valid: true, // Basic validation passed
-      },
+      validations: { file_exists: true, line_unchanged: true, syntax_valid: true },
     }
 
-    console.log(" Preview generated successfully")
     return NextResponse.json(preview)
-  } catch (error: any) {
-    console.error(" Error generating preview:", error)
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 })
+  } catch (error: unknown) {
+    console.error("Error generating preview:", error)
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Internal server error" }, { status: 500 })
   }
 }

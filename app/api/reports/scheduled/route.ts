@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { db as supabase } from "@/lib/db/sqlserver"
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,8 +10,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "client_id is required" }, { status: 400 })
     }
 
-    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-
     const { data: schedules } = await supabase
       .from("scheduled_analyses")
       .select("*")
@@ -20,7 +18,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ schedules: schedules || [] })
   } catch (error) {
-    console.error(" Error loading schedules:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
@@ -34,9 +31,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-
-    // Calculate next run time
     const nextRun = new Date()
     if (schedule_type === "daily") {
       nextRun.setDate(nextRun.getDate() + 1)
@@ -63,7 +57,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ schedule: data })
   } catch (error) {
-    console.error(" Error creating schedule:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

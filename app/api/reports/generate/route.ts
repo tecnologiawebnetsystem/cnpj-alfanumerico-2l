@@ -1,9 +1,5 @@
-import { createClient } from "@supabase/supabase-js"
+import { db as supabase } from "@/lib/db/sqlserver"
 import type { NextRequest } from "next/server"
-
-function getSupabaseClient() {
-  return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-}
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,7 +13,7 @@ export async function GET(request: NextRequest) {
       return Response.json({ error: "Missing required parameters" }, { status: 400 })
     }
 
-    const supabase = getSupabaseClient()
+    // supabase already bound above
 
     let reportData: any = {}
 

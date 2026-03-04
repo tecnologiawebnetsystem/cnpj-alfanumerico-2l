@@ -1,194 +1,122 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createServerClient } from "@supabase/ssr"
+import { db } from "@/lib/db/sqlserver"
 import { GitHubClient } from "@/lib/git/github-client"
 import { AzureDevOpsClient } from "@/lib/git/azure-client"
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
-  console.log(` ========== APPLY TASK FIX ==========`)
-  console.log(` Task ID: ${params.id}`)
-
   try {
     const body = await request.json()
-    const { method, user_id } = body // method: 'pull_request' | 'direct_commit' | 'copy'
+    const { method, user_id } = body
 
-    console.log(` Apply method: ${method}`)
-    console.log(` User ID: ${user_id}`)
-
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      {
-        cookies: {
-          get: (name) => request.cookies.get(name)?.value,
-          set: () => {},
-          remove: () => {},
-        },
-      }
-    )
-
-    const { data: user } = await supabase.from("users").select("role, client_id").eq("id", user_id).single()
+    const { data: user } = await db.from("users").select("role, client_id").eq("id", user_id).single()
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    if (method === "direct_commit" && user.role !== "admin" && user.role !== "super_admin") {
-      console.error(" Permission denied: User cannot do direct commits")
+    const u = user as Record<string, unknown>
+
+    if (method === "direct_commit" && u.role !== "admin" && u.role !== "super_admin") {
       return NextResponse.json({ error: "Only administrators can perform direct commits" }, { status: 403 })
     }
 
-    const { data: task } = await supabase
-      .from("tasks")
-      .select(`
-        *,
-        repository:repositories(*),
-        client:clients(*)
-      `)
-      .eq("id", params.id)
-      .single()
+    const { data: task } = await db.from("tasks").select("*").eq("id", params.id).single()
 
     if (!task) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 })
     }
 
-    console.log(" Task:", task.title)
-    console.log(" Repository:", task.repository.full_name)
-    console.log(" Provider:", task.repository.provider)
+    const t = task as Record<string, unknown>
 
-    const { data: token } = await supabase
+    // Busca repositório
+    const { data: repository } = await db.from("repositories").select("*").eq("id", t.repository_id as string).single()
+    const repo = repository as Record<string, unknown>
+
+    // Busca token git
+    const { data: tokenData } = await db
       .from("github_tokens")
       .select("*")
-      .eq("client_id", user.client_id)
-      .eq("provider", task.repository.provider)
+      .eq("client_id", u.client_id as string)
+      .eq("provider", repo?.provider as string)
       .single()
 
-    if (!token) {
+    if (!tokenData) {
       return NextResponse.json(
-        { error: `No ${task.repository.provider} token found for this client` },
-        { status: 400 }
+        { error: `No ${repo?.provider} token found for this client` },
+        { status: 400 },
       )
     }
 
-    console.log(" Git token found for provider:", token.provider)
+    const token = tokenData as Record<string, unknown>
 
     if (method === "copy") {
-      console.log(" Copy method - returning code")
-      return NextResponse.json({
-        success: true,
-        method: "copy",
-        code: task.code_suggested,
-      })
+      return NextResponse.json({ success: true, method: "copy", code: t.code_suggested })
     }
+
+    const timestamp = Date.now()
+    const branchName = `fix/cnpj-line-${t.line_number}-${timestamp}`
+    const repoFullName = (repo?.full_name || repo?.name) as string
+    const [owner, repoName] = repoFullName.split("/")
 
     let prNumber: number | undefined
     let prUrl: string | undefined
-    let branchName: string | undefined
     let commitSha: string | undefined
 
-    const timestamp = Date.now()
-    branchName = `fix/cnpj-line-${task.line_number}-${timestamp}`
-
-    const repoFullName = task.repository.full_name || task.repository.name
-    const [owner, repo] = repoFullName.split("/")
-
-    console.log(" Repository owner:", owner)
-    console.log(" Repository name:", repo)
-
-    console.log(" Reading file content...")
-    let fileContent: string
-
-    if (task.repository.provider === "github") {
-      const github = new GitHubClient({
-        token: token.access_token,
-        owner,
-        repo,
-      })
-
-      const { content } = await github.getFileContent(task.file_path)
-      fileContent = content
-
-      console.log(" Applying code change...")
-      const lines = fileContent.split("\n")
-      const lineIndex = task.line_number - 1
-
-      if (lineIndex < 0 || lineIndex >= lines.length) {
-        throw new Error(`Line number ${task.line_number} is out of bounds`)
-      }
-
-      lines[lineIndex] = task.code_suggested
-      const newContent = lines.join("\n")
-
+    if (repo?.provider === "github") {
+      const github = new GitHubClient({ token: token.access_token as string, owner, repo: repoName })
+      const { content } = await github.getFileContent(t.file_path as string)
+      const lines = content.split("\n")
+      lines[(t.line_number as number) - 1] = t.code_suggested as string
       await github.createBranch({ branchName })
-
       commitSha = await github.createCommit({
         branch: branchName,
-        filePath: task.file_path,
-        content: newContent,
-        message: `fix: ${task.title}\n\nUpdates CNPJ format on line ${task.line_number} to alphanumeric 18-character format.`,
+        filePath: t.file_path as string,
+        content: lines.join("\n"),
+        message: `fix: ${t.title}`,
       })
-
       if (method === "pull_request") {
-        const prBody = `## Auto-generated fix for CNPJ format\n\n**Task:** ${task.title}\n**File:** \`${task.file_path}\`\n**Line:** ${task.line_number}\n\n### Changes\n\n\`\`\`diff\n- ${task.code_current}\n+ ${task.code_suggested}\n\`\`\`\n\n---\n\nThis PR was automatically generated by the CNPJ Analysis System.`
-
         const pr = await github.createPullRequest({
-          title: `Fix: ${task.title}`,
-          body: prBody,
+          title: `Fix: ${t.title}`,
+          body: `Auto-generated fix by CNPJ Analysis System`,
           head: branchName,
           base: "main",
         })
-
         prNumber = pr.number
         prUrl = pr.url
       }
-    } else if (task.repository.provider === "azure") {
+    } else if (repo?.provider === "azure") {
       const [organization, project] = owner.split(".")
       const azure = new AzureDevOpsClient({
-        token: token.access_token,
+        token: token.access_token as string,
         organization,
         project,
-        repository: repo,
+        repository: repoName,
       })
-
-      fileContent = await azure.getFileContent(task.file_path)
-
-      console.log(" Applying code change...")
-      const lines = fileContent.split("\n")
-      const lineIndex = task.line_number - 1
-
-      if (lineIndex < 0 || lineIndex >= lines.length) {
-        throw new Error(`Line number ${task.line_number} is out of bounds`)
-      }
-
-      lines[lineIndex] = task.code_suggested
-      const newContent = lines.join("\n")
-
+      const content = await azure.getFileContent(t.file_path as string)
+      const lines = content.split("\n")
+      lines[(t.line_number as number) - 1] = t.code_suggested as string
       await azure.createBranch({ branchName })
-
       commitSha = await azure.createCommit({
         branch: branchName,
-        filePath: task.file_path,
-        content: newContent,
-        message: `fix: ${task.title}\n\nUpdates CNPJ format on line ${task.line_number} to alphanumeric 18-character format.`,
+        filePath: t.file_path as string,
+        content: lines.join("\n"),
+        message: `fix: ${t.title}`,
       })
-
       if (method === "pull_request") {
-        const prDescription = `## Auto-generated fix for CNPJ format\n\n**Task:** ${task.title}\n**File:** \`${task.file_path}\`\n**Line:** ${task.line_number}\n\n### Changes\n\n\`\`\`diff\n- ${task.code_current}\n+ ${task.code_suggested}\n\`\`\`\n\n---\n\nThis PR was automatically generated by the CNPJ Analysis System.`
-
         const pr = await azure.createPullRequest({
-          title: `Fix: ${task.title}`,
-          description: prDescription,
+          title: `Fix: ${t.title}`,
+          description: `Auto-generated fix by CNPJ Analysis System`,
           sourceBranch: branchName,
           targetBranch: "main",
         })
-
         prNumber = pr.number
         prUrl = pr.url
       }
     } else {
-      throw new Error(`Provider ${task.repository.provider} not supported yet`)
+      throw new Error(`Provider ${repo?.provider} not supported yet`)
     }
 
-    await supabase
+    await db
       .from("tasks")
       .update({
         pr_url: prUrl,
@@ -200,21 +128,11 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
         apply_method: method,
         status: method === "direct_commit" ? "concluido" : "em_progresso",
       })
-      .eq("id", task.id)
+      .eq("id", t.id as string)
 
-    console.log(" Task updated with PR info")
-    console.log(" Fix applied successfully!")
-
-    return NextResponse.json({
-      success: true,
-      method,
-      pr_url: prUrl,
-      pr_number: prNumber,
-      branch_name: branchName,
-      commit_sha: commitSha,
-    })
-  } catch (error: any) {
-    console.error(" Error applying fix:", error)
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 })
+    return NextResponse.json({ success: true, method, pr_url: prUrl, pr_number: prNumber, branch_name: branchName, commit_sha: commitSha })
+  } catch (error: unknown) {
+    console.error("Error applying fix:", error)
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Internal server error" }, { status: 500 })
   }
 }

@@ -1,13 +1,5 @@
-import { createClient } from "@supabase/supabase-js"
+import { db as supabase } from "@/lib/db/sqlserver"
 import crypto from "crypto"
-
-// Function to create Supabase client
-function getSupabaseClient() {
-  return createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
 
 export function calculateFileHash(content: string): string {
   return crypto.createHash("sha256").update(content).digest("hex")
@@ -18,7 +10,7 @@ export async function getAnalyzedFile(
   filePath: string,
   fileHash: string
 ): Promise<any | null> {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   try {
     const { data, error } = await supabase
@@ -45,7 +37,7 @@ export async function saveAnalyzedFile(params: {
   hasCnpj: boolean
   findings: any[]
 }): Promise<boolean> {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   try {
     const { error } = await supabase.from("analyzed_files").upsert({
@@ -102,7 +94,7 @@ export async function getModifiedFiles(
 export async function cleanupOldAnalyzedFiles(
   daysToKeep: number = 30
 ): Promise<number> {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   try {
     const cutoffDate = new Date()

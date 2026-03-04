@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { db as supabase } from "@/lib/db/sqlserver"
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,49 +11,27 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "base and compare IDs are required" }, { status: 400 })
     }
 
-    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-
-    // Get findings for both analyses
     const { data: baseFindings } = await supabase.from("findings").select("*").eq("analysis_id", baseId)
-
     const { data: compareFindings } = await supabase.from("findings").select("*").eq("analysis_id", compareId)
 
-    // Create maps for comparison
     const baseMap = new Map()
-    baseFindings?.forEach((f) => {
-      const key = `${f.file_path}:${f.line_number}`
-      baseMap.set(key, f)
-    })
+    baseFindings?.forEach((f: any) => baseMap.set(`${f.file_path}:${f.line_number}`, f))
 
     const compareMap = new Map()
-    compareFindings?.forEach((f) => {
-      const key = `${f.file_path}:${f.line_number}`
-      compareMap.set(key, f)
-    })
+    compareFindings?.forEach((f: any) => compareMap.set(`${f.file_path}:${f.line_number}`, f))
 
-    // Find resolved and new findings
-    const resolved = []
-    const newFindings = []
+    const resolved: any[] = []
+    const newFindings: any[] = []
 
     baseMap.forEach((finding, key) => {
       if (!compareMap.has(key)) {
-        resolved.push({
-          repository: finding.repository || "Desconhecido",
-          file: finding.file_path,
-          line: finding.line_number,
-          status: "resolved",
-        })
+        resolved.push({ repository: finding.repository || "Desconhecido", file: finding.file_path, line: finding.line_number, status: "resolved" })
       }
     })
 
     compareMap.forEach((finding, key) => {
       if (!baseMap.has(key)) {
-        newFindings.push({
-          repository: finding.repository || "Desconhecido",
-          file: finding.file_path,
-          line: finding.line_number,
-          status: "new",
-        })
+        newFindings.push({ repository: finding.repository || "Desconhecido", file: finding.file_path, line: finding.line_number, status: "new" })
       }
     })
 
@@ -68,7 +46,6 @@ export async function GET(request: NextRequest) {
       changes: [...resolved, ...newFindings],
     })
   } catch (error) {
-    console.error(" Error comparing analyses:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

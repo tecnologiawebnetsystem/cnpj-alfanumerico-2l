@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js"
+import { db } from "@/lib/db/sqlserver"
 import { ZipProcessor } from "./zip-processor"
 import { CNPJDetector } from "./cnpj-detector"
 import { DatabaseDetector } from "./database-detector"
@@ -24,7 +24,7 @@ export async function analyzeRepository(
     allowedExtensions: allowedExtensions?.join(", ") || "NONE",
   })
 
-  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  const supabase = db
 
   const updateProgress = async (progress: number, step: string) => {
     const timestamp = new Date().toISOString()
