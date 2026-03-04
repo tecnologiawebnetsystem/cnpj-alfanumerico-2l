@@ -1,11 +1,16 @@
 /**
  * lib/supabase/client.ts
- * Compatibilidade: exporta createClient apontando para SQL Server via API.
- * No browser, todas as mutações são feitas via fetch para as API routes.
- * Este arquivo é importado em Client Components apenas para ler estado local.
+ * Compatibilidade para Client Components.
+ *
+ * No browser NÃO existe acesso direto ao banco (mssql é Node.js only).
+ * Client Components devem usar fetch() para as API routes.
+ * Este módulo exporta um stub vazio para não quebrar imports existentes.
  */
-import { db } from "@/lib/db/sqlserver"
 
+// Stub: Client Components não devem usar o banco diretamente.
+// Use fetch("/api/...") nos Client Components.
 export function createClient() {
-  return db
+  throw new Error(
+    "createClient() não pode ser usado em Client Components. Use fetch('/api/...') para acessar dados."
+  )
 }

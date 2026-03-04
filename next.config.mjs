@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // mssql/tedious são pacotes Node.js puros — nunca devem ir para o bundle do browser
+  serverExternalPackages: ["mssql", "tedious", "bcryptjs"],
   eslint: {
     ignoreDuringBuilds: true,
   },
