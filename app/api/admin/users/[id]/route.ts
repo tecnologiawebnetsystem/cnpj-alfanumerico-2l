@@ -1,38 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createServerClient } from "@supabase/ssr"
-import { cookies } from "next/headers"
+import { db } from "@/lib/db/sqlserver"
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const cookieStore = await cookies()
-    const supabase = await createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value
-          },
-          set() {},
-          remove() {},
-        },
-      },
-    )
-
     const body = await request.json()
 
-    // If password is provided, update it
-    if (body.password) {
-      const { error: pwdError } = await supabase.rpc("update_user_password", {
-        p_user_id: id,
-        p_password: body.password,
-      })
-      if (pwdError) throw pwdError
-    }
-
-    // Update other fields
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       name: body.name,
       email: body.email,
       role: body.role,
@@ -41,9 +15,15 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       updated_at: new Date().toISOString(),
     }
 
-    const { data, error } = await supabase.from("users").update(updateData).eq("id", id).select().single()
+    // Se senha fornecida, atualiza o hash
+    if (body.password) {
+      const bcrypt = await import("bcryptjs")
+      updateData.password_hash = await bcrypt.hash(body.password, 10)
+    }
 
-    if (error) throw error
+    const { data, error } = await db.from("users").update(updateData).eq("id", id).single()
+
+    if (error) throw new Error(error.message)
 
     return NextResponse.json(data)
   } catch (error) {
@@ -55,24 +35,10 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const cookieStore = await cookies()
-    const supabase = await createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value
-          },
-          set() {},
-          remove() {},
-        },
-      },
-    )
 
-    const { error } = await supabase.from("users").delete().eq("id", id)
+    const { error } = await db.from("users").delete().eq("id", id)
 
-    if (error) throw error
+    if (error) throw new Error(error.message)
 
     return NextResponse.json({ success: true })
   } catch (error) {

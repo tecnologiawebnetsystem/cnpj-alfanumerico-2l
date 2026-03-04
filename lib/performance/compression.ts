@@ -1,22 +1,15 @@
-import { createClient } from "@supabase/supabase-js"
+import { db as supabase } from "@/lib/db/sqlserver"
 import { gzip, gunzip } from "zlib"
 import { promisify } from "util"
 
 const gzipAsync = promisify(gzip)
 const gunzipAsync = promisify(gunzip)
 
-function getSupabaseClient() {
-  return createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
-
 export async function compressAndSaveFindings(
   analysisId: string,
   findings: any[]
 ): Promise<boolean> {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   try {
     const findingsWithMetadata = findings.map(f => ({
@@ -61,7 +54,7 @@ export async function compressAndSaveFindings(
 export async function decompressFindings(
   analysisId: string
 ): Promise<any[] | null> {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   try {
     const { data, error } = await supabase
@@ -86,7 +79,7 @@ export async function decompressFindings(
 }
 
 export async function archiveOldFindings(daysOld: number = 7): Promise<number> {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   try {
     const cutoffDate = new Date()

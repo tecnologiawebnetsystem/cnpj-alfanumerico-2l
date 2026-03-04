@@ -1,11 +1,4 @@
-import { createClient } from "@supabase/supabase-js"
-
-function getSupabaseClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
+import { db as supabase } from "@/lib/db/sqlserver"
 
 export interface ReportTemplate {
   id?: string
@@ -31,7 +24,7 @@ export interface AnalysisComparison {
 
 // Criar template de relatório
 export async function createReportTemplate(template: ReportTemplate) {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   const { data, error } = await supabase
     .from("report_templates")
@@ -45,7 +38,7 @@ export async function createReportTemplate(template: ReportTemplate) {
 
 // Listar templates de relatório
 export async function getReportTemplates(userId: string, clientId?: string) {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   let query = supabase
     .from("report_templates")
@@ -64,7 +57,7 @@ export async function getReportTemplates(userId: string, clientId?: string) {
 
 // Criar comparação de análises
 export async function createAnalysisComparison(comparison: AnalysisComparison) {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   // Calcular diff usando função SQL
   const { data: diffData } = await supabase.rpc("calculate_analysis_diff", {
@@ -91,7 +84,7 @@ export async function getAnalysisEvolution(
   startDate?: Date,
   endDate?: Date
 ) {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   let query = supabase
     .from("analysis_evolution")
@@ -118,7 +111,7 @@ export async function exportReport(
   format: "pdf" | "excel" | "json" | "html",
   templateId?: string
 ) {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   let template: ReportTemplate | null = null
 

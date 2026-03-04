@@ -1,2 +1,6 @@
-// Re-exports for backwards compatibility with existing imports from "@/lib/supabase"
+/**
+ * lib/supabase.ts
+ * Re-export de compatibilidade — aponta para SQL Server.
+ */
 export { createClient } from "@/lib/supabase/client"
+export { db as getSupabaseClient } from "@/lib/db/sqlserver"

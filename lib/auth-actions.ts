@@ -1,75 +1,70 @@
 "use server"
 
 import bcrypt from "bcryptjs"
-import { createServerClient } from "@/lib/supabase/server"
+import { db } from "@/lib/db/sqlserver"
 import { cookies } from "next/headers"
 
 /**
- * Server Action para hash de senha
- * Deve ser usado apenas no server-side
+ * Hash de senha com bcrypt (salt 10).
  */
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 10)
 }
 
 /**
- * Server Action para comparar senha com hash
+ * Compara senha em texto plano com hash bcrypt.
  */
 export async function comparePassword(password: string, hash: string): Promise<boolean> {
   return bcrypt.compare(password, hash)
 }
 
 /**
- * Obter usuário atual no server-side (para APIs e Server Components)
- * Mudamos para buscar o email do cookie ao invés de usar Supabase Auth
+ * Obtém o usuário autenticado no server-side a partir do cookie user_email.
  */
 export async function getCurrentUser() {
   try {
-    console.log(" getCurrentUser - Start")
-
     const cookieStore = await cookies()
     const userEmail = cookieStore.get("user_email")?.value
 
-    console.log(" User email from cookie:", userEmail)
-
     if (!userEmail) {
-      console.log(" No user email in cookie")
       return null
     }
 
-    const supabase = await createServerClient()
-
-    // Buscar dados do usuário no banco
-    const { data: user, error: userError } = await supabase
+    const { data: user, error } = await db
       .from("users")
-      .select(`
-        id,
-        email,
-        name,
-        role,
-        client_id,
-        clients(name)
-      `)
+      .select("id, email, name, role, client_id")
       .eq("email", userEmail)
       .single()
 
-    if (userError || !user) {
-      console.error(" Error fetching user:", userError)
+    if (error || !user) {
       return null
     }
 
-    console.log(" User found:", { email: user.email, role: user.role })
+    const u = user as Record<string, unknown>
+
+    // Buscar nome do cliente se existir
+    let clientName: string | null = null
+    if (u.client_id) {
+      const { data: client } = await db
+        .from("clients")
+        .select("name")
+        .eq("id", u.client_id as string)
+        .single()
+      if (client) {
+        clientName = (client as Record<string, unknown>).name as string
+      }
+    }
 
     return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-      client_id: user.client_id,
-      client_name: user.clients?.name || null,
+      id: u.id as string,
+      email: u.email as string,
+      name: u.name as string,
+      role: u.role as string,
+      client_id: u.client_id as string | null,
+      client_name: clientName,
     }
   } catch (error) {
-    console.error(" Error in getCurrentUser:", error)
+    console.error("Error in getCurrentUser:", error)
     return null
   }
 }

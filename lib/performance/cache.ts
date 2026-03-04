@@ -1,12 +1,5 @@
-import { createClient } from "@supabase/supabase-js"
+import { db as supabase } from "@/lib/db/sqlserver"
 import crypto from "crypto"
-
-function getSupabaseClient() {
-  return createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
 
 interface CacheResult {
   cache_id: string
@@ -21,7 +14,7 @@ export async function checkCache(
   branch: string,
   commitSha: string
 ): Promise<CacheResult | null> {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   try {
     const { data, error } = await supabase.rpc("check_analysis_cache", {
@@ -61,7 +54,7 @@ export async function saveToCache(params: {
   clientId: string
   ttlHours?: number
 }): Promise<string | null> {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   try {
     const { data, error } = await supabase.rpc("save_to_cache", {
@@ -90,7 +83,7 @@ export async function saveToCache(params: {
 }
 
 export async function cleanupExpiredCache(): Promise<number> {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   try {
     const { data, error } = await supabase.rpc("cleanup_expired_cache")
@@ -106,7 +99,7 @@ export async function cleanupExpiredCache(): Promise<number> {
 }
 
 export async function getCacheStatistics(): Promise<any> {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   try {
     const { data, error } = await supabase
@@ -125,7 +118,7 @@ export async function getCacheStatistics(): Promise<any> {
 export async function invalidateRepositoryCache(
   repositoryId: string
 ): Promise<boolean> {
-  const supabase = getSupabaseClient()
+  // supabase already bound above
   
   try {
     const { error } = await supabase
