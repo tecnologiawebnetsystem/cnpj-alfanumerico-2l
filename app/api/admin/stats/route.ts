@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createServerClient } from "@/lib/supabase/server"
+import { queryOne } from "@/lib/db/index"
+import { db } from "@/lib/db/sqlserver"
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,55 +11,48 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "user_id required" }, { status: 401 })
     }
 
-    const supabase = await createServerClient()
-
     // Verificar se o usuário é super admin
-    const { data: user } = await supabase.from("users").select("role").eq("id", user_id).single()
+    const user = await queryOne<{ role: string }>(
+      "SELECT role FROM users WHERE id = @id",
+      { id: user_id },
+    )
 
     if (!user || (user.role !== "super_admin" && user.role !== "SUPER_ADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
     }
 
-    // Total de clientes
-    const { count: totalClients } = await supabase.from("clients").select("*", { count: "exact", head: true })
-
-    // Clientes ativos
-    const { count: activeClients } = await supabase
-      .from("clients")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "active")
-
-    // Contando assinaturas ativas ao invés de licenças expiradas
-    const { count: activeSubscriptions } = await supabase
-      .from("subscriptions")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "active")
-
-    // Total de usuários
-    const { count: totalUsers } = await supabase.from("users").select("*", { count: "exact", head: true })
-
-    // Total de repositórios
-    const { count: totalRepositories } = await supabase.from("repositories").select("*", { count: "exact", head: true })
-
-    // Total de análises
-    const { count: totalAnalyses } = await supabase.from("analyses").select("*", { count: "exact", head: true })
-
-    const { count: pendingTasks } = await supabase
-      .from("tasks")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "pending")
+    // Uma única query agrega todos os contadores — elimina 6 round-trips extras
+    const stats = await queryOne<{
+      totalClients: number
+      activeClients: number
+      activeSubscriptions: number
+      totalUsers: number
+      totalRepositories: number
+      totalAnalyses: number
+      pendingTasks: number
+    }>(
+      `SELECT
+        (SELECT COUNT(*) FROM clients)                                       AS totalClients,
+        (SELECT COUNT(*) FROM clients  WHERE status = 'active')             AS activeClients,
+        (SELECT COUNT(*) FROM subscriptions WHERE status = 'active')        AS activeSubscriptions,
+        (SELECT COUNT(*) FROM users)                                         AS totalUsers,
+        (SELECT COUNT(*) FROM repositories)                                  AS totalRepositories,
+        (SELECT COUNT(*) FROM analyses)                                      AS totalAnalyses,
+        (SELECT COUNT(*) FROM tasks WHERE status = 'pending')               AS pendingTasks`,
+    )
 
     return NextResponse.json({
-      totalClients: totalClients || 0,
-      activeClients: activeClients || 0,
-      activeSubscriptions: activeSubscriptions || 0,
-      totalUsers: totalUsers || 0,
-      totalRepositories: totalRepositories || 0,
-      totalAnalyses: totalAnalyses || 0,
-      pendingTasks: pendingTasks || 0,
+      totalClients:        stats?.totalClients        ?? 0,
+      activeClients:       stats?.activeClients       ?? 0,
+      activeSubscriptions: stats?.activeSubscriptions ?? 0,
+      totalUsers:          stats?.totalUsers          ?? 0,
+      totalRepositories:   stats?.totalRepositories   ?? 0,
+      totalAnalyses:       stats?.totalAnalyses       ?? 0,
+      pendingTasks:        stats?.pendingTasks        ?? 0,
     })
-  } catch (error: any) {
-    console.error(" Error loading admin stats:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
+    console.error("Error loading admin stats:", msg)
+    return NextResponse.json({ error: msg }, { status: 500 })
   }
 }

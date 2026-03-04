@@ -1,137 +1,145 @@
-import { db as supabase } from "@/lib/db/sqlserver"
-import crypto from "crypto"
+import { query, queryOne, execute } from "@/lib/db/index"
 
 interface CacheResult {
   cache_id: string
-  findings: any[]
-  tasks: any[]
-  statistics: any
+  findings: unknown[]
+  tasks: unknown[]
+  statistics: unknown
   age_minutes: number
 }
 
+/**
+ * Verifica se existe cache válido para o repositório/branch/commit.
+ */
 export async function checkCache(
   repositoryUrl: string,
   branch: string,
-  commitSha: string
+  commitSha: string,
 ): Promise<CacheResult | null> {
-  // supabase already bound above
-  
   try {
-    const { data, error } = await supabase.rpc("check_analysis_cache", {
-      repository_url_param: repositoryUrl,
-      branch_param: branch,
-      commit_sha_param: commitSha,
-    })
+    const row = await queryOne<CacheResult>(
+      `SELECT TOP 1
+              id             AS cache_id,
+              findings_json  AS findings,
+              tasks_json     AS tasks,
+              statistics     AS statistics,
+              DATEDIFF(MINUTE, created_at, GETUTCDATE()) AS age_minutes
+       FROM   analysis_cache
+       WHERE  repository_url = @url
+         AND  branch         = @branch
+         AND  commit_sha     = @sha
+         AND  expires_at     > GETUTCDATE()`,
+      { url: repositoryUrl, branch, sha: commitSha },
+    )
 
-    if (error) throw error
-
-    if (data && data.length > 0) {
-      console.log(
-        ` Cache HIT: ${repositoryUrl} (age: ${data[0].age_minutes}min)`
-      )
-      return data[0]
+    if (row) {
+      return row
     }
-
-    console.log(` Cache MISS: ${repositoryUrl}`)
     return null
-  } catch (error: any) {
-    console.error(" Error checking cache:", error)
+  } catch {
     return null
   }
 }
 
+/**
+ * Persiste o resultado de uma análise no cache.
+ */
 export async function saveToCache(params: {
   repositoryUrl: string
   repositoryId: string
   branch: string
   commitSha: string
-  findings: any[]
-  tasks: any[]
-  statistics: any
+  findings: unknown[]
+  tasks: unknown[]
+  statistics: unknown
   fileCount: number
   totalSizeKb: number
   analysisDurationMs: number
   clientId: string
   ttlHours?: number
 }): Promise<string | null> {
-  // supabase already bound above
-  
   try {
-    const { data, error } = await supabase.rpc("save_to_cache", {
-      repository_url_param: params.repositoryUrl,
-      repository_id_param: params.repositoryId,
-      branch_param: params.branch,
-      commit_sha_param: params.commitSha,
-      findings_param: params.findings,
-      tasks_param: params.tasks,
-      statistics_param: params.statistics,
-      file_count_param: params.fileCount,
-      total_size_kb_param: params.totalSizeKb,
-      analysis_duration_ms_param: params.analysisDurationMs,
-      client_id_param: params.clientId,
-      ttl_hours: params.ttlHours || 24,
-    })
+    const ttl = params.ttlHours ?? 24
+    const expires = new Date(Date.now() + ttl * 60 * 60 * 1000).toISOString()
+    const id = crypto.randomUUID()
 
-    if (error) throw error
+    await execute(
+      `INSERT INTO analysis_cache
+         (id, repository_id, repository_url, branch, commit_sha,
+          findings_json, tasks_json, statistics,
+          file_count, total_size_kb, analysis_duration_ms,
+          client_id, expires_at, created_at)
+       VALUES
+         (@id, @repoId, @url, @branch, @sha,
+          @findings, @tasks, @stats,
+          @fileCount, @sizeKb, @durationMs,
+          @clientId, @expires, GETUTCDATE())`,
+      {
+        id,
+        repoId:     params.repositoryId,
+        url:        params.repositoryUrl,
+        branch:     params.branch,
+        sha:        params.commitSha,
+        findings:   JSON.stringify(params.findings),
+        tasks:      JSON.stringify(params.tasks),
+        stats:      JSON.stringify(params.statistics),
+        fileCount:  params.fileCount,
+        sizeKb:     params.totalSizeKb,
+        durationMs: params.analysisDurationMs,
+        clientId:   params.clientId,
+        expires,
+      },
+    )
 
-    console.log(` Saved to cache: ${params.repositoryUrl}`)
-    return data
-  } catch (error: any) {
-    console.error(" Error saving to cache:", error)
+    return id
+  } catch {
     return null
   }
 }
 
+/**
+ * Remove entradas de cache expiradas. Retorna a quantidade deletada.
+ */
 export async function cleanupExpiredCache(): Promise<number> {
-  // supabase already bound above
-  
   try {
-    const { data, error } = await supabase.rpc("cleanup_expired_cache")
-
-    if (error) throw error
-
-    console.log(` Cleaned up ${data} expired cache entries`)
-    return data
-  } catch (error: any) {
-    console.error(" Error cleaning cache:", error)
+    return await execute(
+      "DELETE FROM analysis_cache WHERE expires_at <= GETUTCDATE()",
+    )
+  } catch {
     return 0
   }
 }
 
-export async function getCacheStatistics(): Promise<any> {
-  // supabase already bound above
-  
+/**
+ * Estatísticas do cache.
+ */
+export async function getCacheStatistics(): Promise<unknown> {
   try {
-    const { data, error } = await supabase
-      .from("cache_statistics")
-      .select("*")
-      .single()
-
-    if (error) throw error
-    return data
-  } catch (error: any) {
-    console.error(" Error getting cache statistics:", error)
+    return await queryOne(
+      `SELECT
+        COUNT(*)                                                             AS total_entries,
+        SUM(CASE WHEN expires_at > GETUTCDATE() THEN 1 ELSE 0 END)         AS active_entries,
+        SUM(CASE WHEN expires_at <= GETUTCDATE() THEN 1 ELSE 0 END)        AS expired_entries,
+        AVG(analysis_duration_ms)                                           AS avg_duration_ms,
+        SUM(total_size_kb)                                                  AS total_size_kb
+       FROM analysis_cache`,
+    )
+  } catch {
     return null
   }
 }
 
-export async function invalidateRepositoryCache(
-  repositoryId: string
-): Promise<boolean> {
-  // supabase already bound above
-  
+/**
+ * Invalida todo o cache de um repositório específico.
+ */
+export async function invalidateRepositoryCache(repositoryId: string): Promise<boolean> {
   try {
-    const { error } = await supabase
-      .from("analysis_cache")
-      .delete()
-      .eq("repository_id", repositoryId)
-
-    if (error) throw error
-
-    console.log(` Invalidated cache for repository: ${repositoryId}`)
+    await execute(
+      "DELETE FROM analysis_cache WHERE repository_id = @repoId",
+      { repoId: repositoryId },
+    )
     return true
-  } catch (error: any) {
-    console.error(" Error invalidating cache:", error)
+  } catch {
     return false
   }
 }

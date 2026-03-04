@@ -1,4 +1,5 @@
 import { db as supabase } from "@/lib/db/sqlserver"
+import { queryOne } from "@/lib/db/index"
 
 export interface ReportTemplate {
   id?: string
@@ -57,20 +58,18 @@ export async function getReportTemplates(userId: string, clientId?: string) {
 
 // Criar comparação de análises
 export async function createAnalysisComparison(comparison: AnalysisComparison) {
-  // supabase already bound above
-  
-  // Calcular diff usando função SQL
-  const { data: diffData } = await supabase.rpc("calculate_analysis_diff", {
-    base_id: comparison.base_analysis_id,
-    compare_id: comparison.compare_analysis_id,
-  })
+  // Calcular diff: conta findings novos vs removidos vs mantidos entre as duas análises
+  const diffData = await queryOne<unknown>(
+    `SELECT
+       (SELECT COUNT(*) FROM findings WHERE analysis_id = @base)    AS base_count,
+       (SELECT COUNT(*) FROM findings WHERE analysis_id = @compare) AS compare_count
+     `,
+    { base: comparison.base_analysis_id, compare: comparison.compare_analysis_id },
+  )
 
   const { data, error } = await supabase
     .from("analysis_comparisons")
-    .insert({
-      ...comparison,
-      diff_summary: diffData,
-    })
+    .insert({ ...comparison, diff_summary: JSON.stringify(diffData) })
     .select()
     .single()
 

@@ -2,6 +2,7 @@
 
 import bcrypt from "bcryptjs"
 import { db } from "@/lib/db/sqlserver"
+import { queryOne } from "@/lib/db/index"
 import { cookies } from "next/headers"
 
 /**
@@ -20,48 +21,33 @@ export async function comparePassword(password: string, hash: string): Promise<b
 
 /**
  * Obtém o usuário autenticado no server-side a partir do cookie user_email.
+ * Usa uma única query com LEFT JOIN em clients para evitar round-trip extra.
  */
 export async function getCurrentUser() {
   try {
     const cookieStore = await cookies()
     const userEmail = cookieStore.get("user_email")?.value
 
-    if (!userEmail) {
-      return null
-    }
+    if (!userEmail) return null
 
-    const { data: user, error } = await db
-      .from("users")
-      .select("id, email, name, role, client_id")
-      .eq("email", userEmail)
-      .single()
+    const row = await queryOne<Record<string, unknown>>(
+      `SELECT u.id, u.email, u.name, u.role, u.client_id,
+              c.name AS client_name
+       FROM   users u
+       LEFT JOIN clients c ON c.id = u.client_id
+       WHERE  u.email = @email`,
+      { email: userEmail },
+    )
 
-    if (error || !user) {
-      return null
-    }
-
-    const u = user as Record<string, unknown>
-
-    // Buscar nome do cliente se existir
-    let clientName: string | null = null
-    if (u.client_id) {
-      const { data: client } = await db
-        .from("clients")
-        .select("name")
-        .eq("id", u.client_id as string)
-        .single()
-      if (client) {
-        clientName = (client as Record<string, unknown>).name as string
-      }
-    }
+    if (!row) return null
 
     return {
-      id: u.id as string,
-      email: u.email as string,
-      name: u.name as string,
-      role: u.role as string,
-      client_id: u.client_id as string | null,
-      client_name: clientName,
+      id:          row.id          as string,
+      email:       row.email       as string,
+      name:        row.name        as string,
+      role:        row.role        as string,
+      client_id:   row.client_id   as string | null,
+      client_name: row.client_name as string | null,
     }
   } catch (error) {
     console.error("Error in getCurrentUser:", error)
