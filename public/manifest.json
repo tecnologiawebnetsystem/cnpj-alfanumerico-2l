@@ -1,12 +1,12 @@
 {
-  "name": "CNPJ Alfanumérico - ACT Digital",
+  "name": "CNPJ Alfanumérico - WebNetSystem",
   "short_name": "CNPJ App",
   "description": "Solução completa para migração de CNPJ alfanumérico com IA",
   "start_url": "/login",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#0052CC",
-  "theme_color": "#0052CC",
+  "background_color": "#CC1F1F",
+  "theme_color": "#CC1F1F",
   "orientation": "portrait-primary",
   "icons": [
     {

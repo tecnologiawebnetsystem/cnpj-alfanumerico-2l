@@ -10,7 +10,7 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const viewport: Viewport = {
-  themeColor: "#0052CC",
+  themeColor: "#CC1F1F",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -18,9 +18,9 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: "ACT Digital - Reforma Tributaria 2026 | Solucoes para sua Empresa",
+  title: "WebNetSystem - Reforma Tributaria 2026 | Solucoes para sua Empresa",
   description:
-    "A reforma tributaria esta chegando e a ACT Digital ajuda voce a passar por ela com seguranca. Entenda IBS, CBS, o periodo de transicao e como preparar sua empresa.",
+    "A reforma tributaria esta chegando e a WebNetSystem ajuda voce a passar por ela com seguranca. Entenda IBS, CBS, o periodo de transicao e como preparar sua empresa.",
   generator: "v0.app",
   manifest: "/manifest.json",
   appleWebApp: {

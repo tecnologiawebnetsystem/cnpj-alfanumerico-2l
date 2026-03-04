@@ -59,7 +59,7 @@ export function SiteHeader() {
             <div className="rounded-xl overflow-hidden shadow-sm border border-border">
               <Image
                 src="/images/act-logo-horizontal.jpeg"
-                alt="ACT Digital"
+                alt="WebNetSystem"
                 width={110}
                 height={44}
                 className="object-cover"

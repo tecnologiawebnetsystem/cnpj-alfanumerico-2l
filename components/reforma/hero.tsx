@@ -24,7 +24,7 @@ export function ReformaHero() {
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto text-balance leading-relaxed mb-10">
             A reforma tributaria esta chegando e a{" "}
-            <span className="font-semibold text-foreground">ACT Digital</span> ajuda voce a passar por ela com
+            <span className="font-semibold text-foreground">WebNetSystem</span> ajuda voce a passar por ela com
             seguranca. Entenda os novos impostos, o periodo de transicao e como preparar sua empresa.
           </p>
 

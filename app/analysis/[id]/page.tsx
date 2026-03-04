@@ -653,7 +653,7 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
               <div className="flex items-center gap-3">
                 <Image
                   src="/images/act-logo-square.jfif"
-                  alt="ACT Digital"
+                  alt="WebNetSystem"
                   width={40}
                   height={40}
                   className="rounded-md"

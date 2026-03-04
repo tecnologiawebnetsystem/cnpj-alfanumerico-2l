@@ -156,7 +156,7 @@ export function SplitPaymentInspectorContent() {
         },
       ]}
       ctaTitle="Seu fluxo de caixa vai mudar. Prepare-se."
-      ctaDescription="O split payment muda fundamentalmente como sua empresa recebe e paga. O Split Payment Inspector da ACT Digital mapeia todos os impactos e gera o codigo de adaptacao."
+      ctaDescription="O split payment muda fundamentalmente como sua empresa recebe e paga. O Split Payment Inspector da WebNetSystem mapeia todos os impactos e gera o codigo de adaptacao."
     />
   )
 }
