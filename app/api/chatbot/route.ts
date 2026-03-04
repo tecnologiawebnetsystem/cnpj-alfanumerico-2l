@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { db as supabase } from "@/lib/db/sqlserver"
+import { getCurrentUser } from "@/lib/auth-actions"
 
-export const runtime = "edge"
 export const dynamic = "force-dynamic"
 
 // Intent types for chatbot
@@ -69,23 +69,13 @@ function extractTaskId(message: string): string | null {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    
-    // Get authenticated user
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    if (!user) {
+    const userData = await getCurrentUser()
+
+    if (!userData) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Get user details with client_id
-    const { data: userData } = await supabase
-      .from("users")
-      .select("id, name, email, role, client_id")
-      .eq("id", user.id)
-      .single()
-    
-    if (!userData || !userData.client_id) {
+    if (!userData.client_id) {
       return NextResponse.json({ error: "User profile not found" }, { status: 404 })
     }
 
@@ -287,31 +277,27 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    
-    // Get authenticated user
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    if (!user) {
+    const userData = await getCurrentUser()
+
+    if (!userData) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const { searchParams } = new URL(request.url)
     const sessionId = searchParams.get("sessionId")
-    
-    // Get chat history
+
     const { data: history } = await supabase
       .from("ai_chat_history")
       .select("*")
-      .eq("user_id", user.id)
+      .eq("user_id", userData.id)
       .eq("session_id", sessionId)
       .order("created_at", { ascending: true })
       .limit(50)
-    
+
     return NextResponse.json({ history: history || [] })
-    
+
   } catch (error: any) {
-    console.error(" Chatbot history error:", error)
+    console.error("Chatbot history error:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
