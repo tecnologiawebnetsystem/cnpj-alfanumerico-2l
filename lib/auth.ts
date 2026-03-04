@@ -1,17 +1,3 @@
-import { getSupabaseClient } from "@/lib/supabase"
-
-// Criar cliente Supabase
-function getSupabaseBrowserClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return null
-  }
-
-  return getSupabaseClient(supabaseUrl, supabaseAnonKey)
-}
-
 export interface User {
   id: string
   email: string
@@ -31,19 +17,12 @@ export interface AuthResponse {
 // Login com email e senha
 export async function login(email: string, password: string): Promise<AuthResponse & { sessionToken?: string }> {
   try {
-    console.log("[v0] === LOGIN START ===")
-    console.log("[v0] Email:", email)
-
     const response = await fetch("/api/auth/login", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
-      credentials: "include", // Include cookies in request
+      credentials: "include",
     })
-
-    console.log("[v0] Response status:", response.status)
 
     if (!response.ok) {
       const result = await response.json()
@@ -51,14 +30,12 @@ export async function login(email: string, password: string): Promise<AuthRespon
     }
 
     const result = await response.json()
-    console.log("[v0] Response body parsed:", result)
 
     if (result.success && result.user) {
       localStorage.setItem("user", JSON.stringify(result.user))
 
       if (result.sessionToken) {
         localStorage.setItem("sessionToken", result.sessionToken)
-
         const cookieValue = btoa(
           JSON.stringify({
             userId: result.user.id,
@@ -68,16 +45,13 @@ export async function login(email: string, password: string): Promise<AuthRespon
           }),
         )
         document.cookie = `session_token=${cookieValue}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`
-        console.log("[v0] Session token saved to cookie")
       }
 
-      console.log("[v0] === LOGIN END - SUCCESS ===")
       return { success: true, user: result.user, sessionToken: result.sessionToken }
     }
 
     return { success: false, error: result.error || "Credenciais inválidas" }
   } catch (error) {
-    console.error("[v0] === LOGIN EXCEPTION ===", error)
     return {
       success: false,
       error: error instanceof Error ? error.message : "Erro ao fazer login",
