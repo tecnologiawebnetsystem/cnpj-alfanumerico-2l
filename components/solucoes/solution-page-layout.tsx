@@ -185,7 +185,7 @@ export function SolutionPageLayout({
               O que a solucao oferece
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-balance">
-              Recursos completos desenvolvidos pela ACT Digital para garantir conformidade total
+              Recursos completos desenvolvidos pela WebNetSystem para garantir conformidade total
             </p>
           </div>
 
@@ -357,7 +357,7 @@ export function SolutionPageLayout({
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4" />
-                <span>ACT Digital</span>
+                <span>WebNetSystem</span>
               </div>
             </div>
           </div>
@@ -369,7 +369,7 @@ export function SolutionPageLayout({
         <div className="container mx-auto px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              2025 ACT Digital. Todos os direitos reservados.
+              2025 WebNetSystem. Todos os direitos reservados.
             </p>
             <div className="flex items-center gap-6">
               <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">

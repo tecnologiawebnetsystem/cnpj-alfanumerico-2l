@@ -9,11 +9,11 @@ export function CTAAct() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6 text-balance">
-              A reforma tributaria esta chegando e a ACT Digital ajuda voce a passar por ela com seguranca
+              A reforma tributaria esta chegando e a WebNetSystem ajuda voce a passar por ela com seguranca
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed max-w-3xl mx-auto">
               A reforma tributaria pode assustar, mas voce nao precisa enfrentar essa transicao sozinho. Com as solucoes
-              da ACT Digital, a adaptacao se torna muito mais simples.
+              da WebNetSystem, a adaptacao se torna muito mais simples.
             </p>
           </div>
 
@@ -71,7 +71,7 @@ export function CTAAct() {
 
           <div className="text-center">
             <p className="text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
-              Com a ACT Digital, voce ganha tranquilidade para focar no crescimento enquanto nossas solucoes cuidam da
+              Com a WebNetSystem, voce ganha tranquilidade para focar no crescimento enquanto nossas solucoes cuidam da
               complexidade tributaria. Explore nossas ferramentas e veja como sua rotina pode ficar muito mais leve.
             </p>
           </div>

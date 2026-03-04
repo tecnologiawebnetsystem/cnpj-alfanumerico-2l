@@ -5,7 +5,7 @@ export function Logo({ className = "" }: { className?: string }) {
     <div className={`flex items-center gap-2 ${className}`}>
       <Image
         src="/images/image.png"
-        alt="CNPJ Detector by ACT Digital"
+        alt="CNPJ Detector by WebNetSystem"
         width={200}
         height={60}
         className="h-auto w-auto max-h-[40px]"
@@ -20,7 +20,7 @@ export function LogoIcon({ className = "" }: { className?: string }) {
     <div className={`flex items-center gap-2 ${className}`}>
       <Image
         src="/images/image.png"
-        alt="ACT Digital - CNPJ Detector"
+        alt="WebNetSystem - CNPJ Detector"
         width={200}
         height={60}
         className="h-auto w-auto"

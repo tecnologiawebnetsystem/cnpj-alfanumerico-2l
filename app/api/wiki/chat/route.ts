@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { generateText } from "ai"
 
 const WIKI_CONTEXT = `
-Você é um assistente IA especializado no sistema CNPJ Alfanumérico da ACT Digital.
+Você é um assistente IA especializado no sistema CNPJ Alfanumérico da WebNetSystem.
 Responda APENAS perguntas sobre este sistema. Se a pergunta não for relacionada, diga educadamente que só pode responder sobre o sistema CNPJ Alfanumérico.
 
 INFORMAÇÕES DO SISTEMA:

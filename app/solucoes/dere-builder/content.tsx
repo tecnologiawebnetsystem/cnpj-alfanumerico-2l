@@ -156,7 +156,7 @@ export function DereBuilderContent() {
         },
       ]}
       ctaTitle="Antecipe-se aos novos leiautes"
-      ctaDescription="A Receita Federal esta construindo os leiautes da DeRE. O DeRE Builder da ACT Digital ajuda sua empresa a se preparar antes da obrigatoriedade, mapeando dados e configurando regras."
+      ctaDescription="A Receita Federal esta construindo os leiautes da DeRE. O DeRE Builder da WebNetSystem ajuda sua empresa a se preparar antes da obrigatoriedade, mapeando dados e configurando regras."
     />
   )
 }

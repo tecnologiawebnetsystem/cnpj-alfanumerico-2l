@@ -186,7 +186,7 @@ export async function POST(req: NextRequest) {
     // Construir historico
     const historyText = history?.map((m: any) => `${m.role === "user" ? "Usuario" : "Assistente"}: ${m.content}`).join("\n") || ""
 
-    const systemPrompt = `Voce e um assistente IA especializado em analise de CNPJ alfanumerico para o sistema ACT Digital.
+    const systemPrompt = `Voce e um assistente IA especializado em analise de CNPJ alfanumerico para o sistema WebNetSystem.
 
 CONTEXTO:${contextData}
 

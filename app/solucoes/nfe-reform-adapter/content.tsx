@@ -155,7 +155,7 @@ export function NfeReformAdapterContent() {
         },
       ]}
       ctaTitle="Prepare seus documentos fiscais para a reforma"
-      ctaDescription="Nao espere a rejeicao da primeira nota. O NF-e Reform Adapter da ACT Digital escaneia seu codigo, identifica todas as alteracoes e gera o codigo corrigido automaticamente."
+      ctaDescription="Nao espere a rejeicao da primeira nota. O NF-e Reform Adapter da WebNetSystem escaneia seu codigo, identifica todas as alteracoes e gera o codigo corrigido automaticamente."
     />
   )
 }

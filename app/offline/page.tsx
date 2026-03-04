@@ -32,7 +32,7 @@ export default function OfflinePage() {
         </div>
         
         <p className="text-slate-500 text-sm">
-          CNPJ Alfanumerico - ACT Digital
+          CNPJ Alfanumerico - WebNetSystem
         </p>
       </div>
     </div>

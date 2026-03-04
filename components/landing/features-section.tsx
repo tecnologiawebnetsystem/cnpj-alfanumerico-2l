@@ -147,10 +147,10 @@ export function FeaturesSection() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-5xl md:text-6xl font-bold mb-6 text-balance bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent">
-            Por que escolher a solução da ACT Digital?
+            Por que escolher a solução da WebNetSystem?
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-balance">
-            Criada pela <span className="font-bold text-primary">ACT Digital</span>, líder em transformação digital há
+            Criada pela <span className="font-bold text-primary">WebNetSystem</span>, líder em transformação digital há
             mais de 13 anos com mais de 100 clientes no Brasil e presença em 12 países
           </p>
         </div>

@@ -50,7 +50,7 @@ export default function AdminClientPage() {
             <div className="flex items-center gap-4">
               <Image
                 src="/images/act-logo-square.jfif"
-                alt="ACT Digital"
+                alt="WebNetSystem"
                 width={48}
                 height={48}
                 className="rounded-xl shadow-lg"

@@ -10,7 +10,7 @@ export function ReformaFooter() {
             <div className="mb-4 rounded-xl overflow-hidden w-fit border border-border">
               <Image
                 src="/images/act-logo-horizontal.jpeg"
-                alt="ACT Digital"
+                alt="WebNetSystem"
                 width={100}
                 height={40}
                 className="object-cover"
@@ -73,7 +73,7 @@ export function ReformaFooter() {
 
         <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
           <p>
-            &copy; {new Date().getFullYear()} ACT Digital. Todos os direitos reservados.
+            &copy; {new Date().getFullYear()} WebNetSystem. Todos os direitos reservados.
           </p>
           <p className="mt-2 text-xs">
             Empresa especializada em transformacao digital e adequacao tributaria para o mercado brasileiro.

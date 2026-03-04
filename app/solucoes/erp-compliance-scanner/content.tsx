@@ -156,7 +156,7 @@ export function ErpComplianceScannerContent() {
         },
       ]}
       ctaTitle="Descubra se seu ERP esta pronto"
-      ctaDescription="Nao espere o dia 1 da reforma para descobrir que seu ERP precisa de upgrade. O ERP Compliance Scanner da ACT Digital faz o diagnostico completo em 48 horas."
+      ctaDescription="Nao espere o dia 1 da reforma para descobrir que seu ERP precisa de upgrade. O ERP Compliance Scanner da WebNetSystem faz o diagnostico completo em 48 horas."
     />
   )
 }

@@ -254,7 +254,7 @@ export default function AnalyzerPage() {
             <div className="flex items-center gap-3">
               <Image
                 src="/images/image.png"
-                alt="CNPJ Detector by ACT Digital"
+                alt="CNPJ Detector by WebNetSystem"
                 width={200}
                 height={60}
                 className="h-auto w-auto max-h-[40px]"
